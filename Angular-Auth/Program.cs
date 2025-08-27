@@ -14,6 +14,7 @@ var configuration = builder.Configuration;
 builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
 
 builder.Services.AddControllers();
+builder.Services.AddLogging();
 
 // DbContext
 builder.Services.AddDbContext<AppDbContext>(options =>
