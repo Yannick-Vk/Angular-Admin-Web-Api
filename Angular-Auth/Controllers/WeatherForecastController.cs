@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Angular_Auth.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("/api/v1/weather")]
 public class WeatherForecastController(ILogger<WeatherForecastController> logger) : ControllerBase {
