@@ -1,4 +1,5 @@
-﻿using Angular_Auth.Models;
+﻿using Angular_Auth.Dto;
+using Angular_Auth.Models;
 using Angular_Auth.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -10,7 +11,7 @@ namespace Angular_Auth.Controllers;
 [Route("/api/v1/users")]
 public class UserController(IUserService service) : ControllerBase {
     [HttpGet]
-    public async Task<List<User>> GetUsers() {
+    public async Task<List<UserDto>> GetUsers() {
         return await service.GetUsers();
     }
 }
