@@ -11,7 +11,7 @@ using Microsoft.OpenApi.Models;
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
 
-builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
+builder.Services.AddTransient<IAuthenticationService, AuthenticationService>();
 
 builder.Services.AddControllers();
 builder.Services.AddLogging();
