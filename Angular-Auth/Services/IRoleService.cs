@@ -7,4 +7,5 @@ public interface IRoleService {
     Task AddRole(Role role);
     Task<IEnumerable<IdentityRole>> GetAllRoles();
     Task<IdentityResult> DeleteRole(string roleName);
+    Task AddRoleToUser(string roleName, string userName);
 }

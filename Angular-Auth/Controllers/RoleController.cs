@@ -31,4 +31,9 @@ public class RoleController(ILogger<RoleController> logger, IRoleService service
         result.Errors.ToList().ForEach(error => logger.LogError("[{code}]: {msg}",  error.Code, error.Description));
         return BadRequest(result.Errors.FirstOrDefault());
     }
+
+    [HttpGet("add-to-user")]
+    public async Task AddUserToRole(AddRoleToUserDto dto) {
+        await service.AddRoleToUser(dto.RoleName, dto.Username);
+    }
 }
