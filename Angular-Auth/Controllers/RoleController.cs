@@ -29,6 +29,6 @@ public class RoleController(ILogger<RoleController> logger, IRoleService service
         }
 
         result.Errors.ToList().ForEach(error => logger.LogError("[{code}]: {msg}",  error.Code, error.Description));
-        return BadRequest();
+        return BadRequest(result.Errors.FirstOrDefault());
     }
 }

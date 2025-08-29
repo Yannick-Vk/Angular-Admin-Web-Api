@@ -18,7 +18,10 @@ public class RoleService(RoleManager<IdentityRole> manager, ILogger<RoleService>
 
     public async Task<IdentityResult> DeleteRole(string roleName) {
         var role = await manager.Roles.FirstOrDefaultAsync(r => r.Name == roleName);
-        if (role is null) return IdentityResult.Failed();
+        if (role is null) return IdentityResult.Failed(new IdentityError {
+            Code = "Not found",
+            Description = $"Cannot find role with the given name `{roleName}`"
+        });
         var result = await manager.DeleteAsync(role);
         return result;
     }
