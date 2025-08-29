@@ -12,6 +12,7 @@ var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
 
 builder.Services
+    .AddLogging()
     .AddTransient<IAuthenticationService, AuthenticationService>()
     .AddTransient<IUserService, UserService>()
     .AddTransient<IRoleService, RoleService>();

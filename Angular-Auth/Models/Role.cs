@@ -2,6 +2,4 @@
 
 namespace Angular_Auth.Models;
 
-public class Role : IdentityRole {
-    
-}
+public class Role(string roleName) : IdentityRole(roleName);

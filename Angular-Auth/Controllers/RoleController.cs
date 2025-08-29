@@ -1,4 +1,5 @@
-﻿using Angular_Auth.Models;
+﻿using Angular_Auth.Dto;
+using Angular_Auth.Models;
 using Angular_Auth.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -16,7 +17,7 @@ public class RoleController(IRoleService service) : Controller {
     }
 
     [HttpPost]
-    public async Task AddRole(string roleName) {
-        await service.AddRole(roleName);
+    public async Task AddRole(AddRoleDto role) {
+        await service.AddRole(new Role(role.roleName) );
     }
 }
