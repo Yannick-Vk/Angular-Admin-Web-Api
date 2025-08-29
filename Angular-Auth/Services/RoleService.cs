@@ -15,4 +15,11 @@ public class RoleService(RoleManager<IdentityRole> manager, ILogger<RoleService>
             .AsNoTracking()
             .ToListAsync();
     }
+
+    public async Task<IdentityResult> DeleteRole(string roleName) {
+        var role = await manager.Roles.FirstOrDefaultAsync(r => r.Name == roleName);
+        if (role is null) return IdentityResult.Failed();
+        var result = await manager.DeleteAsync(role);
+        return result;
+    }
 }
