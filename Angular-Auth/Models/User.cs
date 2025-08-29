@@ -2,4 +2,4 @@
 
 namespace Angular_Auth.Models;
 
-public class User : IdentityUser { }
+public class User : IdentityUser;

@@ -43,7 +43,7 @@ builder.Services.AddAuthentication(options => {
         throw new ArgumentException("JWT:Secret is not configured.");
     }
 
-    options.TokenValidationParameters = new TokenValidationParameters() {
+    options.TokenValidationParameters = new TokenValidationParameters {
         ValidateIssuer = true,
         ValidateAudience = true,
         ValidAudience = configuration["JWT:ValidAudience"],
@@ -58,16 +58,18 @@ builder.Services.AddOpenApi();
 builder.Services.AddSwaggerGen(c => {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "Wedding Planner API", Version = "v1" });
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme {
-        Description = @"JWT Authorization header using the Bearer scheme. \r\n\r\n 
-                      Enter 'Bearer' [space] and then your token in the text input below.
-                      \r\n\r\nExample: 'Bearer 12345abcdef'",
+        Description = """
+                      JWT Authorization header using the Bearer scheme. \r\n\r\n 
+                                            Enter 'Bearer' [space] and then your token in the text input below.
+                                            \r\n\r\nExample: 'Bearer xxxxxxx'
+                      """,
         Name = "Authorization",
         In = ParameterLocation.Header,
         Type = SecuritySchemeType.ApiKey,
         Scheme = "Bearer"
     });
 
-    c.AddSecurityRequirement(new OpenApiSecurityRequirement() {
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement {
         {
             new OpenApiSecurityScheme {
                 Reference = new OpenApiReference {

@@ -1,5 +1,4 @@
 ﻿using Angular_Auth.Dto;
-using Angular_Auth.Models;
 using Angular_Auth.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

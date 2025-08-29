@@ -4,4 +4,4 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Angular_Auth.Repositories;
 
-public class AppDbContext(DbContextOptions options) : IdentityDbContext<User>(options) { }
+public class AppDbContext(DbContextOptions options) : IdentityDbContext<User>(options);
