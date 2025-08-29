@@ -11,8 +11,10 @@ using Microsoft.OpenApi.Models;
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
 
-builder.Services.AddTransient<IAuthenticationService, AuthenticationService>();
-builder.Services.AddTransient<IUserService, UserService>();
+builder.Services
+    .AddTransient<IAuthenticationService, AuthenticationService>()
+    .AddTransient<IUserService, UserService>()
+    .AddTransient<IRoleService, RoleService>();
 
 builder.Services.AddControllers();
 builder.Services.AddLogging();
