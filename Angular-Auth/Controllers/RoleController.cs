@@ -14,4 +14,9 @@ public class RoleController(IRoleService service) : Controller {
     public async Task<List<IdentityRole>> GetRoles() {
         return (await service.GetAllRoles()).ToList();
     }
+
+    [HttpPost]
+    public async Task AddRole(string roleName) {
+        await service.AddRole(roleName);
+    }
 }
