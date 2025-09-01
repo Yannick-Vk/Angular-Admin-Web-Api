@@ -38,6 +38,13 @@ public class RoleService(ILogger<RoleService> logger, RoleManager<IdentityRole> 
         await userManager.AddToRoleAsync(user, roleName);
     }
 
+    public async Task RemoveRoleFromUser(string roleName, string userName) {
+        var user = await userManager.Users.FirstOrDefaultAsync(u => u.UserName == userName);
+        if (user is null) throw new ArgumentException($"user with name `{userName}` doesn't exist`");
+        
+        await userManager.RemoveFromRoleAsync(user, roleName);
+    }
+
     public async Task<IEnumerable<UserDto>> GetUsersWithRole(string roleName) {
         return (await userManager.GetUsersInRoleAsync(roleName)).Select(user => new UserDto(user));
     }

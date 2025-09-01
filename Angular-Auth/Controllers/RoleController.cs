@@ -33,8 +33,13 @@ public class RoleController(ILogger<RoleController> logger, IRoleService service
     }
 
     [HttpPost("add-to-user")]
-    public async Task AddUserToRole(AddRoleToUserDto dto) {
+    public async Task AddUserToRole(UserAndRoleDto dto) {
         await service.AddRoleToUser(dto.RoleName, dto.Username);
+    }
+    
+    [HttpPost("remove-from-user")]
+    public async Task RemoveRoleFromUser(UserAndRoleDto dto) {
+        await service.RemoveRoleFromUser(dto.RoleName, dto.Username);
     }
 
     [HttpGet("{roleName}")]
