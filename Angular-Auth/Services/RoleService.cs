@@ -7,9 +7,14 @@ namespace Angular_Auth.Services;
 
 public class RoleService(ILogger<RoleService> logger, RoleManager<IdentityRole> manager, UserManager<User> userManager) : IRoleService {
 
-    public async Task<User> GetUser(string userName) {
+    private async Task<User> GetUser(string userName) {
         var user = await userManager.Users.FirstOrDefaultAsync(u => u.UserName == userName);
         return user ?? throw new ArgumentException($"user with name `{userName}` doesn't exist`");
+    }
+
+    private async Task<IdentityRole> GetRole(string roleName) {
+        var role = await manager.Roles.FirstOrDefaultAsync(r => r.Name == roleName);
+        return role ?? throw new ArgumentException($"role with name `{roleName}` doesn't exist`");
     }
     
     public async Task AddRole(Role role) {
@@ -33,9 +38,7 @@ public class RoleService(ILogger<RoleService> logger, RoleManager<IdentityRole> 
     }
 
     public async Task AddRoleToUser(string roleName, string userName) {
-        var role = await manager.Roles.FirstOrDefaultAsync(r => r.Name == roleName);
-        if (role is null) throw new ArgumentException($"role with name `{roleName}` doesn't exist`");
-        
+        await GetRole(roleName);
         var user = await GetUser(userName);
         
         logger.LogInformation("Adding role `{RoleName}` to user `{UserName}`", roleName, userName);
