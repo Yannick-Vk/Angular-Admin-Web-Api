@@ -1,10 +1,11 @@
-﻿using Angular_Auth.Models;
+﻿using Angular_Auth.Dto;
+using Angular_Auth.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace Angular_Auth.Services;
 
-public class RoleService(RoleManager<IdentityRole> manager, UserManager<User> userManager) : IRoleService {
+public class RoleService(ILogger<RoleService> logger, RoleManager<IdentityRole> manager, UserManager<User> userManager) : IRoleService {
     public async Task AddRole(Role role) {
         await manager.CreateAsync(role);
     }
@@ -32,6 +33,12 @@ public class RoleService(RoleManager<IdentityRole> manager, UserManager<User> us
         var user = await userManager.Users.FirstOrDefaultAsync(u => u.UserName == userName);
         if (user is null)  throw new ArgumentException($"user with name `{userName}` doesn't exist`");
         
+        logger.LogInformation("Adding role `{RoleName}` to user `{UserName}`", roleName, userName);
+        
         await userManager.AddToRoleAsync(user, roleName);
+    }
+
+    public async Task<IEnumerable<UserDto>> GetUsersWithRole(string roleName) {
+        return (await userManager.GetUsersInRoleAsync(roleName)).Select(user => new UserDto(user));
     }
 }

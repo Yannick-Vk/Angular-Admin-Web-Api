@@ -32,8 +32,14 @@ public class RoleController(ILogger<RoleController> logger, IRoleService service
         return BadRequest(result.Errors.FirstOrDefault());
     }
 
-    [HttpGet("add-to-user")]
+    [HttpPost("add-to-user")]
     public async Task AddUserToRole(AddRoleToUserDto dto) {
         await service.AddRoleToUser(dto.RoleName, dto.Username);
+    }
+
+    [HttpGet("{roleName}")]
+    public async Task<List<UserDto>> GetUserWithRole(string roleName) {
+        var users = await service.GetUsersWithRole(roleName);
+        return users.ToList();
     }
 }
