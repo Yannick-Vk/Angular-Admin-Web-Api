@@ -7,11 +7,14 @@ namespace Angular_Auth.Services;
 
 public class UserService(UserManager<User> manager) : IUserService {
     public async Task<List<UserDto>> GetUsers() {
-        var users = await manager.Users.Select(user => new UserDto {
-            Id = user.Id.ToString(),
-            Username = user.UserName,
-            Email = user.Email
-        }).ToListAsync();
+        var users = await manager.Users
+            .Select(user => new UserDto(user))
+            .ToListAsync();
         return users;
+    }
+
+    public async Task<UserDto?> GetUser(string username) {
+        var user = await manager.Users.FirstOrDefaultAsync(u => u.UserName == username);
+        return new UserDto(user);
     }
 }

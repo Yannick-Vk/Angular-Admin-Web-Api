@@ -12,4 +12,5 @@ public interface IRoleService {
     Task RemoveRoleFromUser(string roleName, string userName);
     Task<IEnumerable<UserDto>> GetUsersWithRole(string roleName);
     Task<bool> UserHasRole(string roleName, string userName);
+    Task<IEnumerable<string>> GetRolesFromUser(string username);
 }

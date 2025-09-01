@@ -60,4 +60,10 @@ public class RoleService(ILogger<RoleService> logger, RoleManager<IdentityRole> 
         var user = await GetUser(userName);
         return await userManager.IsInRoleAsync(user, roleName);
     }
+
+    public async Task<IEnumerable<string>> GetRolesFromUser(string username) {
+        var user = await GetUser(username);
+        var roles = await userManager.GetRolesAsync(user);
+        return roles;
+    }
 }
