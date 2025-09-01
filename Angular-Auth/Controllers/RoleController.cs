@@ -47,4 +47,9 @@ public class RoleController(ILogger<RoleController> logger, IRoleService service
         var users = await service.GetUsersWithRole(roleName);
         return users.ToList();
     }
+    
+    [HttpGet("{roleName}/{username}")]
+    public async Task<bool> UserHasRole(string roleName, string username) {
+        return await service.UserHasRole(roleName, username);
+    }
 }
