@@ -3,6 +3,6 @@
 namespace Angular_Auth.Services;
 
 public interface IAuthenticationService {
-    Task<string> Login(LoginRequest request);
-    Task<string> Register(RegisterRequest request);
+    Task<LoginResponse> Login(LoginRequest request);
+    Task<LoginResponse> Register(RegisterRequest request);
 }
