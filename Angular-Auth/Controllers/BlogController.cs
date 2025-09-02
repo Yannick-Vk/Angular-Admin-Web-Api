@@ -10,6 +10,7 @@ public class BlogController(IBlogService blogService) : Controller {
 
     [HttpPost]
     public async Task<IActionResult> UploadBlog(BlogUpload blog) {
+        await blogService.UploadBlog(blog);
         return Ok();
     }
 
