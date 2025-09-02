@@ -1,4 +1,5 @@
 ﻿using Angular_Auth.Dto;
+using Angular_Auth.Models;
 using Angular_Auth.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -18,5 +19,10 @@ public class BlogController(ILogger<BlogController> logger, IBlogService blogSer
     [HttpGet("{blogId}")]
     public async Task<IActionResult> GetBlog(string blogId) {
         return Ok();
+    }
+
+    [HttpGet]
+    public async Task<List<BlogWithFile>> GetAllBlogs() {
+        return await blogService.GetAllBlogs();
     }
 }

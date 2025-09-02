@@ -5,10 +5,20 @@ using Angular_Auth.Repositories;
 namespace Angular_Auth.Services;
 
 public class BlogService(BlogRepository repo) : IBlogService {
+    public async Task<List<BlogWithFile>> GetAllBlogs() {
+        var blogs = await repo.GetAllBlogs();
+        return blogs.Select(bl => new BlogWithFile {
+            Id = bl.Id,
+            Title = bl.Title,
+            Description = bl.Description,
+            BlogContent = "",
+        }).ToList();
+    }
+
     public Task<Blog> GetBlog() {
         throw new NotImplementedException();
     }
-
+    
     public async Task UploadBlog(BlogUpload blogUpload) {
         var blog = new Blog {
             Id = Guid.NewGuid(),

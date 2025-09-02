@@ -6,4 +6,5 @@ namespace Angular_Auth.Services;
 public interface IBlogService {
     public Task<Blog> GetBlog();
     public Task UploadBlog(BlogUpload blogUpload);
+    public Task<List<BlogWithFile>> GetAllBlogs();
 }
