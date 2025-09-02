@@ -26,11 +26,8 @@ public class BlogService(BlogRepository repo) : IBlogService {
         if (!Directory.Exists(uploadsFolder)) {
             Directory.CreateDirectory(uploadsFolder);
         }
-
-        var sanitizedTitle = blog.Title.Replace(' ', '-');
-        sanitizedTitle = Path.GetInvalidFileNameChars()
-            .Aggregate(sanitizedTitle, (current, invalidChar) => current.Replace(invalidChar.ToString(), string.Empty));
-        var uniqueFileName = blog.Id + "_" + sanitizedTitle + ".md";
+        
+        var uniqueFileName = blog.Id + ".md";
         var filePath = Path.Combine(uploadsFolder, uniqueFileName);
 
         var fileBytes = System.Text.Encoding.UTF8.GetBytes(fileContent);
