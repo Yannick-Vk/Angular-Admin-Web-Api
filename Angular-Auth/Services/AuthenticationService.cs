@@ -19,7 +19,7 @@ public class AuthenticationService(UserManager<User> userManager, IConfiguration
                    await userManager.FindByEmailAsync(request.Username);
 
         if (user is null || !await userManager.CheckPasswordAsync(user, request.Password)) {
-            return new LoginResponse($"Unable to authenticate user {request.Username}");
+            return new LoginResponse($"Username and/or password are incorrect.");
         }
 
         var authClaims = new List<Claim> {
