@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Angular_Auth.Controllers;
 
 [ApiController]
-[Route("/api/v1/auth")]
+[Route("/api/v1/[controller]")]
 public class AuthController(ILogger<AuthController> logger, IAuthenticationService service) : ControllerBase {
     [AllowAnonymous]
     [HttpPost("login")]
