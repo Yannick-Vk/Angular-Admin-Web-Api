@@ -1,6 +1,6 @@
 ﻿namespace Angular_Auth.Dto;
 
 public class LoginRequest {
-    public required string Username  { get; init; }
-    public required string Password { get; init; }
+    public string? Username  { get; init; }
+    public string? Password { get; init; }
 }
