@@ -35,8 +35,13 @@ public class BlogService(BlogRepository repo) : IBlogService {
         };
     }
 
-    public Task<Blog> GetBlog() {
-        throw new NotImplementedException();
+    public async Task<BlogWithFile?> GetBlog(string id) {
+        var blog = await repo.GetBlog(id);
+        if (blog is null) {
+            return null;
+        }
+
+        return await GetBlogWithContent(blog);
     }
     
     public async Task UploadBlog(BlogUpload blogUpload) {

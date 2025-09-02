@@ -11,14 +11,17 @@ public class BlogController(ILogger<BlogController> logger, IBlogService blogSer
 
     [HttpPost]
     public async Task<IActionResult> UploadBlog(BlogUpload blog) {
-        logger.LogInformation("Trying to upload blog");
         await blogService.UploadBlog(blog);
         return Ok();
     }
 
     [HttpGet("{blogId}")]
     public async Task<IActionResult> GetBlog(string blogId) {
-        return Ok();
+        var blog = await blogService.GetBlog(blogId);
+        if (blog is null) {
+            return NotFound("Cannot find a blog with ID : " + blogId);
+        }
+        return Ok(blog);
     }
 
     [HttpGet]
