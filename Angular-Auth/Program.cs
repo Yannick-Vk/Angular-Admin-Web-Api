@@ -15,7 +15,9 @@ builder.Services
     .AddLogging()
     .AddTransient<IAuthenticationService, AuthenticationService>()
     .AddTransient<IUserService, UserService>()
-    .AddTransient<IRoleService, RoleService>();
+    .AddTransient<IRoleService, RoleService>()
+    .AddTransient<IBlogService, BlogService>()
+    ;
 
 builder.Services.AddControllers();
 builder.Services.AddLogging();
