@@ -16,7 +16,7 @@ public class AuthController(ILogger<AuthController> logger, IAuthenticationServi
         var response = await service.Login(request);
         if (!response.Success) {
             logger.LogWarning("Login failed {err}", response.Message);
-            return BadRequest(response);
+            return Unauthorized(response);
         }
         return Ok(response);
     }
@@ -29,7 +29,7 @@ public class AuthController(ILogger<AuthController> logger, IAuthenticationServi
         var response = await service.Register(request);
         if (!response.Success) {
             logger.LogWarning("Registration failed {err}", response.Message);
-            return BadRequest(response);
+            return Unauthorized(response);
         }
         return Ok(response);
     }
