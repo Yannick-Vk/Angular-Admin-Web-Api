@@ -10,27 +10,29 @@ public class BlogService(BlogRepository repo) : IBlogService {
         var blogsWithFile = new List<BlogWithFile>();
 
         foreach (var blog in blogs) {
-            var blogContent = await GetBlogContent(blog);
-            blogsWithFile.Add(new BlogWithFile {
-                Id = blog.Id,
-                Title = blog.Title,
-                Description = blog.Description,
-                BlogContent = blogContent,
-            });
+            var blogContent = await GetBlogWithContent(blog);
+            blogsWithFile.Add(blogContent);
         }
         return blogsWithFile;
     }
 
-
-    private async Task<string> GetBlogContent(Blog blog) {
+    private async Task<BlogWithFile> GetBlogWithContent(Blog blog) {
         var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "uploads");
         var uniqueFileName = blog.Id + ".md";
         var filePath = Path.Combine(uploadsFolder, uniqueFileName);
 
+        // Initialize an empty string, if the file exist add the contents
+        var content = string.Empty;
         if (File.Exists(filePath)) {
-            return await File.ReadAllTextAsync(filePath, System.Text.Encoding.UTF8);
+            content = await File.ReadAllTextAsync(filePath, System.Text.Encoding.UTF8);
         }
-        return string.Empty;
+        
+        return new BlogWithFile {
+            Id = blog.Id,
+            Title = blog.Title,
+            Description = blog.Description,
+            BlogContent = content,
+        };
     }
 
     public Task<Blog> GetBlog() {
