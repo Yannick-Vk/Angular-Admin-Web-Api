@@ -20,17 +20,17 @@ public class BlogService(BlogRepository repo) : IBlogService {
     }
 
 
-    private async Task SaveBlog(Blog blog, string base64File) {
+    private async Task SaveBlog(Blog blog, string fileContent) {
         var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "uploads");
         // Create the directory when it does not exist
         if (!Directory.Exists(uploadsFolder)) {
             Directory.CreateDirectory(uploadsFolder);
         }
         
-        var uniqueFileName = blog.Id + "_" + blog.Title;
+        var uniqueFileName = blog.Id + "_" + blog.Title + ".md";
         var filePath = Path.Combine(uploadsFolder, uniqueFileName);
         
-        var fileBytes = Convert.FromBase64String(base64File);
+        var fileBytes = System.Text.Encoding.UTF8.GetBytes(fileContent);
         
         // Save the file.
         await using var stream = new FileStream(filePath, FileMode.Create);

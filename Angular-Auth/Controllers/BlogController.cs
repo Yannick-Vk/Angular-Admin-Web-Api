@@ -6,10 +6,11 @@ namespace Angular_Auth.Controllers;
 
 [ApiController]
 [Route("api/v1/[controller]s")]
-public class BlogController(IBlogService blogService) : Controller {
+public class BlogController(ILogger<BlogController> logger, IBlogService blogService) : Controller {
 
     [HttpPost]
     public async Task<IActionResult> UploadBlog(BlogUpload blog) {
+        logger.LogInformation("Trying to upload blog");
         await blogService.UploadBlog(blog);
         return Ok();
     }
