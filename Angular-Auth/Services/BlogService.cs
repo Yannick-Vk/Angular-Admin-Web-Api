@@ -7,12 +7,30 @@ namespace Angular_Auth.Services;
 public class BlogService(BlogRepository repo) : IBlogService {
     public async Task<List<BlogWithFile>> GetAllBlogs() {
         var blogs = await repo.GetAllBlogs();
-        return blogs.Select(bl => new BlogWithFile {
-            Id = bl.Id,
-            Title = bl.Title,
-            Description = bl.Description,
-            BlogContent = "",
-        }).ToList();
+        var blogsWithFile = new List<BlogWithFile>();
+
+        foreach (var blog in blogs) {
+            var blogContent = await GetBlogContent(blog);
+            blogsWithFile.Add(new BlogWithFile {
+                Id = blog.Id,
+                Title = blog.Title,
+                Description = blog.Description,
+                BlogContent = blogContent,
+            });
+        }
+        return blogsWithFile;
+    }
+
+
+    private async Task<string> GetBlogContent(Blog blog) {
+        var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "uploads");
+        var uniqueFileName = blog.Id + ".md";
+        var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+        if (File.Exists(filePath)) {
+            return await File.ReadAllTextAsync(filePath, System.Text.Encoding.UTF8);
+        }
+        return string.Empty;
     }
 
     public Task<Blog> GetBlog() {
