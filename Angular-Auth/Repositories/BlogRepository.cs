@@ -24,8 +24,8 @@ public class BlogRepository(AppDbContext context) {
         var blog = await context.Blogs.FindAsync(updatedBlog.Id);
         if (blog is null) return null;
         
-        blog.Title = updatedBlog.Title;
-        blog.Description = updatedBlog.Description;
+        blog.Title = updatedBlog.Title?? blog.Title;
+        blog.Description = updatedBlog.Description?? blog.Description;
         
         context.Blogs.Update(blog);
         await context.SaveChangesAsync();
