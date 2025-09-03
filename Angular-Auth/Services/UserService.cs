@@ -13,8 +13,12 @@ public class UserService(UserManager<User> manager) : IUserService {
         return users;
     }
 
-    public async Task<UserDto?> GetUser(string username) {
+    public async Task<UserDto?> GetUserDto(string username) {
         var user = await manager.Users.FirstOrDefaultAsync(u => u.UserName == username);
         return user is null ? null : new UserDto(user);
+    }
+
+    public async Task<User?> GetFullUser(string username) {
+        return await manager.Users.FirstOrDefaultAsync(u => u.UserName == username);
     }
 }

@@ -4,7 +4,7 @@ using Angular_Auth.Repositories;
 
 namespace Angular_Auth.Services;
 
-public class BlogService(BlogRepository repo) : IBlogService {
+public class BlogService(BlogRepository repo, IUserService userService) : IBlogService {
     public async Task<List<BlogWithFile>> GetAllBlogs() {
         var blogs = await repo.GetAllBlogs();
         var blogsWithFile = new List<BlogWithFile>();
@@ -51,10 +51,15 @@ public class BlogService(BlogRepository repo) : IBlogService {
     }
 
     public async Task UploadBlog(BlogUpload blogUpload) {
+        var author = await userService.GetFullUser(blogUpload.Username);
+        if (author is null) return;
+        
         var blog = new Blog {
             Id = Guid.NewGuid(),
             Title = blogUpload.Title,
-            Description = blogUpload.Description
+            Description = blogUpload.Description,
+            CreatedAt = DateTime.Now,
+            Author = author,
         };
         await repo.SaveBlog(blog);
         await SaveBlog(blog.Id, blogUpload.File);

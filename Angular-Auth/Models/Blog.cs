@@ -10,4 +10,7 @@ public class Blog {
     public required string Title { get; set; }
     [MaxLength(9500)]
     public required string Description { get; set; }
+    public required User Author { get; set; }
+    public required DateTime CreatedAt { get; set; }
+    public DateTime? UpdatedAt { get; set; }
 }
