@@ -8,4 +8,5 @@ public interface IBlogService {
     public Task UploadBlog(BlogUpload blogUpload);
     public Task<List<BlogWithFile>> GetAllBlogs();
     public Task<BlogWithFile?> UpdateBlog(BlogUpdate blog);
+    public Task<Blog?> DeleteBlog(string id);
 }

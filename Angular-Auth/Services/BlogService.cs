@@ -57,7 +57,7 @@ public class BlogService(BlogRepository repo, IUserService userService) : IBlogS
     public async Task UploadBlog(BlogUpload blogUpload) {
         var author = await userService.GetFullUser(blogUpload.Username);
         if (author is null) return;
-        
+
         var blog = new Blog {
             Id = Guid.NewGuid(),
             Title = blogUpload.Title,
@@ -90,11 +90,15 @@ public class BlogService(BlogRepository repo, IUserService userService) : IBlogS
     public async Task<BlogWithFile?> UpdateBlog(BlogUpdate updateBlog) {
         var result = await repo.UpdateBlog(updateBlog);
         if (result is null) return null;
-        
+
         if (updateBlog.UpdatedFileContent is not null) {
             await SaveBlog(result.Id, updateBlog.UpdatedFileContent);
         }
 
         return await GetBlogWithContent(result);
+    }
+
+    public async Task<Blog?> DeleteBlog(string id) {
+        return await repo.DeleteBlog(id);
     }
 }

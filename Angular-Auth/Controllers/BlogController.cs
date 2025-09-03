@@ -8,7 +8,6 @@ namespace Angular_Auth.Controllers;
 [ApiController]
 [Route("api/v1/[controller]s")]
 public class BlogController(ILogger<BlogController> logger, IBlogService blogService) : Controller {
-
     [HttpPost]
     public async Task<IActionResult> UploadBlog(BlogUpload blog) {
         await blogService.UploadBlog(blog);
@@ -21,6 +20,7 @@ public class BlogController(ILogger<BlogController> logger, IBlogService blogSer
         if (blog is null) {
             return NotFound("Cannot find a blog with ID : " + blogId);
         }
+
         return Ok(blog);
     }
 
@@ -35,7 +35,17 @@ public class BlogController(ILogger<BlogController> logger, IBlogService blogSer
         if (result is null) {
             return NotFound("Cannot find a blog with ID : " + blog.Id);
         }
-        
+
         return Ok(result);
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteBlog(string id) {
+        var blog = await blogService.DeleteBlog(id);
+        if (blog is null) {
+            return NotFound($"Cannot find blog with ID: ${id}");
+        }
+        
+        return Ok(blog);
     }
 }

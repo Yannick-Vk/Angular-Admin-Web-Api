@@ -39,4 +39,16 @@ public class BlogRepository(AppDbContext context) {
         await context.SaveChangesAsync();
         return blog;
     }
+
+    public async Task<Blog?> DeleteBlog(string id) {
+        var success = Guid.TryParse(id, out var guid);
+        if (!success) return null;
+
+        var blog = await context.Blogs.FindAsync(guid);
+        if (blog is null) return null;
+
+        context.Blogs.Remove(blog);
+        await context.SaveChangesAsync();
+        return blog;
+    }
 }
