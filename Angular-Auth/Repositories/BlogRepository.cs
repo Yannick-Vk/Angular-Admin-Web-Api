@@ -11,22 +11,30 @@ public class BlogRepository(AppDbContext context) {
     }
 
     public async Task<List<Blog>> GetAllBlogs() {
-        return await context.Blogs.AsNoTracking().ToListAsync();
+        return await context.Blogs
+            .Include(b => b.Author)
+            .AsNoTracking()
+            .ToListAsync();
     }
 
     public async Task<Blog?> GetBlog(string id) {
         var success = Guid.TryParse(id, out var guid);
         if (!success) return null;
-        return await context.Blogs.FindAsync(guid);
+        return await context.Blogs
+            .Include(b => b.Author)
+            .FirstOrDefaultAsync(b => b.Id == guid);
     }
 
     public async Task<Blog?> UpdateBlog(BlogUpdate updatedBlog) {
-        var blog = await context.Blogs.FindAsync(updatedBlog.Id);
+        var blog = await context.Blogs
+            .Include(b => b.Author)
+            .FirstOrDefaultAsync(b => b.Id == updatedBlog.Id);
         if (blog is null) return null;
-        
-        blog.Title = updatedBlog.Title?? blog.Title;
-        blog.Description = updatedBlog.Description?? blog.Description;
-        
+
+        blog.Title = updatedBlog.Title ?? blog.Title;
+        blog.Description = updatedBlog.Description ?? blog.Description;
+        blog.UpdatedAt = DateTime.Now;
+
         context.Blogs.Update(blog);
         await context.SaveChangesAsync();
         return blog;

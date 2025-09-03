@@ -33,12 +33,16 @@ public class BlogService(BlogRepository repo, IUserService userService) : IBlogS
             content = await File.ReadAllTextAsync(filePath, System.Text.Encoding.UTF8);
         }
 
-        return new BlogWithFile {
+        var newBlog = new BlogWithFile() {
             Id = blog.Id,
             Title = blog.Title,
             Description = blog.Description,
             BlogContent = content,
+            Author = blog.Author.UserName ?? "NULL USER",
+            CreatedAt = blog.CreatedAt,
+            UpdatedAt = blog.UpdatedAt,
         };
+        return newBlog;
     }
 
     public async Task<BlogWithFile?> GetBlog(string id) {
@@ -86,7 +90,6 @@ public class BlogService(BlogRepository repo, IUserService userService) : IBlogS
     public async Task<BlogWithFile?> UpdateBlog(BlogUpdate updateBlog) {
         var result = await repo.UpdateBlog(updateBlog);
         if (result is null) return null;
-        result.UpdatedAt = DateTime.Now;
         
         if (updateBlog.UpdatedFileContent is not null) {
             await SaveBlog(result.Id, updateBlog.UpdatedFileContent);
