@@ -52,18 +52,18 @@ public class BlogService(BlogRepository repo) : IBlogService {
             Description = blogUpload.Description
         };
         await repo.SaveBlog(blog);
-        await SaveBlog(blog, blogUpload.File);
+        await SaveBlog(blog.Id, blogUpload.File);
     }
 
 
-    private async Task SaveBlog(Blog blog, string fileContent) {
+    private async Task SaveBlog(Guid id, string fileContent) {
         var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "uploads");
         // Create the directory when it does not exist
         if (!Directory.Exists(uploadsFolder)) {
             Directory.CreateDirectory(uploadsFolder);
         }
 
-        var uniqueFileName = blog.Id + ".md";
+        var uniqueFileName = id + ".md";
         var filePath = Path.Combine(uploadsFolder, uniqueFileName);
 
         var fileBytes = System.Text.Encoding.UTF8.GetBytes(fileContent);
@@ -74,6 +74,13 @@ public class BlogService(BlogRepository repo) : IBlogService {
     }
 
     public async Task<Blog?> UpdateBlog(BlogUpdate updateBlog) {
-        return await repo.UpdateBlog(updateBlog);
+        var result = await repo.UpdateBlog(updateBlog);
+        if (result is null) return null;
+        
+        if (updateBlog.UpdatedFileContent is not null) {
+            await SaveBlog(result.Id, updateBlog.UpdatedFileContent);
+        }
+        
+        return result;
     }
 }

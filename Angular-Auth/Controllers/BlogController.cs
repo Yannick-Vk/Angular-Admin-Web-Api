@@ -35,6 +35,7 @@ public class BlogController(ILogger<BlogController> logger, IBlogService blogSer
         if (result is null) {
             return NotFound("Cannot find a blog with ID : " + blog.Id);
         }
+        
         return Ok(result);
     }
 }
