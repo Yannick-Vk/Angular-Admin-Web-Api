@@ -17,6 +17,11 @@ public class BlogService(BlogRepository repo) : IBlogService {
         return blogsWithFile;
     }
 
+    /// <summary>
+    /// Returns a BlogWithFile object from a given Blog object
+    /// </summary>
+    /// <param name="blog"></param>
+    /// <returns>A blog with file content</returns>
     private async Task<BlogWithFile> GetBlogWithContent(Blog blog) {
         var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "uploads");
         var uniqueFileName = blog.Id + ".md";
@@ -73,14 +78,14 @@ public class BlogService(BlogRepository repo) : IBlogService {
         await stream.WriteAsync(fileBytes);
     }
 
-    public async Task<Blog?> UpdateBlog(BlogUpdate updateBlog) {
+    public async Task<BlogWithFile?> UpdateBlog(BlogUpdate updateBlog) {
         var result = await repo.UpdateBlog(updateBlog);
         if (result is null) return null;
         
         if (updateBlog.UpdatedFileContent is not null) {
             await SaveBlog(result.Id, updateBlog.UpdatedFileContent);
         }
-        
-        return result;
+
+        return await GetBlogWithContent(result);
     }
 }
