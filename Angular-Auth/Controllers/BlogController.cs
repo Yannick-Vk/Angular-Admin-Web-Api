@@ -28,4 +28,13 @@ public class BlogController(ILogger<BlogController> logger, IBlogService blogSer
     public async Task<List<BlogWithFile>> GetAllBlogs() {
         return await blogService.GetAllBlogs();
     }
+
+    [HttpPatch]
+    public async Task<IActionResult> UpdateBlog(BlogUpdate blog) {
+        var result = await blogService.UpdateBlog(blog);
+        if (result is null) {
+            return NotFound("Cannot find a blog with ID : " + blog.Id);
+        }
+        return Ok(result);
+    }
 }

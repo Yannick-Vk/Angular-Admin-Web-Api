@@ -1,3 +1,4 @@
+using Angular_Auth.Dto;
 using Angular_Auth.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -17,5 +18,14 @@ public class BlogRepository(AppDbContext context) {
         var success = Guid.TryParse(id, out var guid);
         if (!success) return null;
         return await context.Blogs.FindAsync(guid);
+    }
+
+    public async Task<Blog?> UpdateBlog(BlogUpdate updatedBlog) {
+        var blog = await context.Blogs.FindAsync(updatedBlog.Id);
+        if (blog is null) return null;
+        
+        context.Blogs.Update(blog);
+        await context.SaveChangesAsync();
+        return blog;
     }
 }

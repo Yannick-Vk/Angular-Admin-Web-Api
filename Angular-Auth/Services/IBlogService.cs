@@ -7,4 +7,5 @@ public interface IBlogService {
     public Task<BlogWithFile?> GetBlog(string id);
     public Task UploadBlog(BlogUpload blogUpload);
     public Task<List<BlogWithFile>> GetAllBlogs();
+    public Task<Blog?> UpdateBlog(BlogUpdate blog);
 }

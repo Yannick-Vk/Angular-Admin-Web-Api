@@ -15,6 +15,6 @@ public class UserService(UserManager<User> manager) : IUserService {
 
     public async Task<UserDto?> GetUser(string username) {
         var user = await manager.Users.FirstOrDefaultAsync(u => u.UserName == username);
-        return new UserDto(user);
+        return user is null ? null : new UserDto(user);
     }
 }

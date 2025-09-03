@@ -13,6 +13,7 @@ public class BlogService(BlogRepository repo) : IBlogService {
             var blogContent = await GetBlogWithContent(blog);
             blogsWithFile.Add(blogContent);
         }
+
         return blogsWithFile;
     }
 
@@ -26,7 +27,7 @@ public class BlogService(BlogRepository repo) : IBlogService {
         if (File.Exists(filePath)) {
             content = await File.ReadAllTextAsync(filePath, System.Text.Encoding.UTF8);
         }
-        
+
         return new BlogWithFile {
             Id = blog.Id,
             Title = blog.Title,
@@ -43,7 +44,7 @@ public class BlogService(BlogRepository repo) : IBlogService {
 
         return await GetBlogWithContent(blog);
     }
-    
+
     public async Task UploadBlog(BlogUpload blogUpload) {
         var blog = new Blog {
             Id = Guid.NewGuid(),
@@ -61,7 +62,7 @@ public class BlogService(BlogRepository repo) : IBlogService {
         if (!Directory.Exists(uploadsFolder)) {
             Directory.CreateDirectory(uploadsFolder);
         }
-        
+
         var uniqueFileName = blog.Id + ".md";
         var filePath = Path.Combine(uploadsFolder, uniqueFileName);
 
@@ -70,5 +71,9 @@ public class BlogService(BlogRepository repo) : IBlogService {
         // Save the file.
         await using var stream = new FileStream(filePath, FileMode.Create);
         await stream.WriteAsync(fileBytes);
+    }
+
+    public async Task<Blog?> UpdateBlog(BlogUpdate updateBlog) {
+        return await repo.UpdateBlog(updateBlog);
     }
 }
