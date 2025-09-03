@@ -86,6 +86,7 @@ public class BlogService(BlogRepository repo, IUserService userService) : IBlogS
     public async Task<BlogWithFile?> UpdateBlog(BlogUpdate updateBlog) {
         var result = await repo.UpdateBlog(updateBlog);
         if (result is null) return null;
+        result.UpdatedAt = DateTime.Now;
         
         if (updateBlog.UpdatedFileContent is not null) {
             await SaveBlog(result.Id, updateBlog.UpdatedFileContent);
