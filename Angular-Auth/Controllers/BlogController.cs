@@ -1,11 +1,13 @@
 ﻿using Angular_Auth.Dto;
 using Angular_Auth.Models;
 using Angular_Auth.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Angular_Auth.Controllers;
 
 [ApiController]
+//[Authorize]
 [Route("api/v1/[controller]s")]
 public class BlogController(ILogger<BlogController> logger, IBlogService blogService) : Controller {
     [HttpPost]
