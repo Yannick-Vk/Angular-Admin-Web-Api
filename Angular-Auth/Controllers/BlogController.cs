@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Angular_Auth.Controllers;
 
 [ApiController]
-//[Authorize]
+[Authorize]
 [Route("api/v1/[controller]s")]
 public class BlogController(ILogger<BlogController> logger, IBlogService blogService) : Controller {
     [HttpPost]
