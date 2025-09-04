@@ -101,4 +101,8 @@ public class BlogService(BlogRepository repo, IUserService userService) : IBlogS
     public async Task<Blog?> DeleteBlog(string id) {
         return await repo.DeleteBlog(id);
     }
+
+    public async Task<IEnumerable<Blog>> GetBlogsWithAuthor(string username) {
+        return await repo.GetAllBlogsWithAuthor(username);
+    }
 }

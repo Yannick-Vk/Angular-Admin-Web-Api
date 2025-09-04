@@ -1,4 +1,5 @@
 ﻿using Angular_Auth.Dto;
+using Angular_Auth.Migrations;
 using Angular_Auth.Models;
 using Angular_Auth.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -16,7 +17,8 @@ public class BlogController(ILogger<BlogController> logger, IBlogService blogSer
         return Ok();
     }
 
-    [HttpGet("{blogId}")][AllowAnonymous]
+    [HttpGet("{blogId}")]
+    [AllowAnonymous]
     public async Task<IActionResult> GetBlog(string blogId) {
         var blog = await blogService.GetBlog(blogId);
         if (blog is null) {
@@ -26,7 +28,8 @@ public class BlogController(ILogger<BlogController> logger, IBlogService blogSer
         return Ok(blog);
     }
 
-    [HttpGet][AllowAnonymous]
+    [HttpGet]
+    [AllowAnonymous]
     public async Task<List<BlogWithFile>> GetAllBlogs() {
         return await blogService.GetAllBlogs();
     }
@@ -47,7 +50,12 @@ public class BlogController(ILogger<BlogController> logger, IBlogService blogSer
         if (blog is null) {
             return NotFound($"Cannot find blog with ID: ${id}");
         }
-        
+
         return Ok(blog);
+    }
+
+    [HttpGet("author/{username}")]
+    public async Task<IEnumerable<Blog>> GetAllBlogsWithAuthor(string username) {
+        return await blogService.GetBlogsWithAuthor(username);
     }
 }

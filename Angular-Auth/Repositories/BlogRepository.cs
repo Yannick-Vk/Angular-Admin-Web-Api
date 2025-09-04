@@ -51,4 +51,11 @@ public class BlogRepository(AppDbContext context) {
         await context.SaveChangesAsync();
         return blog;
     }
+
+    public async Task<IEnumerable<Blog>> GetAllBlogsWithAuthor(string author) {
+        return await context.Blogs
+            .Include(b => b.Author)
+            .Where(b => b.Author.UserName == author)
+            .ToListAsync();
+    }
 }
