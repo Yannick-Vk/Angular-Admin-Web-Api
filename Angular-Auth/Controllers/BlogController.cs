@@ -16,7 +16,7 @@ public class BlogController(ILogger<BlogController> logger, IBlogService blogSer
         return Ok();
     }
 
-    [HttpGet("{blogId}")]
+    [HttpGet("{blogId}")][AllowAnonymous]
     public async Task<IActionResult> GetBlog(string blogId) {
         var blog = await blogService.GetBlog(blogId);
         if (blog is null) {
@@ -26,7 +26,7 @@ public class BlogController(ILogger<BlogController> logger, IBlogService blogSer
         return Ok(blog);
     }
 
-    [HttpGet]
+    [HttpGet][AllowAnonymous]
     public async Task<List<BlogWithFile>> GetAllBlogs() {
         return await blogService.GetAllBlogs();
     }
