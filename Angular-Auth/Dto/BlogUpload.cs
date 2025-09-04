@@ -5,5 +5,5 @@ public class BlogUpload {
     public required string Description { get; set; }
     public required string File { get; set; }
     
-    public required string Username { get; set; }
+    public required string Author { get; set; }
 }

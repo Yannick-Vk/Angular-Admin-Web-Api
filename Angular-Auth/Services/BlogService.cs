@@ -55,7 +55,7 @@ public class BlogService(BlogRepository repo, IUserService userService) : IBlogS
     }
 
     public async Task UploadBlog(BlogUpload blogUpload) {
-        var author = await userService.GetFullUser(blogUpload.Username);
+        var author = await userService.GetFullUser(blogUpload.Author);
         if (author is null) return;
 
         var blog = new Blog {
