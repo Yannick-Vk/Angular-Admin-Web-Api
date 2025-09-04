@@ -12,9 +12,12 @@ namespace Angular_Auth.Controllers;
 [Route("api/v1/[controller]s")]
 public class BlogController(ILogger<BlogController> logger, IBlogService blogService) : Controller {
     [HttpPost]
-    public async Task<IActionResult> UploadBlog(BlogUpload blog) {
-        await blogService.UploadBlog(blog);
-        return Ok();
+    public async Task<IActionResult> UploadBlog(BlogUpload blogUpload) {
+        var id = await blogService.UploadBlog(blogUpload);
+        if (id is null) {
+            return Problem("Failed to save blog ");
+        }
+        return Ok(id);
     }
 
     [HttpGet("{blogId}")]

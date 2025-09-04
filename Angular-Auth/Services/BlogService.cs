@@ -54,9 +54,9 @@ public class BlogService(BlogRepository repo, IUserService userService) : IBlogS
         return await GetBlogWithContent(blog);
     }
 
-    public async Task UploadBlog(BlogUpload blogUpload) {
+    public async Task<Guid?> UploadBlog(BlogUpload blogUpload) {
         var author = await userService.GetFullUser(blogUpload.Author);
-        if (author is null) return;
+        if (author is null) return null;
 
         var blog = new Blog {
             Id = Guid.NewGuid(),
@@ -67,6 +67,7 @@ public class BlogService(BlogRepository repo, IUserService userService) : IBlogS
         };
         await repo.SaveBlog(blog);
         await SaveBlog(blog.Id, blogUpload.File);
+        return blog.Id;
     }
 
 
