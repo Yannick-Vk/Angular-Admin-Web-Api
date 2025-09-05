@@ -22,7 +22,7 @@ public class BlogService(BlogRepository repo, IUserService userService) : IBlogS
     /// </summary>
     /// <param name="blog"></param>
     /// <returns>A blog with file content</returns>
-    private async Task<BlogWithFile> GetBlogWithContent(Blog blog) {
+    private static async Task<BlogWithFile> GetBlogWithContent(Blog blog) {
         var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "uploads");
         var uniqueFileName = blog.Id + ".md";
         var filePath = Path.Combine(uploadsFolder, uniqueFileName);
@@ -35,8 +35,8 @@ public class BlogService(BlogRepository repo, IUserService userService) : IBlogS
 
         var newBlog = new BlogWithFile() {
             Id = blog.Id,
-            Title = blog.Title,
-            Description = blog.Description,
+            Title = blog.Title.Trim(),
+            Description = blog.Description.Trim(),
             BlogContent = content,
             Author = blog.Author.UserName ?? "NULL USER",
             CreatedAt = blog.CreatedAt,
@@ -60,8 +60,8 @@ public class BlogService(BlogRepository repo, IUserService userService) : IBlogS
 
         var blog = new Blog {
             Id = Guid.NewGuid(),
-            Title = blogUpload.Title,
-            Description = blogUpload.Description,
+            Title = blogUpload.Title.Trim(),
+            Description = blogUpload.Description.Trim(),
             CreatedAt = DateTime.Now,
             Author = author,
         };
@@ -71,7 +71,7 @@ public class BlogService(BlogRepository repo, IUserService userService) : IBlogS
     }
 
 
-    private async Task SaveBlog(Guid id, string fileContent) {
+    private static async Task SaveBlog(Guid id, string fileContent) {
         var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "uploads");
         // Create the directory when it does not exist
         if (!Directory.Exists(uploadsFolder)) {
