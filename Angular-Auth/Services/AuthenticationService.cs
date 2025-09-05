@@ -12,40 +12,44 @@ public class AuthenticationService(UserManager<User> userManager, IConfiguration
     : IAuthenticationService {
     public async Task<LoginResponse> Login(LoginRequest request) {
         if (request.Username is null || request.Password is null) {
-            return new LoginResponse("Username and Password are required.");
+            return new LoginResponse() { Message = "Username and Password are required." };
         }
 
         var user = await userManager.FindByNameAsync(request.Username) ??
                    await userManager.FindByEmailAsync(request.Username);
 
         if (user is null || !await userManager.CheckPasswordAsync(user, request.Password)) {
-            return new LoginResponse($"Username and/or password are incorrect.");
+            return new LoginResponse() { Message = "Username and/or password are incorrect." };
         }
 
         var authClaims = new List<Claim> {
-            new(ClaimTypes.Name, user.UserName ?? string.Empty),
-            new(ClaimTypes.Email, user.Email ?? string.Empty),
+            new("Id", user.Id),
+            new("Username", user.UserName ?? string.Empty),
+            new("Email", user.Email ?? string.Empty),
             new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
         };
 
         var token = GetToken(authClaims);
         var jwt = new JwtSecurityTokenHandler().WriteToken(token);
 
-        return new LoginResponse(jwt, token.ValidTo, user.UserName ?? string.Empty, user.Email ?? string.Empty);
+        return new LoginResponse {
+            Success = true,
+            Token = jwt,
+        };
     }
 
     public async Task<LoginResponse> Register(RegisterRequest request) {
         if (request.Email is null || request.Username is null || request.Password is null) {
-            return new LoginResponse("Email, Username and Password are required.");
+            return new LoginResponse() { Message = "Email, Username and Password are required." };
         }
 
         // Find a user that already has a given Email or Username
         var userByEmail = await userManager.FindByEmailAsync(request.Email);
         var userByUsername = await userManager.FindByNameAsync(request.Username);
         if (userByEmail is not null || userByUsername is not null) {
-            return new LoginResponse(
-                $"User with email {request.Email} or username {request.Username} already exists."
-            );
+            return new LoginResponse() {
+                Message = $"User with email {request.Email} or username {request.Username} already exists."
+            };
         }
 
         // Create a new user
@@ -58,8 +62,9 @@ public class AuthenticationService(UserManager<User> userManager, IConfiguration
         var result = await userManager.CreateAsync(user, request.Password);
 
         if (!result.Succeeded) {
-            return new LoginResponse(
-                $"Unable to register user {request.Username} errors: {ShowErrorsText(result.Errors)}");
+            return new LoginResponse {
+                Message = "Unable to register user {request.Username} errors: {ShowErrorsText(result.Errors)}"
+            };
         }
 
         return await Login(new LoginRequest { Username = request.Email, Password = request.Password });

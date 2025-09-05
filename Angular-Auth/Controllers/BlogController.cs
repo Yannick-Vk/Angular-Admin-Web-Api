@@ -17,6 +17,7 @@ public class BlogController(ILogger<BlogController> logger, IBlogService blogSer
         if (id is null) {
             return Problem("Failed to save blog ");
         }
+
         return Ok(id);
     }
 
@@ -69,6 +70,7 @@ public class BlogController(ILogger<BlogController> logger, IBlogService blogSer
         if (!blogs.Any()) {
             return NotFound("Cannot find a blog with search text : " + searchText);
         }
+
         return Ok(blogs);
     }
 }
