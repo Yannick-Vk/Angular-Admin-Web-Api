@@ -4,7 +4,7 @@ using Angular_Auth.Repositories;
 
 namespace Angular_Auth.Services;
 
-public class BlogService(BlogRepository repo, IUserService userService) : IBlogService {
+public class BlogService(ILogger<BlogService> logger, BlogRepository repo, IUserService userService) : IBlogService {
     public async Task<IEnumerable<BlogWithFile>> GetAllBlogs() {
         var blogs = await repo.GetAllBlogs();
         return await GetBlogsWithFile(blogs);
@@ -71,22 +71,21 @@ public class BlogService(BlogRepository repo, IUserService userService) : IBlogS
         await stream.WriteAsync(fileBytes);
     }
 
-    public async Task<BlogWithFile?> UpdateBlog(BlogUpdate updateBlog) {
-        var blog = await repo.GetBlog(updateBlog.Id);
+    public async Task<BlogWithFile?> UpdateBlog(BlogUpdate dto) {
+        var blog = await repo.GetBlog(dto.Id);
         if (blog is null) return null;
 
-        blog.Title = updateBlog.Title ?? blog.Title;
-        blog.Description = updateBlog.Description ?? blog.Description;
+        blog.Title = dto.Title ?? blog.Title;
+        blog.Description = dto.Description ?? blog.Description;
         blog.UpdatedAt = DateTime.Now;
         
-        var result = await repo.UpdateBlog(blog);
-        if (result is null) return null;
+        var updatedBlog = await repo.UpdateBlog(blog);
 
-        if (updateBlog.UpdatedFileContent is not null) {
-            await SaveBlog(result.Id, updateBlog.UpdatedFileContent);
+        if (dto.BlogContent is not null) {
+            await SaveBlog(updatedBlog.Id, dto.BlogContent);
         }
 
-        return await GetBlogWithContent(result);
+        return await GetBlogWithContent(updatedBlog);
     }
 
     public async Task<Blog?> DeleteBlog(string id) {
@@ -97,6 +96,7 @@ public class BlogService(BlogRepository repo, IUserService userService) : IBlogS
         if (blog is null) return null;
         
         return await repo.DeleteBlog(blog);
+        //TODO: delete blog file
     }
 
     public async Task<IEnumerable<BlogWithAuthor>> GetBlogsWithAuthor(string username) {
