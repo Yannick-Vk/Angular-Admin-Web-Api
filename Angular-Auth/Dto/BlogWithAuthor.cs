@@ -4,6 +4,7 @@ using Angular_Auth.Models;
 namespace Angular_Auth.Dto;
 
 public class BlogWithAuthor {
+    public required Guid Id {get; set;}
     public required string Title { get; set; }
     public required string Description { get; set; }
     public required string Author { get; set; }
@@ -14,6 +15,7 @@ public class BlogWithAuthor {
 
     [SetsRequiredMembers]
     public BlogWithAuthor(Blog blog) {
+        Id = blog.Id;
         Title = blog.Title;
         Description = blog.Description;
         Author = blog.Author.UserName ?? "NULL USER";
