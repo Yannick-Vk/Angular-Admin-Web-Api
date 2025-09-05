@@ -63,7 +63,7 @@ public class AuthenticationService(UserManager<User> userManager, IConfiguration
 
         if (!result.Succeeded) {
             return new LoginResponse {
-                Message = "Unable to register user {request.Username} errors: {ShowErrorsText(result.Errors)}"
+                Message = $"Unable to register user {request.Username}:{Environment.NewLine}{ShowErrorsText(result.Errors)}"
             };
         }
 
@@ -89,6 +89,6 @@ public class AuthenticationService(UserManager<User> userManager, IConfiguration
     }
 
     private static string ShowErrorsText(IEnumerable<IdentityError> errors) {
-        return string.Join(", ", errors.Select(error => error.Description).ToArray());
+        return string.Join(Environment.NewLine, errors.Select(error => error.Description).ToArray());
     }
 }
