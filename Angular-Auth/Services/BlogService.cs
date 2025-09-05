@@ -26,20 +26,15 @@ public class BlogService(BlogRepository repo, IUserService userService) : IBlogS
             content = await File.ReadAllTextAsync(filePath, System.Text.Encoding.UTF8);
         }
 
-        var newBlog = new BlogWithFile() {
-            Id = blog.Id,
-            Title = blog.Title.Trim(),
-            Description = blog.Description.Trim(),
-            BlogContent = content,
-            Author = blog.Author.UserName ?? "NULL USER",
-            CreatedAt = blog.CreatedAt,
-            UpdatedAt = blog.UpdatedAt,
-        };
+        var newBlog = new BlogWithFile(blog, content);
         return newBlog;
     }
 
     public async Task<BlogWithFile?> GetBlog(string id) {
-        var blog = await repo.GetBlog(id);
+        var success = Guid.TryParse(id, out var guid);
+        if (!success) return null;
+        
+        var blog = await repo.GetBlog(guid);
         if (blog is null) {
             return null;
         }
@@ -51,13 +46,8 @@ public class BlogService(BlogRepository repo, IUserService userService) : IBlogS
         var author = await userService.GetFullUser(blogUpload.Author);
         if (author is null) return null;
 
-        var blog = new Blog {
-            Id = Guid.NewGuid(),
-            Title = blogUpload.Title.Trim(),
-            Description = blogUpload.Description.Trim(),
-            CreatedAt = DateTime.Now,
-            Author = author,
-        };
+        var blog = new Blog(blogUpload, author);
+        
         await repo.SaveBlog(blog);
         await SaveBlog(blog.Id, blogUpload.File);
         return blog.Id;
@@ -82,7 +72,14 @@ public class BlogService(BlogRepository repo, IUserService userService) : IBlogS
     }
 
     public async Task<BlogWithFile?> UpdateBlog(BlogUpdate updateBlog) {
-        var result = await repo.UpdateBlog(updateBlog);
+        var blog = await repo.GetBlog(updateBlog.Id);
+        if (blog is null) return null;
+
+        blog.Title = updateBlog.Title ?? blog.Title;
+        blog.Description = updateBlog.Description ?? blog.Description;
+        blog.UpdatedAt = DateTime.Now;
+        
+        var result = await repo.UpdateBlog(blog);
         if (result is null) return null;
 
         if (updateBlog.UpdatedFileContent is not null) {
@@ -93,7 +90,13 @@ public class BlogService(BlogRepository repo, IUserService userService) : IBlogS
     }
 
     public async Task<Blog?> DeleteBlog(string id) {
-        return await repo.DeleteBlog(id);
+        var success = Guid.TryParse(id, out var guid);
+        if (!success) return null;
+
+        var blog =  await repo.GetBlog(guid);
+        if (blog is null) return null;
+        
+        return await repo.DeleteBlog(blog);
     }
 
     public async Task<IEnumerable<BlogWithAuthor>> GetBlogsWithAuthor(string username) {

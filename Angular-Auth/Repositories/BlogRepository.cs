@@ -18,36 +18,19 @@ public class BlogRepository(AppDbContext context) {
             .ToListAsync();
     }
 
-    public async Task<Blog?> GetBlog(string id) {
-        var success = Guid.TryParse(id, out var guid);
-        if (!success) return null;
+    public async Task<Blog?> GetBlog(Guid guid) {
         return await context.Blogs
             .Include(b => b.Author)
             .FirstOrDefaultAsync(b => b.Id == guid);
     }
 
-    public async Task<Blog?> UpdateBlog(BlogUpdate updatedBlog) {
-        var blog = await context.Blogs
-            .Include(b => b.Author)
-            .FirstOrDefaultAsync(b => b.Id == updatedBlog.Id);
-        if (blog is null) return null;
-
-        blog.Title = updatedBlog.Title ?? blog.Title;
-        blog.Description = updatedBlog.Description ?? blog.Description;
-        blog.UpdatedAt = DateTime.Now;
-
+    public async Task<Blog?> UpdateBlog(Blog blog) {
         context.Blogs.Update(blog);
         await context.SaveChangesAsync();
         return blog;
     }
 
-    public async Task<Blog?> DeleteBlog(string id) {
-        var success = Guid.TryParse(id, out var guid);
-        if (!success) return null;
-
-        var blog = await context.Blogs.FindAsync(guid);
-        if (blog is null) return null;
-
+    public async Task<Blog?> DeleteBlog(Blog blog) {
         context.Blogs.Remove(blog);
         await context.SaveChangesAsync();
         return blog;

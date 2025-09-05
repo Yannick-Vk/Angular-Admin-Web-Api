@@ -1,5 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Diagnostics.CodeAnalysis;
+using Angular_Auth.Dto;
 
 namespace Angular_Auth.Models;
 
@@ -13,4 +15,16 @@ public class Blog {
     public required User Author { get; set; }
     public required DateTime CreatedAt { get; set; }
     public DateTime? UpdatedAt { get; set; }
+    
+    
+    public Blog() {}
+
+    [SetsRequiredMembers]
+    public Blog(BlogUpload upload, User author) {
+        Id = Guid.NewGuid();
+        Title = upload.Title.Trim();
+        Description = upload.Description.Trim();
+        CreatedAt = DateTime.Now;
+        Author = author;
+    }
 }
