@@ -1,6 +1,4 @@
-﻿using Angular_Auth.Models;
-
-namespace Angular_Auth.Dto;
+﻿namespace Angular_Auth.Dto;
 
 public class BlogWithFile {
     public required Guid Id { get; set; }

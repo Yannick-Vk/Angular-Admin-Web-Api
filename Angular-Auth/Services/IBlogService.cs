@@ -9,6 +9,6 @@ public interface IBlogService {
     public Task<IEnumerable<BlogWithFile>> GetAllBlogs();
     public Task<BlogWithFile?> UpdateBlog(BlogUpdate blog);
     public Task<Blog?> DeleteBlog(string id);
-    public Task<IEnumerable<Blog>> GetBlogsWithAuthor(string username);
+    public Task<IEnumerable<BlogWithAuthor>> GetBlogsWithAuthor(string username);
     public Task<IEnumerable<BlogWithFile>> SearchBlog(string searchText);
 }

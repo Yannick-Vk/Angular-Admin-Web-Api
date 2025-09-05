@@ -59,8 +59,8 @@ public class BlogController(ILogger<BlogController> logger, IBlogService blogSer
     }
 
     [HttpGet("author/{username}")]
-    public async Task<IEnumerable<Blog>> GetAllBlogsWithAuthor(string username) {
-        return await blogService.GetBlogsWithAuthor(username);
+    public async Task<IActionResult> GetAllBlogsWithAuthor(string username) {
+        return Ok(await blogService.GetBlogsWithAuthor(username));
     }
 
     [AllowAnonymous]
