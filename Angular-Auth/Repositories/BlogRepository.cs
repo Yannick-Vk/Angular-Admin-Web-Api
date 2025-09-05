@@ -58,6 +58,18 @@ public class BlogRepository(AppDbContext context) {
             .Include(b => b.Author)
             .Where(b => b.Author.UserName == author)
             .OrderByDescending(b => b.CreatedAt)
+            .AsNoTracking()
             .ToListAsync();
+    }
+
+    public async Task<IEnumerable<Blog>> FindBlogs(string searchWord) {
+        searchWord = searchWord.Trim().ToLower();
+        
+        return await context.Blogs
+            .Include(b => b.Author)
+            .Where(b => b.Title.ToLower().Contains(searchWord))
+            .AsNoTracking()
+            .ToListAsync()
+        ;
     }
 }

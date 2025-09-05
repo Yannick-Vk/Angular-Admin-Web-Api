@@ -5,16 +5,9 @@ using Angular_Auth.Repositories;
 namespace Angular_Auth.Services;
 
 public class BlogService(BlogRepository repo, IUserService userService) : IBlogService {
-    public async Task<List<BlogWithFile>> GetAllBlogs() {
+    public async Task<IEnumerable<BlogWithFile>> GetAllBlogs() {
         var blogs = await repo.GetAllBlogs();
-        var blogsWithFile = new List<BlogWithFile>();
-
-        foreach (var blog in blogs) {
-            var blogContent = await GetBlogWithContent(blog);
-            blogsWithFile.Add(blogContent);
-        }
-
-        return blogsWithFile;
+        return await GetBlogsWithFile(blogs);
     }
 
     /// <summary>
@@ -105,5 +98,21 @@ public class BlogService(BlogRepository repo, IUserService userService) : IBlogS
 
     public async Task<IEnumerable<Blog>> GetBlogsWithAuthor(string username) {
         return await repo.GetAllBlogsWithAuthor(username);
+    }
+
+    private async Task<IEnumerable<BlogWithFile>> GetBlogsWithFile(IEnumerable<Blog> blogs) {
+        var blogsWithFile = new List<BlogWithFile>();
+        
+        foreach (var blog in blogs) {
+            var blogContent = await GetBlogWithContent(blog);
+            blogsWithFile.Add(blogContent);
+        }
+        
+        return blogsWithFile;
+    }
+
+    public async Task<IEnumerable<BlogWithFile>> SearchBlog(string searchText) {
+        var blogs = await repo.FindBlogs(searchText);
+        return await GetBlogsWithFile(blogs);
     }
 }

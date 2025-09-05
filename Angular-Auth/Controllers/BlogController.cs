@@ -33,7 +33,7 @@ public class BlogController(ILogger<BlogController> logger, IBlogService blogSer
 
     [HttpGet]
     [AllowAnonymous]
-    public async Task<List<BlogWithFile>> GetAllBlogs() {
+    public async Task<IEnumerable<BlogWithFile>> GetAllBlogs() {
         return await blogService.GetAllBlogs();
     }
 
@@ -60,5 +60,15 @@ public class BlogController(ILogger<BlogController> logger, IBlogService blogSer
     [HttpGet("author/{username}")]
     public async Task<IEnumerable<Blog>> GetAllBlogsWithAuthor(string username) {
         return await blogService.GetBlogsWithAuthor(username);
+    }
+
+    [AllowAnonymous]
+    [HttpGet("search/{searchText}")]
+    public async Task<IActionResult> GetAllBlogsWithSearch(string searchText) {
+        var blogs = await blogService.SearchBlog(searchText);
+        if (!blogs.Any()) {
+            return NotFound("Cannot find a blog with search text : " + searchText);
+        }
+        return Ok(blogs);
     }
 }
