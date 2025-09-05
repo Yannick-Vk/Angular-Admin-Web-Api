@@ -14,6 +14,7 @@ public class BlogRepository(AppDbContext context) {
         return await context.Blogs
             .Include(b => b.Author)
             .AsNoTracking()
+            .OrderByDescending(b => b.CreatedAt)
             .ToListAsync();
     }
 
@@ -56,6 +57,7 @@ public class BlogRepository(AppDbContext context) {
         return await context.Blogs
             .Include(b => b.Author)
             .Where(b => b.Author.UserName == author)
+            .OrderByDescending(b => b.CreatedAt)
             .ToListAsync();
     }
 }
