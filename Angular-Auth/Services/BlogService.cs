@@ -95,8 +95,12 @@ public class BlogService(ILogger<BlogService> logger, BlogRepository repo, IUser
         var blog =  await repo.GetBlog(guid);
         if (blog is null) return null;
         
-        return await repo.DeleteBlog(blog);
-        //TODO: delete blog file
+        blog = await repo.DeleteBlog(blog);
+        // Delete blog file
+        if (blog is not null) {
+            DeleteFile(blog.Id.ToString());
+        }
+        return blog;
     }
 
     public async Task<IEnumerable<BlogWithAuthor>> GetBlogsWithAuthor(string username) {
@@ -117,5 +121,12 @@ public class BlogService(ILogger<BlogService> logger, BlogRepository repo, IUser
     public async Task<IEnumerable<BlogWithFile>> SearchBlog(string searchText) {
         var blogs = await repo.FindBlogs(searchText);
         return await GetBlogsWithFile(blogs);
+    }
+
+    private void DeleteFile(string id) {
+        var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "uploads");
+        var uniqueFileName = id + ".md";
+        var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+        File.Delete(filePath);
     }
 }
