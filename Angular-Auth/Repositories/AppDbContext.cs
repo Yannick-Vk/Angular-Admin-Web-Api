@@ -6,4 +6,4 @@ namespace Angular_Auth.Repositories;
 
 public class AppDbContext(DbContextOptions options) : IdentityDbContext<User>(options) {
     public DbSet<Blog> Blogs { get; set; }
-};
+}

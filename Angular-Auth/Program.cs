@@ -42,16 +42,14 @@ builder.Services.AddAuthentication(options => {
     options.SaveToken = true;
     options.RequireHttpsMetadata = false;
     var secret = configuration["JWT:Secret"];
-    if (secret is null) {
-        throw new ArgumentException("JWT:Secret is not configured.");
-    }
+    if (secret is null) throw new ArgumentException("JWT:Secret is not configured.");
 
     options.TokenValidationParameters = new TokenValidationParameters {
         ValidateIssuer = true,
         ValidateAudience = true,
         ValidAudience = configuration["JWT:ValidAudience"],
         ValidIssuer = configuration["JWT:ValidIssuer"],
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret))
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret)),
     };
 });
 
@@ -59,7 +57,7 @@ builder.Services.AddAuthentication(options => {
 builder.Services.AddOpenApi();
 // Swagger Gen
 builder.Services.AddSwaggerGen(c => {
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Angular Blogs API", Version = "v1" });
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Angular Blogs API", Version = "v1", });
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme {
         Description = """
                       ## JWT Authorization header using the Bearer scheme.
@@ -70,7 +68,7 @@ builder.Services.AddSwaggerGen(c => {
         Name = "Authorization",
         In = ParameterLocation.Header,
         Type = SecuritySchemeType.ApiKey,
-        Scheme = "Bearer"
+        Scheme = "Bearer",
     });
 
     c.AddSecurityRequirement(new OpenApiSecurityRequirement {
@@ -78,14 +76,14 @@ builder.Services.AddSwaggerGen(c => {
             new OpenApiSecurityScheme {
                 Reference = new OpenApiReference {
                     Type = ReferenceType.SecurityScheme,
-                    Id = "Bearer"
+                    Id = "Bearer",
                 },
                 Scheme = "oauth2",
                 Name = "Bearer",
                 In = ParameterLocation.Header,
             },
             new List<string>()
-        }
+        },
     });
 });
 

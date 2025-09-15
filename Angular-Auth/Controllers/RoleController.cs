@@ -24,9 +24,7 @@ public class RoleController(ILogger<RoleController> logger, IRoleService service
     [HttpDelete]
     public async Task<ActionResult> DeleteRole(RoleDto role) {
         var result = await service.DeleteRole(role.roleName);
-        if (result.Succeeded) {
-            return Ok();
-        }
+        if (result.Succeeded) return Ok();
 
         result.Errors.ToList().ForEach(error => logger.LogError("[{code}]: {msg}", error.Code, error.Description));
         return BadRequest(result.Errors.FirstOrDefault());

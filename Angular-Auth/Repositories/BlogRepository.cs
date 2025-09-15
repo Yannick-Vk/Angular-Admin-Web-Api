@@ -48,13 +48,13 @@ public class BlogRepository(AppDbContext context) {
 
     public async Task<IEnumerable<Blog>> FindBlogs(string searchWord) {
         searchWord = searchWord.Trim().ToLower();
-        
+
         return await context.Blogs
-            .Include(b => b.Author)
-            .Where(b => b.Title.ToLower().Contains(searchWord))
-            .OrderByDescending(b => b.CreatedAt)
-            .AsNoTracking()
-            .ToListAsync()
-        ;
+                .Include(b => b.Author)
+                .Where(b => b.Title.ToLower().Contains(searchWord))
+                .OrderByDescending(b => b.CreatedAt)
+                .AsNoTracking()
+                .ToListAsync()
+            ;
     }
 }

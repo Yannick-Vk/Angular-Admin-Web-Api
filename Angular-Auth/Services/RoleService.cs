@@ -22,7 +22,7 @@ public class RoleService(ILogger<RoleService> logger, RoleManager<IdentityRole> 
         if (role is null)
             return IdentityResult.Failed(new IdentityError {
                 Code = "Not found",
-                Description = $"Cannot find role with the given name `{roleName}`"
+                Description = $"Cannot find role with the given name `{roleName}`",
             });
         var result = await manager.DeleteAsync(role);
         return result;
@@ -30,14 +30,10 @@ public class RoleService(ILogger<RoleService> logger, RoleManager<IdentityRole> 
 
     public async Task AddRoleToUser(string roleName, string userName) {
         var role = await manager.Roles.FirstOrDefaultAsync(r => r.Name == roleName);
-        if (role == null) {
-            throw new ArgumentException($"Role with name `{roleName}` doesn't exist");
-        }
+        if (role == null) throw new ArgumentException($"Role with name `{roleName}` doesn't exist");
 
         var user = await userManager.Users.FirstOrDefaultAsync(u => u.UserName == userName);
-        if (user == null) {
-            throw new ArgumentException($"User with name `{userName}` doesn't exist");
-        }
+        if (user == null) throw new ArgumentException($"User with name `{userName}` doesn't exist");
 
         logger.LogInformation("Adding role `{RoleName}` to user `{UserName}`", roleName, userName);
 
@@ -46,9 +42,7 @@ public class RoleService(ILogger<RoleService> logger, RoleManager<IdentityRole> 
 
     public async Task RemoveRoleFromUser(string roleName, string userName) {
         var user = await userManager.Users.FirstOrDefaultAsync(u => u.UserName == userName);
-        if (user == null) {
-            throw new ArgumentException($"User with name `{userName}` doesn't exist");
-        }
+        if (user == null) throw new ArgumentException($"User with name `{userName}` doesn't exist");
 
         await userManager.RemoveFromRoleAsync(user, roleName);
     }
@@ -59,18 +53,14 @@ public class RoleService(ILogger<RoleService> logger, RoleManager<IdentityRole> 
 
     public async Task<bool> UserHasRole(string roleName, string userName) {
         var user = await userManager.Users.FirstOrDefaultAsync(u => u.UserName == userName);
-        if (user == null) {
-            throw new ArgumentException($"User with name `{userName}` doesn't exist");
-        }
+        if (user == null) throw new ArgumentException($"User with name `{userName}` doesn't exist");
 
         return await userManager.IsInRoleAsync(user, roleName);
     }
 
     public async Task<IEnumerable<string>> GetRolesFromUser(string username) {
         var user = await userManager.Users.FirstOrDefaultAsync(u => u.UserName == username);
-        if (user == null) {
-            throw new ArgumentException($"User with name `{username}` doesn't exist");
-        }
+        if (user == null) throw new ArgumentException($"User with name `{username}` doesn't exist");
 
         var roles = await userManager.GetRolesAsync(user);
         return roles;

@@ -18,9 +18,10 @@ public class AuthController(ILogger<AuthController> logger, IAuthenticationServi
             logger.LogWarning("Login failed {err}", response.Message);
             return Unauthorized(response);
         }
+
         return Ok(response);
     }
-    
+
     [AllowAnonymous]
     [HttpPost("register")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(LoginResponse))]
@@ -31,6 +32,7 @@ public class AuthController(ILogger<AuthController> logger, IAuthenticationServi
             logger.LogWarning("Registration failed {err}", response.Message);
             return Unauthorized(response);
         }
+
         return Ok(response);
     }
 }

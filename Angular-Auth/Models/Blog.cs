@@ -7,17 +7,7 @@ namespace Angular_Auth.Models;
 
 [Table("Blogs")]
 public class Blog {
-    public Guid Id { get; set; }
-    [MaxLength(255)]
-    public required string Title { get; set; }
-    [MaxLength(9500)]
-    public required string Description { get; set; }
-    public required User Author { get; set; }
-    public required DateTime CreatedAt { get; set; }
-    public DateTime? UpdatedAt { get; set; }
-    
-    
-    public Blog() {}
+    public Blog() { }
 
     [SetsRequiredMembers]
     public Blog(BlogUpload upload, User author) {
@@ -27,4 +17,14 @@ public class Blog {
         CreatedAt = DateTime.Now;
         Author = author;
     }
+
+    public Guid Id { get; set; }
+
+    [MaxLength(255)] public required string Title { get; set; }
+
+    [MaxLength(9500)] public required string Description { get; set; }
+
+    public required User Author { get; set; }
+    public required DateTime CreatedAt { get; set; }
+    public DateTime? UpdatedAt { get; set; }
 }

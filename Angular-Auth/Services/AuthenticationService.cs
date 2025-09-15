@@ -11,16 +11,14 @@ namespace Angular_Auth.Services;
 public class AuthenticationService(UserManager<User> userManager, IConfiguration configuration)
     : IAuthenticationService {
     public async Task<LoginResponse> Login(LoginRequest request) {
-        if (request.Username is null || request.Password is null) {
-            return new LoginResponse() { Message = "Username and Password are required." };
-        }
+        if (request.Username is null || request.Password is null)
+            return new LoginResponse { Message = "Username and Password are required.", };
 
         var user = await userManager.FindByNameAsync(request.Username) ??
                    await userManager.FindByEmailAsync(request.Username);
 
-        if (user is null || !await userManager.CheckPasswordAsync(user, request.Password)) {
-            return new LoginResponse() { Message = "Username and/or password are incorrect." };
-        }
+        if (user is null || !await userManager.CheckPasswordAsync(user, request.Password))
+            return new LoginResponse { Message = "Username and/or password are incorrect.", };
 
         var authClaims = new List<Claim> {
             new("Id", user.Id),
@@ -39,18 +37,16 @@ public class AuthenticationService(UserManager<User> userManager, IConfiguration
     }
 
     public async Task<LoginResponse> Register(RegisterRequest request) {
-        if (request.Email is null || request.Username is null || request.Password is null) {
-            return new LoginResponse() { Message = "Email, Username and Password are required." };
-        }
+        if (request.Email is null || request.Username is null || request.Password is null)
+            return new LoginResponse { Message = "Email, Username and Password are required.", };
 
         // Find a user that already has a given Email or Username
         var userByEmail = await userManager.FindByEmailAsync(request.Email);
         var userByUsername = await userManager.FindByNameAsync(request.Username);
-        if (userByEmail is not null || userByUsername is not null) {
-            return new LoginResponse() {
-                Message = $"User with email {request.Email} or username {request.Username} already exists."
+        if (userByEmail is not null || userByUsername is not null)
+            return new LoginResponse {
+                Message = $"User with email {request.Email} or username {request.Username} already exists.",
             };
-        }
 
         // Create a new user
         User user = new() {
@@ -61,26 +57,24 @@ public class AuthenticationService(UserManager<User> userManager, IConfiguration
 
         var result = await userManager.CreateAsync(user, request.Password);
 
-        if (!result.Succeeded) {
+        if (!result.Succeeded)
             return new LoginResponse {
-                Message = $"Unable to register user {request.Username}:{Environment.NewLine}{ShowErrorsText(result.Errors)}"
+                Message =
+                    $"Unable to register user {request.Username}:{Environment.NewLine}{ShowErrorsText(result.Errors)}",
             };
-        }
 
-        return await Login(new LoginRequest { Username = request.Email, Password = request.Password });
+        return await Login(new LoginRequest { Username = request.Email, Password = request.Password, });
     }
 
     private JwtSecurityToken GetToken(IEnumerable<Claim> authClaims) {
         var secret = configuration["JWT:Secret"];
-        if (secret is null) {
-            throw new ArgumentException("JWT:Secret is not configured.");
-        }
+        if (secret is null) throw new ArgumentException("JWT:Secret is not configured.");
 
         var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret));
 
         var token = new JwtSecurityToken(
-            issuer: configuration["JWT:ValidIssuer"],
-            audience: configuration["JWT:ValidAudience"],
+            configuration["JWT:ValidIssuer"],
+            configuration["JWT:ValidAudience"],
             expires: DateTime.Now.AddMinutes(30),
             claims: authClaims,
             signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)

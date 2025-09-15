@@ -1,6 +1,4 @@
 ﻿using Angular_Auth.Dto;
-using Angular_Auth.Migrations;
-using Angular_Auth.Models;
 using Angular_Auth.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -14,9 +12,7 @@ public class BlogController(ILogger<BlogController> logger, IBlogService blogSer
     [HttpPost]
     public async Task<IActionResult> UploadBlog(BlogUpload blogUpload) {
         var id = await blogService.UploadBlog(blogUpload);
-        if (id is null) {
-            return Problem("Failed to save blog ");
-        }
+        if (id is null) return Problem("Failed to save blog ");
 
         return Ok(id);
     }
@@ -25,9 +21,7 @@ public class BlogController(ILogger<BlogController> logger, IBlogService blogSer
     [AllowAnonymous]
     public async Task<IActionResult> GetBlog(string blogId) {
         var blog = await blogService.GetBlog(blogId);
-        if (blog is null) {
-            return NotFound("Cannot find a blog with ID : " + blogId);
-        }
+        if (blog is null) return NotFound("Cannot find a blog with ID : " + blogId);
 
         return Ok(blog);
     }
@@ -41,9 +35,7 @@ public class BlogController(ILogger<BlogController> logger, IBlogService blogSer
     [HttpPatch]
     public async Task<IActionResult> UpdateBlog(BlogUpdate blog) {
         var result = await blogService.UpdateBlog(blog);
-        if (result is null) {
-            return NotFound("Cannot find a blog with ID : " + blog.Id);
-        }
+        if (result is null) return NotFound("Cannot find a blog with ID : " + blog.Id);
 
         return Ok(result);
     }
@@ -51,9 +43,7 @@ public class BlogController(ILogger<BlogController> logger, IBlogService blogSer
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteBlog(string id) {
         var blog = await blogService.DeleteBlog(id);
-        if (blog is null) {
-            return NotFound($"Cannot find blog with ID: ${id}");
-        }
+        if (blog is null) return NotFound($"Cannot find blog with ID: ${id}");
 
         return Ok(blog);
     }
@@ -67,9 +57,7 @@ public class BlogController(ILogger<BlogController> logger, IBlogService blogSer
     [HttpGet("search/{searchText}")]
     public async Task<IActionResult> GetAllBlogsWithSearch(string searchText) {
         var blogs = await blogService.SearchBlog(searchText);
-        if (!blogs.Any()) {
-            return NotFound("Cannot find a blog with search text : " + searchText);
-        }
+        if (!blogs.Any()) return NotFound("Cannot find a blog with search text : " + searchText);
 
         return Ok(blogs);
     }

@@ -4,13 +4,6 @@ using Angular_Auth.Models;
 namespace Angular_Auth.Dto;
 
 public class BlogWithAuthor {
-    public required Guid Id {get; set;}
-    public required string Title { get; set; }
-    public required string Description { get; set; }
-    public required string Author { get; set; }
-    public required DateTime CreatedAt { get; set; }
-    public DateTime? UpdatedAt { get; set; }
-
     public BlogWithAuthor() { }
 
     [SetsRequiredMembers]
@@ -22,4 +15,11 @@ public class BlogWithAuthor {
         CreatedAt = blog.CreatedAt;
         UpdatedAt = blog.UpdatedAt;
     }
+
+    public required Guid Id { get; set; }
+    public required string Title { get; set; }
+    public required string Description { get; set; }
+    public required string Author { get; set; }
+    public required DateTime CreatedAt { get; set; }
+    public DateTime? UpdatedAt { get; set; }
 }
