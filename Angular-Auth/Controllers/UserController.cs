@@ -19,9 +19,14 @@ public class UserController(IUserService service, IRoleService roleService) : Co
     public async Task<UserDto?> GetUser(string userName) {
         return await service.GetUserDto(userName);
     }
-    
+
     [HttpGet("{userName}/Roles")]
-    public async Task<IEnumerable<string>> GetUserRoles(string userName) {
-        return await roleService.GetRolesFromUser(userName);
+    public async Task<IActionResult> GetUserRoles(string userName) {
+        try {
+            return Ok(await roleService.GetRolesFromUser(userName));
+        }
+        catch (Exception ex) {
+            return BadRequest(ex.Message);
+        }
     }
 }

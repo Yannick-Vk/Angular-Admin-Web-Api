@@ -28,7 +28,7 @@ public class RoleController(ILogger<RoleController> logger, IRoleService service
             return Ok();
         }
 
-        result.Errors.ToList().ForEach(error => logger.LogError("[{code}]: {msg}",  error.Code, error.Description));
+        result.Errors.ToList().ForEach(error => logger.LogError("[{code}]: {msg}", error.Code, error.Description));
         return BadRequest(result.Errors.FirstOrDefault());
     }
 
@@ -42,7 +42,7 @@ public class RoleController(ILogger<RoleController> logger, IRoleService service
             return BadRequest(e.Message);
         }
     }
-    
+
     [HttpPost("remove-from-user")]
     public async Task<ActionResult> RemoveRoleFromUser(UserAndRoleDto dto) {
         try {
@@ -59,7 +59,7 @@ public class RoleController(ILogger<RoleController> logger, IRoleService service
         var users = await service.GetUsersWithRole(roleName);
         return users.ToList();
     }
-    
+
     [HttpGet("{roleName}/{username}")]
     public async Task<ActionResult<bool>> UserHasRole(string roleName, string username) {
         try {

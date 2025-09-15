@@ -5,12 +5,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Angular_Auth.Services;
 
-public class RoleService(ILogger<RoleService> logger, RoleManager<IdentityRole> manager, UserManager<User> userManager) : IRoleService {
-
-    
-
-    
-
+public class RoleService(ILogger<RoleService> logger, RoleManager<IdentityRole> manager, UserManager<User> userManager)
+    : IRoleService {
     public async Task CreateNewRole(Role role) {
         await manager.CreateAsync(role);
     }
@@ -23,10 +19,11 @@ public class RoleService(ILogger<RoleService> logger, RoleManager<IdentityRole> 
 
     public async Task<IdentityResult> DeleteRole(string roleName) {
         var role = await manager.Roles.FirstOrDefaultAsync(r => r.Name == roleName);
-        if (role is null) return IdentityResult.Failed(new IdentityError {
-            Code = "Not found",
-            Description = $"Cannot find role with the given name `{roleName}`"
-        });
+        if (role is null)
+            return IdentityResult.Failed(new IdentityError {
+                Code = "Not found",
+                Description = $"Cannot find role with the given name `{roleName}`"
+            });
         var result = await manager.DeleteAsync(role);
         return result;
     }
@@ -36,6 +33,7 @@ public class RoleService(ILogger<RoleService> logger, RoleManager<IdentityRole> 
         if (role == null) {
             throw new ArgumentException($"Role with name `{roleName}` doesn't exist");
         }
+
         var user = await userManager.Users.FirstOrDefaultAsync(u => u.UserName == userName);
         if (user == null) {
             throw new ArgumentException($"User with name `{userName}` doesn't exist");
@@ -64,6 +62,7 @@ public class RoleService(ILogger<RoleService> logger, RoleManager<IdentityRole> 
         if (user == null) {
             throw new ArgumentException($"User with name `{userName}` doesn't exist");
         }
+
         return await userManager.IsInRoleAsync(user, roleName);
     }
 
@@ -72,6 +71,7 @@ public class RoleService(ILogger<RoleService> logger, RoleManager<IdentityRole> 
         if (user == null) {
             throw new ArgumentException($"User with name `{username}` doesn't exist");
         }
+
         var roles = await userManager.GetRolesAsync(user);
         return roles;
     }
