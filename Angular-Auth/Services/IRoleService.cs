@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Identity;
 namespace Angular_Auth.Services;
 
 public interface IRoleService {
-    Task AddRole(Role role);
+    Task CreateNewRole(Role role);
     Task<IEnumerable<IdentityRole>> GetAllRoles();
     Task<IdentityResult> DeleteRole(string roleName);
     Task AddRoleToUser(string roleName, string userName);

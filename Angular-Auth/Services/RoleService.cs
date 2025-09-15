@@ -16,8 +16,8 @@ public class RoleService(ILogger<RoleService> logger, RoleManager<IdentityRole> 
         var role = await manager.Roles.FirstOrDefaultAsync(r => r.Name == roleName);
         return role ?? throw new ArgumentException($"role with name `{roleName}` doesn't exist`");
     }
-    
-    public async Task AddRole(Role role) {
+
+    public async Task CreateNewRole(Role role) {
         await manager.CreateAsync(role);
     }
 

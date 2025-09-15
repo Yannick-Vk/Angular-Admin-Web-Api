@@ -17,8 +17,8 @@ public class RoleController(ILogger<RoleController> logger, IRoleService service
     }
 
     [HttpPost]
-    public async Task AddRole(RoleDto role) {
-        await service.AddRole(new Role(role.roleName) );
+    public async Task CreateNewRole(RoleDto role) {
+        await service.CreateNewRole(new Role(role.roleName));
     }
 
     [HttpDelete]
