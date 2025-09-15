@@ -59,12 +59,13 @@ builder.Services.AddAuthentication(options => {
 builder.Services.AddOpenApi();
 // Swagger Gen
 builder.Services.AddSwaggerGen(c => {
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Wedding Planner API", Version = "v1" });
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Angular Blogs API", Version = "v1" });
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme {
         Description = """
-                      JWT Authorization header using the Bearer scheme. \r\n\r\n 
-                                            Enter 'Bearer' [space] and then your token in the text input below.
-                                            \r\n\r\nExample: 'Bearer xxxxxxx'
+                      ## JWT Authorization header using the Bearer scheme.
+                      Enter 'Bearer' [space] and then your token in the text input below.
+
+                      **Example:** 'Bearer xxxxxxx'
                       """,
         Name = "Authorization",
         In = ParameterLocation.Header,
