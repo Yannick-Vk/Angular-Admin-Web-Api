@@ -7,15 +7,9 @@ namespace Angular_Auth.Services;
 
 public class RoleService(ILogger<RoleService> logger, RoleManager<IdentityRole> manager, UserManager<User> userManager) : IRoleService {
 
-    private async Task<User> GetUser(string userName) {
-        var user = await userManager.Users.FirstOrDefaultAsync(u => u.UserName == userName);
-        return user ?? throw new ArgumentException($"user with name `{userName}` doesn't exist`");
-    }
+    
 
-    private async Task<IdentityRole> GetRole(string roleName) {
-        var role = await manager.Roles.FirstOrDefaultAsync(r => r.Name == roleName);
-        return role ?? throw new ArgumentException($"role with name `{roleName}` doesn't exist`");
-    }
+    
 
     public async Task CreateNewRole(Role role) {
         await manager.CreateAsync(role);
@@ -38,17 +32,26 @@ public class RoleService(ILogger<RoleService> logger, RoleManager<IdentityRole> 
     }
 
     public async Task AddRoleToUser(string roleName, string userName) {
-        await GetRole(roleName);
-        var user = await GetUser(userName);
-        
+        var role = await manager.Roles.FirstOrDefaultAsync(r => r.Name == roleName);
+        if (role == null) {
+            throw new ArgumentException($"Role with name `{roleName}` doesn't exist");
+        }
+        var user = await userManager.Users.FirstOrDefaultAsync(u => u.UserName == userName);
+        if (user == null) {
+            throw new ArgumentException($"User with name `{userName}` doesn't exist");
+        }
+
         logger.LogInformation("Adding role `{RoleName}` to user `{UserName}`", roleName, userName);
-        
+
         await userManager.AddToRoleAsync(user, roleName);
     }
 
     public async Task RemoveRoleFromUser(string roleName, string userName) {
-        var user = await GetUser(userName);
-        
+        var user = await userManager.Users.FirstOrDefaultAsync(u => u.UserName == userName);
+        if (user == null) {
+            throw new ArgumentException($"User with name `{userName}` doesn't exist");
+        }
+
         await userManager.RemoveFromRoleAsync(user, roleName);
     }
 
@@ -57,12 +60,18 @@ public class RoleService(ILogger<RoleService> logger, RoleManager<IdentityRole> 
     }
 
     public async Task<bool> UserHasRole(string roleName, string userName) {
-        var user = await GetUser(userName);
+        var user = await userManager.Users.FirstOrDefaultAsync(u => u.UserName == userName);
+        if (user == null) {
+            throw new ArgumentException($"User with name `{userName}` doesn't exist");
+        }
         return await userManager.IsInRoleAsync(user, roleName);
     }
 
     public async Task<IEnumerable<string>> GetRolesFromUser(string username) {
-        var user = await GetUser(username);
+        var user = await userManager.Users.FirstOrDefaultAsync(u => u.UserName == username);
+        if (user == null) {
+            throw new ArgumentException($"User with name `{username}` doesn't exist");
+        }
         var roles = await userManager.GetRolesAsync(user);
         return roles;
     }

@@ -33,13 +33,25 @@ public class RoleController(ILogger<RoleController> logger, IRoleService service
     }
 
     [HttpPost("add-to-user")]
-    public async Task AddUserToRole(UserAndRoleDto dto) {
-        await service.AddRoleToUser(dto.RoleName, dto.Username);
+    public async Task<ActionResult> AddUserToRole(UserAndRoleDto dto) {
+        try {
+            await service.AddRoleToUser(dto.RoleName, dto.Username);
+            return Ok();
+        }
+        catch (ArgumentException e) {
+            return BadRequest(e.Message);
+        }
     }
     
     [HttpPost("remove-from-user")]
-    public async Task RemoveRoleFromUser(UserAndRoleDto dto) {
-        await service.RemoveRoleFromUser(dto.RoleName, dto.Username);
+    public async Task<ActionResult> RemoveRoleFromUser(UserAndRoleDto dto) {
+        try {
+            await service.RemoveRoleFromUser(dto.RoleName, dto.Username);
+            return Ok();
+        }
+        catch (ArgumentException e) {
+            return BadRequest(e.Message);
+        }
     }
 
     [HttpGet("{roleName}")]
@@ -49,7 +61,12 @@ public class RoleController(ILogger<RoleController> logger, IRoleService service
     }
     
     [HttpGet("{roleName}/{username}")]
-    public async Task<bool> UserHasRole(string roleName, string username) {
-        return await service.UserHasRole(roleName, username);
+    public async Task<ActionResult<bool>> UserHasRole(string roleName, string username) {
+        try {
+            return await service.UserHasRole(roleName, username);
+        }
+        catch (ArgumentException e) {
+            return BadRequest(e.Message);
+        }
     }
 }
