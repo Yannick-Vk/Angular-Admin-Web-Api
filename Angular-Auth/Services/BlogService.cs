@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using Angular_Auth.Dto;
+using Angular_Auth.Exceptions;
 using Angular_Auth.Models;
 using Angular_Auth.Repositories;
 
@@ -32,18 +33,15 @@ public class BlogService(ILogger<BlogService> logger, BlogRepository repo, IUser
         return blog.Id;
     }
 
-    public async Task<BlogWithFile?> UpdateBlog(BlogUpdate dto, UserDto loggedInUser) {
+    public async Task<BlogWithFile> UpdateBlog(BlogUpdate dto, UserDto loggedInUser) {
         var blog = await repo.GetBlog(dto.Id);
-        if (blog is null) return null;
+        if (blog is null) throw new BlogNotFoundException($"Blog with ID {dto.Id} was not found.");
 
         var author = loggedInUser.Username;
 
-        logger.LogInformation("Updating Blog {id} {title} by {author}, using login {login}", blog.Id, blog.Title,
-            blog.Author, author);
-
         if (blog.Author.UserName != author) {
-            logger.LogError("Wrong blog author: expected `{author}` but got `{wrongAuthor}`", blog.Author, author);
-            return null;
+            logger.LogError("User {user} attempted to update a blog belonging to {author}", author, blog.Author.UserName);
+            throw new NotBlogAuthorException("You do not have permission to update this blog.");
         }
 
         blog.Title = dto.Title ?? blog.Title;

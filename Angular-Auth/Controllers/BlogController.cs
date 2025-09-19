@@ -1,4 +1,5 @@
 ﻿using Angular_Auth.Dto;
+using Angular_Auth.Exceptions;
 using Angular_Auth.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -38,11 +39,23 @@ public class BlogController(
     [HttpPatch]
     public async Task<IActionResult> UpdateBlog(BlogUpdate blog) {
         var user = authService.GetUserFromRequest(Request);
-        
-        var result = await blogService.UpdateBlog(blog, user);
-        if (result is null) return NotFound("Cannot find a blog with ID : " + blog.Id);
+        if (user is null) {
+            return Unauthorized();
+        }
 
-        return Ok(result);
+        try {
+            var result = await blogService.UpdateBlog(blog, user);
+            return Ok(result);
+        }
+        catch (BlogNotFoundException e) {
+            return NotFound(e.Message);
+        }
+        catch (NotBlogAuthorException e) {
+            return Forbid(e.Message);
+        }
+        catch (Exception e) {
+            return BadRequest(e.Message);
+        }
     }
 
     [HttpDelete("{id}")]
