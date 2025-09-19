@@ -64,10 +64,26 @@ public class BlogController(
 
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteBlog(string id) {
-        var blog = await blogService.DeleteBlog(id);
-        if (blog is null) return NotFound($"Cannot find blog with ID: ${id}");
+        var user  = authService.GetUserFromRequest(Request);
+        if (user is null) {
+            return Unauthorized();
+        }
 
-        return Ok(blog);
+        try {
+            var blog = await blogService.DeleteBlog(id, user);
+            if (blog is null) return NotFound($"Cannot find blog with ID: ${id}");
+
+            return Ok(blog);
+        }
+        catch (BlogNotFoundException e) {
+            return NotFound(e.Message);
+        }
+        catch (NotBlogAuthorException e) {
+            return Forbid();
+        }
+        catch (Exception e) {
+            return BadRequest(e.Message);
+        }
     }
 
     [HttpGet("author/me")]
