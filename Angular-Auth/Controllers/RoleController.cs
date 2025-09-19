@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Angular_Auth.Controllers;
 
-[Authorize]
+[Authorize(Roles = "Admin")]
 [ApiController]
 [Route("/api/v1/roles")]
 public class RoleController(ILogger<RoleController> logger, IRoleService service) : Controller {

@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Angular_Auth.Controllers;
 
-[Authorize]
+[Authorize(Roles = "Admin")]
 [ApiController]
 [Route("/api/v1/users")]
 public class UserController(IUserService service, IRoleService roleService) : ControllerBase {
