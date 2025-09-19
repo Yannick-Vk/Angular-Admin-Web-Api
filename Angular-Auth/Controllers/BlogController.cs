@@ -8,7 +8,10 @@ namespace Angular_Auth.Controllers;
 [ApiController]
 [Authorize]
 [Route("api/v1/[controller]s")]
-public class BlogController(ILogger<BlogController> logger, IBlogService blogService) : Controller {
+public class BlogController(
+    ILogger<BlogController> logger,
+    IBlogService blogService,
+    IAuthenticationService authService) : Controller {
     [HttpPost]
     public async Task<IActionResult> UploadBlog(BlogUpload blogUpload) {
         var id = await blogService.UploadBlog(blogUpload);
@@ -34,7 +37,9 @@ public class BlogController(ILogger<BlogController> logger, IBlogService blogSer
 
     [HttpPatch]
     public async Task<IActionResult> UpdateBlog(BlogUpdate blog) {
-        var result = await blogService.UpdateBlog(blog);
+        var user = authService.GetUserFromRequest(Request);
+        
+        var result = await blogService.UpdateBlog(blog, user);
         if (result is null) return NotFound("Cannot find a blog with ID : " + blog.Id);
 
         return Ok(result);

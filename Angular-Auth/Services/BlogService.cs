@@ -32,9 +32,19 @@ public class BlogService(ILogger<BlogService> logger, BlogRepository repo, IUser
         return blog.Id;
     }
 
-    public async Task<BlogWithFile?> UpdateBlog(BlogUpdate dto) {
+    public async Task<BlogWithFile?> UpdateBlog(BlogUpdate dto, UserDto loggedInUser) {
         var blog = await repo.GetBlog(dto.Id);
         if (blog is null) return null;
+
+        var author = loggedInUser.Username;
+
+        logger.LogInformation("Updating Blog {id} {title} by {author}, using login {login}", blog.Id, blog.Title,
+            blog.Author, author);
+
+        if (blog.Author.UserName != author) {
+            logger.LogError("Wrong blog author: expected `{author}` but got `{wrongAuthor}`", blog.Author, author);
+            return null;
+        }
 
         blog.Title = dto.Title ?? blog.Title;
         blog.Description = dto.Description ?? blog.Description;
