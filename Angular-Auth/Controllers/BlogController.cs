@@ -3,6 +3,7 @@ using Angular_Auth.Exceptions;
 using Angular_Auth.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using static Microsoft.AspNetCore.Http.StatusCodes;
 
 namespace Angular_Auth.Controllers;
 
@@ -37,10 +38,10 @@ public class BlogController(
     }
     
     [HttpPatch]
-    [ProducesResponseType(statusCode: StatusCodes.Status200OK)]
-    [ProducesResponseType(statusCode: StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(statusCode: StatusCodes.Status403Forbidden)]
-    [ProducesResponseType(statusCode: StatusCodes.Status404NotFound)]
+    [ProducesResponseType(Status200OK)]
+    [ProducesResponseType(Status401Unauthorized)]
+    [ProducesResponseType(Status403Forbidden)]
+    [ProducesResponseType(Status404NotFound)]
     public async Task<IActionResult> UpdateBlog(BlogUpdate blog) {
         var user = authService.GetUserFromRequest(Request);
         if (user is null) {
@@ -64,6 +65,10 @@ public class BlogController(
     }
 
     [HttpDelete("{id}")]
+    [ProducesResponseType(Status200OK)]
+    [ProducesResponseType(Status401Unauthorized)]
+    [ProducesResponseType(Status403Forbidden)]
+    [ProducesResponseType(Status404NotFound)]
     public async Task<IActionResult> DeleteBlog(string id) {
         var user  = authService.GetUserFromRequest(Request);
         if (user is null) {
