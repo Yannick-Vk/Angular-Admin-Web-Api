@@ -70,9 +70,14 @@ public class BlogController(
         return Ok(blog);
     }
 
-    [HttpGet("author/{username}")]
-    public async Task<IActionResult> GetAllBlogsWithAuthor(string username) {
-        return Ok(await blogService.GetBlogsWithAuthor(username));
+    [HttpGet("author/me")]
+    public async Task<IActionResult> GetAllBlogsWithAuthor() {
+        var user = authService.GetUserFromRequest(Request);
+        if (user is null) {
+            return Unauthorized();
+        }
+        
+        return Ok(await blogService.GetBlogsWithAuthor(user.Username!));
     }
 
     [AllowAnonymous]
