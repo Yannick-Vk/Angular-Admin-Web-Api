@@ -35,8 +35,12 @@ public class BlogController(
     public async Task<IEnumerable<BlogWithFile>> GetAllBlogs() {
         return await blogService.GetAllBlogs();
     }
-
+    
     [HttpPatch]
+    [ProducesResponseType(statusCode: StatusCodes.Status200OK)]
+    [ProducesResponseType(statusCode: StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(statusCode: StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(statusCode: StatusCodes.Status404NotFound)]
     public async Task<IActionResult> UpdateBlog(BlogUpdate blog) {
         var user = authService.GetUserFromRequest(Request);
         if (user is null) {
@@ -51,7 +55,7 @@ public class BlogController(
             return NotFound(e.Message);
         }
         catch (NotBlogAuthorException e) {
-            return Forbid(e.Message);
+            return Forbid();
         }
         catch (Exception e) {
             return BadRequest(e.Message);
