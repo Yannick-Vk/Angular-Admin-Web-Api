@@ -55,6 +55,7 @@ public class BlogController(
             return NotFound(e.Message);
         }
         catch (NotBlogAuthorException e) {
+            logger.LogError("{message}", e.Message);
             return Forbid();
         }
         catch (Exception e) {
@@ -79,6 +80,7 @@ public class BlogController(
             return NotFound(e.Message);
         }
         catch (NotBlogAuthorException e) {
+            logger.LogError("{message}", e.Message);
             return Forbid();
         }
         catch (Exception e) {
