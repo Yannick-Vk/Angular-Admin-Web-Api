@@ -3,7 +3,7 @@ version: '3.8'
 services:
   app:
     build:
-      context: ..
+      context: .
       dockerfile: Angular-Auth/Dockerfile
     container_name: my-auth-app
     ports:
