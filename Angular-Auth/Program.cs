@@ -129,7 +129,11 @@ using (var scope = app.Services.CreateScope())
 if (app.Environment.IsDevelopment()) {
     app.MapOpenApi();
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Angular Blogs API v1");
+        c.SwaggerEndpoint("https://localhost:5001/swagger/v1/swagger.json", "Angular Blogs API v1 - HTTPS");
+    });
 }
 
 // Use CORS
