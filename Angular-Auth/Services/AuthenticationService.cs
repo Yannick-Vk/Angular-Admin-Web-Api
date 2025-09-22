@@ -33,7 +33,7 @@ public class AuthenticationService(
             new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
         };
 
-        authClaims.AddRange(userRoles.Select(userRole => new Claim("roles", userRole)));
+        authClaims.AddRange(userRoles.Select(userRole => new Claim(ClaimTypes.Role, userRole)));
 
         var token = GetToken(authClaims);
         var jwt = new JwtSecurityTokenHandler().WriteToken(token);
