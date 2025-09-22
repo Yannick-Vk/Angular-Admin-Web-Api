@@ -3,6 +3,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Linq;
 using Angular_Auth.Dto;
+using Angular_Auth.Exceptions;
 using Angular_Auth.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
@@ -14,15 +15,15 @@ public class AuthenticationService(
     UserManager<User> userManager,
     IConfiguration configuration)
     : IAuthenticationService {
-    public async Task<LoginResponse> Login(LoginRequest request) {
+    public async Task<string> Login(LoginRequest request) {
         if (request.Username is null || request.Password is null)
-            return new LoginResponse { Message = "Username and Password are required.", };
+            throw new CredentialsRequiredException("Username and Password are required.");
 
         var user = await userManager.FindByNameAsync(request.Username) ??
                    await userManager.FindByEmailAsync(request.Username);
 
         if (user is null || !await userManager.CheckPasswordAsync(user, request.Password))
-            return new LoginResponse { Message = "Username and/or password are incorrect.", };
+            throw new WrongCredentialsException("Username and/or password are incorrect.");
 
         var authClaims = new List<Claim> {
             new("Id", user.Id),
@@ -34,23 +35,19 @@ public class AuthenticationService(
         var token = GetToken(authClaims);
         var jwt = new JwtSecurityTokenHandler().WriteToken(token);
 
-        return new LoginResponse {
-            Success = true,
-            Token = jwt,
-        };
+        return jwt;
     }
 
-    public async Task<LoginResponse> Register(RegisterRequest request) {
+    public async Task<string> Register(RegisterRequest request) {
         if (request.Email is null || request.Username is null || request.Password is null)
-            return new LoginResponse { Message = "Email, Username and Password are required.", };
+            throw new CredentialsRequiredException("Email, Username and Password are required.");
 
         // Find a user that already has a given Email or Username
         var userByEmail = await userManager.FindByEmailAsync(request.Email);
         var userByUsername = await userManager.FindByNameAsync(request.Username);
         if (userByEmail is not null || userByUsername is not null)
-            return new LoginResponse {
-                Message = $"User with email {request.Email} or username {request.Username} already exists.",
-            };
+            throw new UserAlreadyExistsException(
+                $"User with email {request.Email} or username {request.Username} already exists.");
 
         // Create a new user
         User user = new() {
@@ -62,10 +59,8 @@ public class AuthenticationService(
         var result = await userManager.CreateAsync(user, request.Password);
 
         if (!result.Succeeded)
-            return new LoginResponse {
-                Message =
-                    $"Unable to register user {request.Username}:{Environment.NewLine}{ShowErrorsText(result.Errors)}",
-            };
+            throw new RegistrationFailedException(
+                $"Unable to register user {request.Username}:{Environment.NewLine}{ShowErrorsText(result.Errors)}");
 
         return await Login(new LoginRequest { Username = request.Email, Password = request.Password, });
     }
@@ -139,8 +134,8 @@ public class AuthenticationService(
                 Username = userName,
                 Email = userEmail
             };
-
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             logger.LogError(e, "Error validating JWT token.");
         }
 

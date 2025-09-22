@@ -1,4 +1,5 @@
 using Angular_Auth.Dto;
+using Angular_Auth.Exceptions;
 using Angular_Auth.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -13,13 +14,15 @@ public class AuthController(ILogger<AuthController> logger, IAuthenticationServi
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(LoginResponse))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(LoginResponse))]
     public async Task<IActionResult> Login([FromBody] LoginRequest request) {
-        var response = await service.Login(request);
-        if (!response.Success) {
-            logger.LogWarning("Login failed {err}", response.Message);
-            return Unauthorized(response);
+        try {
+            return Ok(await service.Login(request));
         }
-
-        return Ok(response);
+        catch (Exception e) when (e is CredentialsRequiredException or WrongCredentialsException) {
+            return BadRequest(e.Message);
+        }
+        catch (Exception e) {
+            return BadRequest(e.Message);
+        }
     }
 
     [AllowAnonymous]
@@ -27,12 +30,11 @@ public class AuthController(ILogger<AuthController> logger, IAuthenticationServi
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(LoginResponse))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(LoginResponse))]
     public async Task<IActionResult> Register([FromBody] RegisterRequest request) {
-        var response = await service.Register(request);
-        if (!response.Success) {
-            logger.LogWarning("Registration failed {err}", response.Message);
-            return Unauthorized(response);
+        try {
+            return Ok(await service.Register(request));
         }
-
-        return Ok(response);
+        catch (Exception e) {
+            return BadRequest(e.Message);
+        }
     }
 }

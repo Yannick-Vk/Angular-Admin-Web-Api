@@ -3,7 +3,7 @@
 namespace Angular_Auth.Services;
 
 public interface IAuthenticationService {
-    Task<LoginResponse> Login(LoginRequest request);
-    Task<LoginResponse> Register(RegisterRequest request);
+    Task<string> Login(LoginRequest request);
+    Task<string> Register(RegisterRequest request);
     public UserDto? GetUserFromRequest(HttpRequest req);
 }
