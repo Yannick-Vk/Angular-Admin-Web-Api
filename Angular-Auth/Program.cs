@@ -92,39 +92,6 @@ builder.Services.AddCors();
 
 var app = builder.Build();
 
-// Automatically apply database migrations on startup
-using (var scope = app.Services.CreateScope())
-{
-    var services = scope.ServiceProvider;
-    var logger = services.GetRequiredService<ILogger<Program>>();
-    var context = services.GetRequiredService<AppDbContext>();
-    
-    try
-    {
-        logger.LogInformation("Connecting to database and applying migrations...");
-        
-        // Simple retry loop
-        for (var i = 0; i < 5; i++)
-        {
-            try
-            {
-                context.Database.Migrate();
-                logger.LogInformation("Migrations applied successfully.");
-                break;
-            }
-            catch (Microsoft.Data.SqlClient.SqlException)
-            {
-                logger.LogWarning("Database not ready yet. Waiting 5 seconds to retry.");
-                System.Threading.Thread.Sleep(5000);
-            }
-        }
-    }
-    catch (Exception ex)
-    {
-        logger.LogError(ex, "An error occurred while migrating the database.");
-    }
-}
-
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment()) {
     app.MapOpenApi();
@@ -134,7 +101,7 @@ if (app.Environment.IsDevelopment()) {
 
 // Use CORS
 app.UseCors(b => b.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin());
-// app.UseHttpsRedirection();
+app.UseHttpsRedirection();
 
 //  Authentication
 app.UseAuthentication();
