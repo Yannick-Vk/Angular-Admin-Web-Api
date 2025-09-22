@@ -57,7 +57,7 @@ public class BlogController(
         }
         catch (NotBlogAuthorException e) {
             logger.LogError("{message}", e.Message);
-            return Forbid();
+            return StatusCode(Status403Forbidden, e.Message);
         }
         catch (Exception e) {
             return BadRequest(e.Message);
@@ -86,7 +86,7 @@ public class BlogController(
         }
         catch (NotBlogAuthorException e) {
             logger.LogError("{message}", e.Message);
-            return Forbid();
+            return StatusCode(Status403Forbidden, e.Message);
         }
         catch (Exception e) {
             return BadRequest(e.Message);
