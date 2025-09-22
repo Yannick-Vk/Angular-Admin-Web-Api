@@ -8,12 +8,13 @@ using static Microsoft.AspNetCore.Http.StatusCodes;
 
 namespace Angular_Auth.Controllers;
 
-[Authorize(Roles = "Admin")]
+[Authorize]
 [ApiController]
 [Route("/api/v1/roles")]
 public class RoleController(ILogger<RoleController> logger, IRoleService service, IAuthenticationService authService)
     : Controller {
     [HttpGet]
+    [Authorize(Roles = "Admin")]
     [ProducesResponseType(Status200OK)]
     [ProducesResponseType(Status401Unauthorized)]
     [ProducesResponseType(Status403Forbidden)]
@@ -22,6 +23,7 @@ public class RoleController(ILogger<RoleController> logger, IRoleService service
     }
 
     [HttpPost]
+    [Authorize(Roles = "Admin")]
     [ProducesResponseType(Status200OK)]
     [ProducesResponseType(Status401Unauthorized)]
     [ProducesResponseType(Status403Forbidden)]
@@ -30,6 +32,7 @@ public class RoleController(ILogger<RoleController> logger, IRoleService service
     }
 
     [HttpDelete]
+    [Authorize(Roles = "Admin")]
     [ProducesResponseType(Status200OK)]
     [ProducesResponseType(Status401Unauthorized)]
     [ProducesResponseType(Status403Forbidden)]
@@ -42,6 +45,7 @@ public class RoleController(ILogger<RoleController> logger, IRoleService service
     }
 
     [HttpPost("add-to-user")]
+    [Authorize(Roles = "Admin")]
     [ProducesResponseType(Status200OK)]
     [ProducesResponseType(Status401Unauthorized)]
     [ProducesResponseType(Status403Forbidden)]
@@ -56,6 +60,7 @@ public class RoleController(ILogger<RoleController> logger, IRoleService service
     }
 
     [HttpPost("remove-from-user")]
+    [Authorize(Roles = "Admin")]
     [ProducesResponseType(Status200OK)]
     [ProducesResponseType(Status401Unauthorized)]
     [ProducesResponseType(Status403Forbidden)]
@@ -70,6 +75,7 @@ public class RoleController(ILogger<RoleController> logger, IRoleService service
     }
 
     [HttpGet("{roleName}")]
+    [Authorize(Roles = "Admin")]
     [ProducesResponseType(Status200OK)]
     [ProducesResponseType(Status401Unauthorized)]
     [ProducesResponseType(Status403Forbidden)]
@@ -86,7 +92,10 @@ public class RoleController(ILogger<RoleController> logger, IRoleService service
     public async Task<ActionResult<bool>> UserHasRole(string roleName) {
         try {
             var token = authService.GetUserWithRolesFromRequest(Request);
-            if (token is null) { throw new UnauthorizedAccessException(); }
+            if (token is null) {
+                throw new UnauthorizedAccessException();
+            }
+
             return await service.UserHasRole(roleName, token);
         }
         catch (ArgumentException e) {
