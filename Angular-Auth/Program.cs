@@ -51,6 +51,15 @@ builder.Services.AddAuthentication(options => {
         ValidIssuer = configuration["JWT:ValidIssuer"],
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret)),
     };
+
+    options.Events = new JwtBearerEvents {
+        OnMessageReceived = ctx => {
+            ctx.Request.Cookies.TryGetValue("accessToken", out var accessToken);
+            if (!string.IsNullOrEmpty(accessToken))
+                ctx.Token = accessToken;
+            return Task.CompletedTask;
+        }
+    };
 });
 
 

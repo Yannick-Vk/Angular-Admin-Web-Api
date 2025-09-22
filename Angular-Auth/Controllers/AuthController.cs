@@ -15,7 +15,11 @@ public class AuthController(ILogger<AuthController> logger, IAuthenticationServi
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(string))]
     public async Task<IActionResult> Login([FromBody] LoginRequest request) {
         try {
-            return Ok(await service.Login(request));
+            var token = await service.Login(request);
+
+            service.SetTokenCookie(HttpContext, token);
+            // TODO remove token form ok
+            return Ok(token);
         }
         catch (Exception e) when (e is CredentialsRequiredException or WrongCredentialsException) {
             return BadRequest(e.Message);

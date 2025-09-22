@@ -14,6 +14,11 @@ public class AuthenticationService(
     UserManager<User> userManager,
     IConfiguration configuration)
     : IAuthenticationService {
+
+    private DateTime TokenExpiry() {
+        return DateTime.Now.AddMinutes(30);
+    }
+    
     public async Task<string> Login(LoginRequest request) {
         if (request.Username is null || request.Password is null)
             throw new CredentialsRequiredException("Username and Password are required.");
@@ -72,11 +77,11 @@ public class AuthenticationService(
         if (secret is null) throw new ArgumentException("JWT:Secret is not configured.");
 
         var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret));
-
+        
         var token = new JwtSecurityToken(
             configuration["JWT:ValidIssuer"],
             configuration["JWT:ValidAudience"],
-            expires: DateTime.Now.AddMinutes(30),
+            expires: TokenExpiry(),
             claims: authClaims,
             signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
         );
@@ -90,11 +95,11 @@ public class AuthenticationService(
     public UserDto? GetUserFromRequest(HttpRequest req) {
         var token = GetSecurityTokenFromRequest(req);
         if (token is null) return null;
-        
+
         var userId = token.Claims.FirstOrDefault(x => x.Type == "Id")?.Value;
         var userName = token.Claims.FirstOrDefault(x => x.Type == "Username")?.Value;
         var userEmail = token.Claims.FirstOrDefault(x => x.Type == "Email")?.Value;
-        
+
         if (userId is null || userName is null || userEmail is null) return null;
 
         return new UserDto(userId, userName, userEmail);
@@ -106,11 +111,11 @@ public class AuthenticationService(
 
         var user = GetUserFromRequest(req);
         if (user is null) return null;
-        
+
         var userRoles = jwtToken.Claims
             .Where(x => x.Type == ClaimTypes.Role)
             .Select(x => x.Value).ToList();
-        
+
         return new UserWithRoles(user, userRoles);
     }
 
@@ -156,5 +161,16 @@ public class AuthenticationService(
         }
 
         return null;
+    }
+
+    public void SetTokenCookie(HttpContext context, string token) {
+        context.Response.Cookies.Append("accessToken", token,
+            new CookieOptions {
+                Expires = TokenExpiry(),
+                HttpOnly = true, // Set as Http-only cookie
+                IsEssential = true, // Cookie is required for the app to work
+                Secure = true, // Via Https or SSL only
+                SameSite = SameSiteMode.None,
+            });
     }
 }
