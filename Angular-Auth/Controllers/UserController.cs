@@ -2,21 +2,25 @@
 using Angular_Auth.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using static Microsoft.AspNetCore.Http.StatusCodes;
 
 namespace Angular_Auth.Controllers;
 
-[Authorize(Roles = "Admin")]
 [ApiController]
 [Route("/api/v1/users")]
+[Authorize(Roles = "Admin")]
 public class UserController(IUserService service, IRoleService roleService) : ControllerBase {
     [HttpGet]
-    public async Task<List<UserDto>> GetUsers() {
-        return await service.GetUsers();
+    [ProducesResponseType(Status200OK)]
+    [ProducesResponseType(Status401Unauthorized)]
+    [ProducesResponseType(Status403Forbidden)]
+    public async Task<IActionResult> GetUsers() {
+        return Ok(await service.GetUsers());
     }
 
     [HttpGet("{userName}")]
-    public async Task<UserDto?> GetUser(string userName) {
-        return await service.GetUserDto(userName);
+    public async Task<IActionResult> GetUser(string userName) {
+        return Ok(await service.GetUserDto(userName));
     }
 
     [HttpGet("{userName}/Roles")]
