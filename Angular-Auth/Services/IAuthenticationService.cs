@@ -5,8 +5,8 @@ using Microsoft.IdentityModel.Tokens;
 namespace Angular_Auth.Services;
 
 public interface IAuthenticationService {
-    Task<string> Login(LoginRequest request);
-    Task<string> Register(RegisterRequest request);
+    Task<LoginResponseWithToken> Login(LoginRequest request);
+    Task<LoginResponseWithToken> Register(RegisterRequest request);
     public UserDto? GetUserFromRequest(HttpRequest req);
     public UserWithRoles? GetUserWithRolesFromRequest(HttpRequest req);
     public JwtSecurityToken? GetSecurityTokenFromRequest(HttpRequest req);

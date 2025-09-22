@@ -19,7 +19,7 @@ public class AuthenticationService(
         return DateTime.Now.AddMinutes(30);
     }
     
-    public async Task<string> Login(LoginRequest request) {
+    public async Task<LoginResponseWithToken> Login(LoginRequest request) {
         if (request.Username is null || request.Password is null)
             throw new CredentialsRequiredException("Username and Password are required.");
 
@@ -42,10 +42,10 @@ public class AuthenticationService(
         var token = GetToken(authClaims);
         var jwt = new JwtSecurityTokenHandler().WriteToken(token);
 
-        return jwt;
+        return new LoginResponseWithToken(jwt, user.UserName!, TokenExpiry());
     }
 
-    public async Task<string> Register(RegisterRequest request) {
+    public async Task<LoginResponseWithToken> Register(RegisterRequest request) {
         if (request.Email is null || request.Username is null || request.Password is null)
             throw new CredentialsRequiredException("Email, Username and Password are required.");
 
