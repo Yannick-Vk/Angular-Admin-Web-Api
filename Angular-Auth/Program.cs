@@ -50,6 +50,7 @@ builder.Services.AddAuthentication(options => {
         ValidAudience = configuration["JWT:ValidAudience"],
         ValidIssuer = configuration["JWT:ValidIssuer"],
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret)),
+        RoleClaimType = "roles"
     };
 });
 

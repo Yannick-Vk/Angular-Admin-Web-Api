@@ -25,12 +25,15 @@ public class AuthenticationService(
         if (user is null || !await userManager.CheckPasswordAsync(user, request.Password))
             throw new WrongCredentialsException("Username and/or password are incorrect.");
 
+        var userRoles = await userManager.GetRolesAsync(user);
         var authClaims = new List<Claim> {
             new("Id", user.Id),
             new("Username", user.UserName ?? string.Empty),
             new("Email", user.Email ?? string.Empty),
             new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
         };
+
+        authClaims.AddRange(userRoles.Select(userRole => new Claim("roles", userRole)));
 
         var token = GetToken(authClaims);
         var jwt = new JwtSecurityTokenHandler().WriteToken(token);
