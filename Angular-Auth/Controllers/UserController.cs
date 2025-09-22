@@ -19,11 +19,17 @@ public class UserController(IUserService service, IRoleService roleService) : Co
     }
 
     [HttpGet("{userName}")]
+    [ProducesResponseType(Status200OK)]
+    [ProducesResponseType(Status401Unauthorized)]
+    [ProducesResponseType(Status403Forbidden)]
     public async Task<IActionResult> GetUser(string userName) {
         return Ok(await service.GetUserDto(userName));
     }
 
     [HttpGet("{userName}/Roles")]
+    [ProducesResponseType(Status200OK)]
+    [ProducesResponseType(Status401Unauthorized)]
+    [ProducesResponseType(Status403Forbidden)]
     public async Task<IActionResult> GetUserRoles(string userName) {
         try {
             return Ok(await roleService.GetRolesFromUser(userName));
