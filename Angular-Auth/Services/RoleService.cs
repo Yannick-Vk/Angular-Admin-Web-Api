@@ -5,7 +5,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Angular_Auth.Services;
 
-public class RoleService(ILogger<RoleService> logger, RoleManager<IdentityRole> manager, UserManager<User> userManager)
+public class RoleService(
+    ILogger<RoleService> logger,
+    RoleManager<IdentityRole> manager,
+    UserManager<User> userManager)
     : IRoleService {
     public async Task CreateNewRole(Role role) {
         await manager.CreateAsync(role);
@@ -51,11 +54,9 @@ public class RoleService(ILogger<RoleService> logger, RoleManager<IdentityRole> 
         return (await userManager.GetUsersInRoleAsync(roleName)).Select(user => new UserDto(user));
     }
 
-    public async Task<bool> UserHasRole(string roleName, string userName) {
-        var user = await userManager.Users.FirstOrDefaultAsync(u => u.UserName == userName);
-        if (user == null) throw new ArgumentException($"User with name `{userName}` doesn't exist");
-
-        return await userManager.IsInRoleAsync(user, roleName);
+    public async Task<bool> UserHasRole(string roleName, UserWithRoles user) {
+        var role = await manager.Roles.FirstOrDefaultAsync(r => r.Name == roleName);
+        return role is null ? throw new ArgumentException($"Role with name `{roleName}` doesn't exist") : user.Roles.Contains(roleName);
     }
 
     public async Task<IEnumerable<string>> GetRolesFromUser(string username) {

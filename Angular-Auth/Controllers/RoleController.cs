@@ -11,7 +11,8 @@ namespace Angular_Auth.Controllers;
 [Authorize(Roles = "Admin")]
 [ApiController]
 [Route("/api/v1/roles")]
-public class RoleController(ILogger<RoleController> logger, IRoleService service) : Controller {
+public class RoleController(ILogger<RoleController> logger, IRoleService service, IAuthenticationService authService)
+    : Controller {
     [HttpGet]
     [ProducesResponseType(Status200OK)]
     [ProducesResponseType(Status401Unauthorized)]
@@ -77,16 +78,19 @@ public class RoleController(ILogger<RoleController> logger, IRoleService service
         return users.ToList();
     }
 
-    [HttpGet("{roleName}/{username}")]
+    [HttpGet("me/{roleName}")]
     [ProducesResponseType(Status200OK)]
     [ProducesResponseType(Status401Unauthorized)]
+    [ProducesResponseType(Status404NotFound)]
     [ProducesResponseType(Status403Forbidden)]
-    public async Task<ActionResult<bool>> UserHasRole(string roleName, string username) {
+    public async Task<ActionResult<bool>> UserHasRole(string roleName) {
         try {
-            return await service.UserHasRole(roleName, username);
+            var token = authService.GetUserWithRolesFromRequest(Request);
+            if (token is null) { throw new UnauthorizedAccessException(); }
+            return await service.UserHasRole(roleName, token);
         }
         catch (ArgumentException e) {
-            return BadRequest(e.Message);
+            return NotFound(e.Message);
         }
     }
 }

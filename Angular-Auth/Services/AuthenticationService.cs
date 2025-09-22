@@ -88,6 +88,33 @@ public class AuthenticationService(
     }
 
     public UserDto? GetUserFromRequest(HttpRequest req) {
+        var token = GetSecurityTokenFromRequest(req);
+        if (token is null) return null;
+        
+        var userId = token.Claims.FirstOrDefault(x => x.Type == "Id")?.Value;
+        var userName = token.Claims.FirstOrDefault(x => x.Type == "Username")?.Value;
+        var userEmail = token.Claims.FirstOrDefault(x => x.Type == "Email")?.Value;
+        
+        if (userId is null || userName is null || userEmail is null) return null;
+
+        return new UserDto(userId, userName, userEmail);
+    }
+
+    public UserWithRoles? GetUserWithRolesFromRequest(HttpRequest req) {
+        var jwtToken = GetSecurityTokenFromRequest(req);
+        if (jwtToken is null) return null;
+
+        var user = GetUserFromRequest(req);
+        if (user is null) return null;
+        
+        var userRoles = jwtToken.Claims
+            .Where(x => x.Type == ClaimTypes.Role)
+            .Select(x => x.Value).ToList();
+        
+        return new UserWithRoles(user, userRoles);
+    }
+
+    public JwtSecurityToken? GetSecurityTokenFromRequest(HttpRequest req) {
         string? authHeader = req.Headers.Authorization;
         if (authHeader is null || !authHeader.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase)) {
             logger.LogInformation("No JWT token found in the request or incorrect scheme.");
@@ -122,20 +149,7 @@ public class AuthenticationService(
                 ValidAudience = audience,
                 ClockSkew = TimeSpan.Zero
             }, out SecurityToken validatedToken);
-
-            var jwtToken = (JwtSecurityToken)validatedToken;
-            var userId = jwtToken.Claims.FirstOrDefault(x => x.Type == "Id")?.Value;
-            var userName = jwtToken.Claims.FirstOrDefault(x => x.Type == "Username")?.Value;
-            var userEmail = jwtToken.Claims.FirstOrDefault(x => x.Type == "Email")?.Value;
-
-            logger.LogInformation(
-                "Successfully validated token. User ID: {UserId}, Username: {UserName}, Email: {UserEmail}", userId,
-                userName, userEmail);
-            return new UserDto {
-                Id = userId,
-                Username = userName,
-                Email = userEmail
-            };
+            return (JwtSecurityToken)validatedToken;
         }
         catch (Exception e) {
             logger.LogError(e, "Error validating JWT token.");
