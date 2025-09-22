@@ -1,7 +1,6 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using System.Linq;
 using Angular_Auth.Dto;
 using Angular_Auth.Exceptions;
 using Angular_Auth.Models;

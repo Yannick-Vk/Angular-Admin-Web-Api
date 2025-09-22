@@ -1,5 +1,4 @@
-﻿using Angular_Auth.Dto;
-using Angular_Auth.Services;
+﻿using Angular_Auth.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using static Microsoft.AspNetCore.Http.StatusCodes;
