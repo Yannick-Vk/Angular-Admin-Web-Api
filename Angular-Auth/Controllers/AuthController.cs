@@ -11,8 +11,8 @@ namespace Angular_Auth.Controllers;
 public class AuthController(ILogger<AuthController> logger, IAuthenticationService service) : ControllerBase {
     [AllowAnonymous]
     [HttpPost("login")]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(LoginResponse))]
-    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(LoginResponse))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(string))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(string))]
     public async Task<IActionResult> Login([FromBody] LoginRequest request) {
         try {
             return Ok(await service.Login(request));
@@ -27,8 +27,8 @@ public class AuthController(ILogger<AuthController> logger, IAuthenticationServi
 
     [AllowAnonymous]
     [HttpPost("register")]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(LoginResponse))]
-    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(LoginResponse))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(string))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(string))]
     public async Task<IActionResult> Register([FromBody] RegisterRequest request) {
         try {
             return Ok(await service.Register(request));
