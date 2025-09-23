@@ -41,4 +41,11 @@ public class AuthController(ILogger<AuthController> logger, IAuthenticationServi
             return BadRequest(e.Message);
         }
     }
+
+    [Authorize]
+    [HttpPost("logout")]
+    public IActionResult Logout() {
+        service.RemoveTokenCookie(HttpContext);
+        return Ok(new { message = "Logged out successfully" });
+    }
 }

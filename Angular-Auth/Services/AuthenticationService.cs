@@ -184,4 +184,15 @@ public class AuthenticationService(
                 SameSite = SameSiteMode.None,
             });
     }
+
+    public void RemoveTokenCookie(HttpContext context) {
+        context.Response.Cookies.Append("accessToken", "",
+            new CookieOptions {
+                Expires = DateTime.Now.AddDays(-1),
+                HttpOnly = true,
+                IsEssential = true,
+                Secure = true,
+                SameSite = SameSiteMode.None,
+            });
+    }
 }
