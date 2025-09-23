@@ -42,7 +42,7 @@ public class AuthenticationService(
         var token = GetToken(authClaims);
         var jwt = new JwtSecurityTokenHandler().WriteToken(token);
 
-        return new LoginResponseWithToken(jwt, user.UserName!, TokenExpiry());
+        return new LoginResponseWithToken(user.Id, jwt, user.UserName!, user.Email!, TokenExpiry());
     }
 
     public async Task<LoginResponseWithToken> Register(RegisterRequest request) {
