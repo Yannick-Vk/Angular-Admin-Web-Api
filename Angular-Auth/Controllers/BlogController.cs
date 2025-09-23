@@ -43,8 +43,9 @@ public class BlogController(
     [ProducesResponseType(Status403Forbidden)]
     [ProducesResponseType(Status404NotFound)]
     public async Task<IActionResult> UpdateBlog(BlogUpdate blog) {
-        var user = authService.GetUserFromRequest(Request);
+        var user = authService.GetUserFromClaimsPrincipal(HttpContext.User);
         if (user is null) {
+            logger.LogError("Failed to get user from request.");
             return Unauthorized();
         }
 
@@ -70,7 +71,7 @@ public class BlogController(
     [ProducesResponseType(Status403Forbidden)]
     [ProducesResponseType(Status404NotFound)]
     public async Task<IActionResult> DeleteBlog(string id) {
-        var user  = authService.GetUserFromRequest(Request);
+        var user  = authService.GetUserFromClaimsPrincipal(HttpContext.User);
         if (user is null) {
             return Unauthorized();
         }
@@ -95,7 +96,7 @@ public class BlogController(
 
     [HttpGet("author/me")]
     public async Task<IActionResult> GetAllBlogsWithAuthor() {
-        var user = authService.GetUserFromRequest(Request);
+        var user = authService.GetUserFromClaimsPrincipal(HttpContext.User);
         if (user is null) {
             return Unauthorized();
         }

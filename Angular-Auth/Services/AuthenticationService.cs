@@ -130,6 +130,16 @@ public class AuthenticationService(
         return new UserWithRoles(new UserDto(userId, userName, userEmail), userRoles);
     }
 
+    public UserDto? GetUserFromClaimsPrincipal(ClaimsPrincipal claims) {
+        var userId = claims.FindFirst("Id")?.Value;
+        var userName = claims.FindFirst("Username")?.Value;
+        var userEmail = claims.FindFirst("Email")?.Value;
+
+        if (userId is null || userName is null || userEmail is null) return null;
+
+        return new UserDto(userId, userName, userEmail);
+    }
+
     public JwtSecurityToken? GetSecurityTokenFromRequest(HttpRequest req) {
         string? authHeader = req.Headers.Authorization;
         if (authHeader is null || !authHeader.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase)) {

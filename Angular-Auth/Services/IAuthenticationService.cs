@@ -11,6 +11,7 @@ public interface IAuthenticationService {
     public UserDto? GetUserFromRequest(HttpRequest req);
     public UserWithRoles? GetUserWithRolesFromRequest(HttpRequest req);
     public UserWithRoles? GetUserWithRolesFromClaimsPrincipal(ClaimsPrincipal claims);
+    public UserDto? GetUserFromClaimsPrincipal(ClaimsPrincipal claims);
     public JwtSecurityToken? GetSecurityTokenFromRequest(HttpRequest req);
     public void SetTokenCookie(HttpContext context, string token);
     public void RemoveTokenCookie(HttpContext context);

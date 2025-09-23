@@ -54,9 +54,13 @@ builder.Services.AddAuthentication(options => {
 
     options.Events = new JwtBearerEvents {
         OnMessageReceived = ctx => {
-            ctx.Request.Cookies.TryGetValue("accessToken", out var accessToken);
-            if (!string.IsNullOrEmpty(accessToken))
+            var logger = ctx.HttpContext.RequestServices.GetRequiredService<ILogger<Program>>();
+            if (ctx.Request.Cookies.TryGetValue("accessToken", out var accessToken)) {
+                logger.LogInformation("Access token found in cookie.");
                 ctx.Token = accessToken;
+            } else {
+                logger.LogInformation("Access token not found in cookie.");
+            }
             return Task.CompletedTask;
         }
     };
