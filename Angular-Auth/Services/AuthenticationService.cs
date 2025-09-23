@@ -14,11 +14,10 @@ public class AuthenticationService(
     UserManager<User> userManager,
     IConfiguration configuration)
     : IAuthenticationService {
-
     private DateTime TokenExpiry() {
         return DateTime.Now.AddMinutes(30);
     }
-    
+
     public async Task<LoginResponseWithToken> Login(LoginRequest request) {
         if (request.Username is null || request.Password is null)
             throw new CredentialsRequiredException("Username and Password are required.");
@@ -77,7 +76,7 @@ public class AuthenticationService(
         if (secret is null) throw new ArgumentException("JWT:Secret is not configured.");
 
         var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret));
-        
+
         var token = new JwtSecurityToken(
             configuration["JWT:ValidIssuer"],
             configuration["JWT:ValidAudience"],
@@ -117,6 +116,18 @@ public class AuthenticationService(
             .Select(x => x.Value).ToList();
 
         return new UserWithRoles(user, userRoles);
+    }
+
+    public UserWithRoles? GetUserWithRolesFromClaimsPrincipal(ClaimsPrincipal claims) {
+        var userId = claims.FindFirst("Id")?.Value;
+        var userName = claims.FindFirst("Username")?.Value;
+        var userEmail = claims.FindFirst("Email")?.Value;
+
+        if (userId is null || userName is null || userEmail is null) return null;
+
+        var userRoles = claims.FindAll(ClaimTypes.Role).Select(x => x.Value).ToList();
+
+        return new UserWithRoles(new UserDto(userId, userName, userEmail), userRoles);
     }
 
     public JwtSecurityToken? GetSecurityTokenFromRequest(HttpRequest req) {

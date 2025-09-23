@@ -85,18 +85,16 @@ public class RoleController(ILogger<RoleController> logger, IRoleService service
     }
 
     [HttpGet("me/{roleName}")]
+    [Authorize]
     [ProducesResponseType(Status200OK)]
     [ProducesResponseType(Status401Unauthorized)]
     [ProducesResponseType(Status404NotFound)]
     [ProducesResponseType(Status403Forbidden)]
     public async Task<ActionResult<bool>> UserHasRole(string roleName) {
         try {
-            var token = authService.GetUserWithRolesFromRequest(Request);
-            if (token is null) {
-                throw new UnauthorizedAccessException();
-            }
-
-            return await service.UserHasRole(roleName, token);
+            var user = authService.GetUserWithRolesFromClaimsPrincipal(HttpContext.User);
+            if (user is null) return Unauthorized();
+            return await service.UserHasRole(roleName, user);
         }
         catch (ArgumentException e) {
             return NotFound(e.Message);
