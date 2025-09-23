@@ -109,7 +109,7 @@ if (app.Environment.IsDevelopment()) {
 }
 
 // Use CORS
-app.UseCors(b => b.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin());
+app.UseCors(b => b.WithOrigins("http://localhost:4200", "https://localhost:4200").AllowAnyHeader().AllowAnyMethod().AllowCredentials());
 app.UseHttpsRedirection();
 
 //  Authentication
