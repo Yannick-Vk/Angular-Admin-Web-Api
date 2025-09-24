@@ -8,11 +8,12 @@ namespace Angular_Auth.Services;
 public interface IAuthenticationService {
     public Task<LoginResponseWithToken> Login(LoginRequest request);
     public Task<LoginResponseWithToken> Register(RegisterRequest request);
+    public Task<LoginResponseWithToken> RefreshToken(string? refreshToken);
     public UserDto? GetUserFromRequest(HttpRequest req);
     public UserWithRoles? GetUserWithRolesFromRequest(HttpRequest req);
     public UserWithRoles? GetUserWithRolesFromClaimsPrincipal(ClaimsPrincipal claims);
     public UserDto? GetUserFromClaimsPrincipal(ClaimsPrincipal claims);
     public JwtSecurityToken? GetSecurityTokenFromRequest(HttpRequest req);
-    public void SetTokenCookie(HttpContext context, string token);
+    public void SetTokenCookie(HttpContext context, string token, string refreshToken);
     public void RemoveTokenCookie(HttpContext context);
 }

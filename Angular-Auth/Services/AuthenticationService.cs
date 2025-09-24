@@ -18,6 +18,13 @@ public class AuthenticationService(
         return DateTime.Now.AddMinutes(30);
     }
 
+    private string GenerateRefreshToken() {
+        var randomNumber = new byte[32];
+        using var rng = System.Security.Cryptography.RandomNumberGenerator.Create();
+        rng.GetBytes(randomNumber);
+        return Convert.ToBase64String(randomNumber);
+    }
+
     public async Task<LoginResponseWithToken> Login(LoginRequest request) {
         if (request.Username is null || request.Password is null)
             throw new CredentialsRequiredException("Username and Password are required.");
@@ -40,8 +47,48 @@ public class AuthenticationService(
 
         var token = GetToken(authClaims);
         var jwt = new JwtSecurityTokenHandler().WriteToken(token);
+        var refreshToken = GenerateRefreshToken();
 
-        return new LoginResponseWithToken(user.Id, jwt, user.UserName!, user.Email!, TokenExpiry());
+        _ = int.TryParse(configuration["JWT:RefreshTokenValidityInDays"], out int refreshTokenValidityInDays);
+
+        user.RefreshToken = refreshToken;
+        user.RefreshTokenExpiryTime = DateTime.Now.AddDays(refreshTokenValidityInDays);
+
+        await userManager.UpdateAsync(user);
+
+        return new LoginResponseWithToken(user.Id, jwt, user.UserName!, user.Email!, TokenExpiry(), refreshToken);
+    }
+
+    public async Task<LoginResponseWithToken> RefreshToken(string? refreshToken) {
+        if (refreshToken is null) throw new CredentialsRequiredException("Refresh token is required.");
+
+        var user = userManager.Users.SingleOrDefault(u => u.RefreshToken == refreshToken);
+
+        if (user is null || user.RefreshTokenExpiryTime <= DateTime.Now)
+            throw new WrongCredentialsException("Invalid or expired refresh token.");
+
+        var userRoles = await userManager.GetRolesAsync(user);
+        var authClaims = new List<Claim> {
+            new("Id", user.Id),
+            new("Username", user.UserName ?? string.Empty),
+            new("Email", user.Email ?? string.Empty),
+            new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+        };
+
+        authClaims.AddRange(userRoles.Select(userRole => new Claim(ClaimTypes.Role, userRole)));
+
+        var token = GetToken(authClaims);
+        var jwt = new JwtSecurityTokenHandler().WriteToken(token);
+        var newRefreshToken = GenerateRefreshToken();
+
+        _ = int.TryParse(configuration["JWT:RefreshTokenValidityInDays"], out int refreshTokenValidityInDays);
+
+        user.RefreshToken = newRefreshToken;
+        user.RefreshTokenExpiryTime = DateTime.Now.AddDays(refreshTokenValidityInDays);
+
+        await userManager.UpdateAsync(user);
+
+        return new LoginResponseWithToken(user.Id, jwt, user.UserName!, user.Email!, TokenExpiry(), newRefreshToken);
     }
 
     public async Task<LoginResponseWithToken> Register(RegisterRequest request) {
@@ -184,10 +231,18 @@ public class AuthenticationService(
         return null;
     }
 
-    public void SetTokenCookie(HttpContext context, string token) {
+    public void SetTokenCookie(HttpContext context, string token, string refreshToken) {
         context.Response.Cookies.Append("accessToken", token,
             new CookieOptions {
                 Expires = TokenExpiry(),
+                HttpOnly = true, // Set as Http-only cookie
+                IsEssential = true, // Cookie is required for the app to work
+                Secure = true, // Via Https or SSL only
+                SameSite = SameSiteMode.None,
+            });
+        context.Response.Cookies.Append("refreshToken", refreshToken,
+            new CookieOptions {
+                Expires = DateTime.Now.AddDays(int.Parse(configuration["JWT:RefreshTokenValidityInDays"] ?? "7")),
                 HttpOnly = true, // Set as Http-only cookie
                 IsEssential = true, // Cookie is required for the app to work
                 Secure = true, // Via Https or SSL only
@@ -197,6 +252,14 @@ public class AuthenticationService(
 
     public void RemoveTokenCookie(HttpContext context) {
         context.Response.Cookies.Append("accessToken", "",
+            new CookieOptions {
+                Expires = DateTime.Now.AddDays(-1),
+                HttpOnly = true,
+                IsEssential = true,
+                Secure = true,
+                SameSite = SameSiteMode.None,
+            });
+        context.Response.Cookies.Append("refreshToken", "",
             new CookieOptions {
                 Expires = DateTime.Now.AddDays(-1),
                 HttpOnly = true,

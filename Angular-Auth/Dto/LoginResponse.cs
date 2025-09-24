@@ -1,12 +1,13 @@
 ﻿namespace Angular_Auth.Dto;
 
-public class LoginResponse(string id, string username, string email, DateTime expiration) {
+public class LoginResponse(string id, string username, string email, DateTime expiration, string refreshToken) {
     public string Id { get; set; } = id;
     public string Username { get; set; } = username;
     public string Email { get; set; } = email;
     public DateTime Expiry { get; set; } = expiration;
+    public string RefreshToken { get; set; } = refreshToken;
 
     public static LoginResponse FromResponseWithToken(LoginResponseWithToken response) {
-        return new LoginResponse(response.Id, response.UserName, response.Email, response.Expiry);
+        return new LoginResponse(response.Id, response.UserName, response.Email, response.Expiry, response.RefreshToken);
     }
 }
