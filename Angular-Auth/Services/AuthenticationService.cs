@@ -15,7 +15,7 @@ public class AuthenticationService(
     IConfiguration configuration)
     : IAuthenticationService {
     private DateTime TokenExpiry() {
-        return DateTime.Now.AddMinutes(30);
+        return DateTime.Now.AddMinutes(5);
     }
 
     private string GenerateRefreshToken() {
