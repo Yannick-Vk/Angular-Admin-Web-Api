@@ -242,7 +242,7 @@ public class AuthenticationService(
             });
         context.Response.Cookies.Append("refreshToken", refreshToken,
             new CookieOptions {
-                Expires = DateTime.Now.AddDays(int.Parse(configuration["JWT:RefreshTokenValidityInDays"] ?? "7")),
+                Expires = DateTime.Now.AddDays(int.Parse(configuration["JWT:RefreshTokenValidityInDays"] ?? "1")),
                 HttpOnly = true, // Set as Http-only cookie
                 IsEssential = true, // Cookie is required for the app to work
                 Secure = true, // Via Https or SSL only
