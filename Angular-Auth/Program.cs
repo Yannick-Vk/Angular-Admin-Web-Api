@@ -58,9 +58,11 @@ builder.Services.AddAuthentication(options => {
             if (ctx.Request.Cookies.TryGetValue("accessToken", out var accessToken)) {
                 logger.LogInformation("Access token found in cookie.");
                 ctx.Token = accessToken;
-            } else {
+            }
+            else {
                 logger.LogInformation("Access token not found in cookie.");
             }
+
             return Task.CompletedTask;
         }
     };
@@ -113,7 +115,10 @@ if (app.Environment.IsDevelopment()) {
 }
 
 // Use CORS
-app.UseCors(b => b.WithOrigins("http://localhost:4200", "https://localhost:4200").AllowAnyHeader().AllowAnyMethod().AllowCredentials());
+app.UseCors(b => b.WithOrigins("http://localhost:4200", "https://localhost:4200", "http://localhost:5175")
+    .AllowAnyHeader()
+    .AllowAnyMethod()
+    .AllowCredentials());
 app.UseHttpsRedirection();
 
 //  Authentication

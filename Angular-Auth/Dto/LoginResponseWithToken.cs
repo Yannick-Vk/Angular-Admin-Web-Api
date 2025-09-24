@@ -9,6 +9,6 @@ public class LoginResponseWithToken(string id, string token, string userName, st
     public string RefreshToken { get; set; } = refreshToken;
 
     public LoginResponse RemoveToken() {
-        return new LoginResponse(Id, UserName, Email, Expiry, string.Empty);
+        return new LoginResponse(Id, UserName, Email, Expiry);
     }
 }
