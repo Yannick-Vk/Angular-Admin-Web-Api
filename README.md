@@ -58,6 +58,7 @@ The following are the main endpoints of the API:
 *   `POST /api/v1/Auth/register`: Register a new user.
 *   `POST /api/v1/Auth/login`: Login a user and get a JWT token.
 *   `POST /api/v1/Auth/logout`: Logout the current user.
+*   `POST /api/v1/Auth/refresh`: Refresh the access token.
 
 ### Roles
 
