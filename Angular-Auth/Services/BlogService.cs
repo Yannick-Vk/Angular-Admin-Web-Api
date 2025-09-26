@@ -84,6 +84,21 @@ public class BlogService(ILogger<BlogService> logger, BlogRepository repo, IUser
         return await GetBlogsWithFile(blogs);
     }
 
+    // Find user and blog, then add user to authors and send an update
+    public async Task AddAuthor(string blogId, string userId) {
+        var success = Guid.TryParse(blogId, out var guid);
+        if (!success) return;
+        
+        var blog = await repo.GetBlog(guid);
+        if (blog is null) return;
+        
+        var user = await userService.GetFullUser(userId);
+        if (user is null) return;
+        
+        blog.Authors.Add(user);
+        await repo.UpdateBlog(blog);
+    }
+
     /// <summary>
     ///     Returns a BlogWithFile object from a given Blog object
     /// </summary>

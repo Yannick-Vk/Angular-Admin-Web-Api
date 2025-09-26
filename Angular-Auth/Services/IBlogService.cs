@@ -11,4 +11,5 @@ public interface IBlogService {
     public Task<Blog?> DeleteBlog(string id, UserDto user);
     public Task<IEnumerable<BlogWithAuthor>> GetBlogsWithAuthor(string username);
     public Task<IEnumerable<BlogWithFile>> SearchBlog(string searchText);
+    public Task AddAuthor(string blogId, string userId);
 }
