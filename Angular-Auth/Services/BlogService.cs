@@ -22,9 +22,9 @@ public class BlogService(ILogger<BlogService> logger, BlogRepository repo, IUser
         return await GetBlogWithContent(blog);
     }
 
-    public async Task<Guid?> UploadBlog(BlogUpload blogUpload) {
+    public async Task<Guid> UploadBlog(BlogUpload blogUpload) {
         var author = await userService.GetFullUser(blogUpload.Author);
-        if (author is null) return null;
+        if (author is null) throw new UnauthorizedAccessException($"Cannot find user {blogUpload.Author}");
 
         var blog = new Blog(blogUpload, author);
 

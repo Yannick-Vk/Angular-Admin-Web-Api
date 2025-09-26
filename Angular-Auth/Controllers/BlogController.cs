@@ -16,10 +16,13 @@ public class BlogController(
     IAuthenticationService authService) : Controller {
     [HttpPost]
     public async Task<IActionResult> UploadBlog(BlogUpload blogUpload) {
-        var id = await blogService.UploadBlog(blogUpload);
-        if (id is null) return Problem("Failed to save blog ");
-
-        return Ok(id);
+        try {
+            var id = await blogService.UploadBlog(blogUpload);
+            return Ok(id);
+        }
+        catch (Exception ex) {
+            return Unauthorized(ex.Message);
+        }
     }
 
     [HttpGet("{blogId}")]
@@ -36,7 +39,7 @@ public class BlogController(
     public async Task<IEnumerable<BlogWithFile>> GetAllBlogs() {
         return await blogService.GetAllBlogs();
     }
-    
+
     [HttpPatch]
     [ProducesResponseType(Status200OK)]
     [ProducesResponseType(Status401Unauthorized)]
@@ -71,14 +74,13 @@ public class BlogController(
     [ProducesResponseType(Status403Forbidden)]
     [ProducesResponseType(Status404NotFound)]
     public async Task<IActionResult> DeleteBlog(string id) {
-        var user  = authService.GetUserFromClaimsPrincipal(HttpContext.User);
+        var user = authService.GetUserFromClaimsPrincipal(HttpContext.User);
         if (user is null) {
             return Unauthorized();
         }
 
         try {
             var blog = await blogService.DeleteBlog(id, user);
-
             return Ok(blog);
         }
         catch (BlogNotFoundException e) {
@@ -99,7 +101,7 @@ public class BlogController(
         if (user is null) {
             return Unauthorized();
         }
-        
+
         return Ok(await blogService.GetBlogsWithAuthor(user.Username!));
     }
 
