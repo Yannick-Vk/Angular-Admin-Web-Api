@@ -5,7 +5,7 @@ namespace Angular_Auth.Services;
 
 public interface IBlogService {
     public Task<BlogWithFile?> GetBlog(string id);
-    public Task<Guid> UploadBlog(BlogUpload blogUpload);
+    public Task<Guid> UploadBlog(UserDto user, BlogUpload blogUpload);
     public Task<IEnumerable<BlogWithFile>> GetAllBlogs();
     public Task<BlogWithFile> UpdateBlog(BlogUpdate dto, UserDto loggedInUser);
     public Task<Blog> DeleteBlog(string id, UserDto user);

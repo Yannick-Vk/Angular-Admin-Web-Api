@@ -17,7 +17,10 @@ public class BlogController(
     [HttpPost]
     public async Task<IActionResult> UploadBlog(BlogUpload blogUpload) {
         try {
-            var id = await blogService.UploadBlog(blogUpload);
+            var user = authService.GetUserFromClaimsPrincipal(HttpContext.User);
+            if (user is null) throw new UnauthorizedAccessException($"Cannot find user {HttpContext.User}");
+            
+            var id = await blogService.UploadBlog(user, blogUpload);
             return Ok(id);
         }
         catch (Exception ex) {
