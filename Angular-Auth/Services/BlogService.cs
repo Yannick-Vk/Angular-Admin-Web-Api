@@ -155,14 +155,14 @@ public class BlogService(ILogger<BlogService> logger, BlogRepository repo, IUser
         return blogsWithFile;
     }
 
-    private void DeleteFile(string id) {
+    private static void DeleteFile(string id) {
         var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "uploads");
         var uniqueFileName = id + ".md";
         var filePath = Path.Combine(uploadsFolder, uniqueFileName);
         File.Delete(filePath);
     }
 
-    private bool UserIsAuthor(Blog blog, User user) {
+    private static bool UserIsAuthor(Blog blog, User user) {
         return blog.Authors.Exists(author => author.Id == user.Id);
     }
 }
