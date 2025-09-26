@@ -112,4 +112,10 @@ public class BlogController(
 
         return Ok(blogs);
     }
+
+    [HttpPost("{blogId}/authors/add/{userId}")]
+    public async Task<IActionResult> AddAuthor(string blogId, string userId) {
+        await blogService.AddAuthor(blogId, userId);
+        return Ok();
+    }
 }
