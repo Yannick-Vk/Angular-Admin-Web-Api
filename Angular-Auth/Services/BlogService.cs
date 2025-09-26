@@ -29,7 +29,7 @@ public class BlogService(ILogger<BlogService> logger, BlogRepository repo, IUser
         var blog = new Blog(blogUpload, author);
 
         await repo.SaveBlog(blog);
-        await SaveBlog(blog.Id, blogUpload.File);
+        await SaveBlogFile(blog.Id, blogUpload.File);
         return blog.Id;
     }
 
@@ -51,7 +51,7 @@ public class BlogService(ILogger<BlogService> logger, BlogRepository repo, IUser
 
         var updatedBlog = await repo.UpdateBlog(blog);
 
-        if (dto.BlogContent is not null) await SaveBlog(updatedBlog.Id, dto.BlogContent);
+        if (dto.BlogContent is not null) await SaveBlogFile(updatedBlog.Id, dto.BlogContent);
 
         return await GetBlogWithContent(updatedBlog);
     }
@@ -71,7 +71,7 @@ public class BlogService(ILogger<BlogService> logger, BlogRepository repo, IUser
 
         await repo.DeleteBlog(blog);
         // Delete blog file
-        DeleteFile(blog.Id.ToString());
+        DeleteBlogFile(blog.Id.ToString());
         return blog;
     }
 
@@ -116,31 +116,39 @@ public class BlogService(ILogger<BlogService> logger, BlogRepository repo, IUser
     /// <param name="blog"></param>
     /// <returns>A blog with file content</returns>
     private static async Task<BlogWithFile> GetBlogWithContent(Blog blog) {
-        var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "uploads");
-        var uniqueFileName = blog.Id + ".md";
+        var content = await GetFileContent(blog.Id.ToString(), "blogs", ".md");
+        var newBlog = new BlogWithFile(blog, content);
+        return newBlog;
+    }
+
+    private static async Task SaveBlogFile(Guid id, string fileContent) {
+        await SaveFile(id.ToString(), fileContent, "blogs", ".md");
+    }
+
+    private static async Task<string> GetFileContent(string filename, string folder, string extension) {
+        var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), $"uploads/{folder}");
+        var uniqueFileName = filename + extension;
         var filePath = Path.Combine(uploadsFolder, uniqueFileName);
 
         // Initialize an empty string, if the file exist add the contents
         var content = string.Empty;
         if (File.Exists(filePath)) content = await File.ReadAllTextAsync(filePath, Encoding.UTF8);
-
-        var newBlog = new BlogWithFile(blog, content);
-        return newBlog;
+        return content;
     }
 
 
-    private static async Task SaveBlog(Guid id, string fileContent) {
-        var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "uploads");
+    private static async Task SaveFile(string filename, string fileContent, string folder, string ext) {
+        var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), $"uploads/{folder}");
         // Create the directory when it does not exist
         if (!Directory.Exists(uploadsFolder)) Directory.CreateDirectory(uploadsFolder);
 
-        var uniqueFileName = id + ".md";
-        var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+        var uniqueFileName = filename + ext;
+        var fullPath = Path.Combine(uploadsFolder, uniqueFileName);
 
         var fileBytes = Encoding.UTF8.GetBytes(fileContent);
 
         // Save the file.
-        await using var stream = new FileStream(filePath, FileMode.Create);
+        await using var stream = new FileStream(fullPath, FileMode.Create);
         await stream.WriteAsync(fileBytes);
     }
 
@@ -155,9 +163,13 @@ public class BlogService(ILogger<BlogService> logger, BlogRepository repo, IUser
         return blogsWithFile;
     }
 
-    private static void DeleteFile(string id) {
-        var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "uploads");
-        var uniqueFileName = id + ".md";
+    public static void DeleteBlogFile(string blogId) {
+        DeleteFile(blogId, "blogs", ".md");
+    }
+
+    private static void DeleteFile(string filename, string folder, string extension) {
+        var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "uploads/{folder}");
+        var uniqueFileName = filename + extension;
         var filePath = Path.Combine(uploadsFolder, uniqueFileName);
         File.Delete(filePath);
     }
