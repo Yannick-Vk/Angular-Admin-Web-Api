@@ -156,6 +156,6 @@ public class BlogService(ILogger<BlogService> logger, BlogRepository repo, IUser
     }
 
     private bool UserIsAuthor(Blog blog, User user) {
-        return blog.Authors.Contains(user);
+        return blog.Authors.Exists(author => author.Id == user.Id);
     }
 }
