@@ -39,7 +39,7 @@ public class BlogService(ILogger<BlogService> logger, BlogRepository repo, IUser
 
         var author = loggedInUser.Username;
 
-        if (!blog.Authors.Contains(new User() {
+        if (!UserIsAuthor(blog, new User {
                 UserName = author,
             })) {
             logger.LogError("User {user} attempted to updated a blog without being its author.", author);
@@ -64,7 +64,7 @@ public class BlogService(ILogger<BlogService> logger, BlogRepository repo, IUser
         var blog = await repo.GetBlog(guid);
         if (blog is null) throw new BlogNotFoundException($"Blog with ID {id} was not found.");
 
-        if (!blog.Authors.Contains(new User() {
+        if (UserIsAuthor(blog, new User {
                 UserName = user.Username,
             }))
             throw new NotBlogAuthorException("You do not have permission to delete this blog.");
@@ -88,13 +88,17 @@ public class BlogService(ILogger<BlogService> logger, BlogRepository repo, IUser
     public async Task AddAuthor(string blogId, string userId) {
         var success = Guid.TryParse(blogId, out var guid);
         if (!success) return;
-        
+
         var blog = await repo.GetBlog(guid);
         if (blog is null) return;
-        
+
         var user = await userService.GetFullUser(userId);
         if (user is null) return;
-        
+
+        if (!UserIsAuthor(blog, user)) {
+            return;
+        }
+
         blog.Authors.Add(user);
         await repo.UpdateBlog(blog);
     }
@@ -149,5 +153,9 @@ public class BlogService(ILogger<BlogService> logger, BlogRepository repo, IUser
         var uniqueFileName = id + ".md";
         var filePath = Path.Combine(uploadsFolder, uniqueFileName);
         File.Delete(filePath);
+    }
+
+    private bool UserIsAuthor(Blog blog, User user) {
+        return blog.Authors.Contains(user);
     }
 }
