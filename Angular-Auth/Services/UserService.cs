@@ -1,4 +1,5 @@
 ﻿using Angular_Auth.Dto;
+using Angular_Auth.Exceptions;
 using Angular_Auth.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -13,13 +14,14 @@ public class UserService(UserManager<User> manager) : IUserService {
         return users;
     }
 
-    public async Task<UserDto?> GetUserDto(string username) {
-        var user = await manager.Users.FirstOrDefaultAsync(u => u.UserName == username);
-        return user is null ? null : new UserDto(user);
+    public async Task<User> GetUserById(string userId) {
+        var user = await manager.Users.FirstAsync(user => user.Id == userId);
+        return user ?? throw new UserNotFoundException($"Cannot find user with id {userId}");
     }
 
-    public async Task<User?> GetUserByUsername(string username) {
-        return await manager.Users.FirstOrDefaultAsync(u => u.UserName == username);
+    public async Task<User> GetUserByUsername(string username) {
+        var user = await manager.Users.FirstOrDefaultAsync(u => u.UserName == username);
+        return user ?? throw new UserNotFoundException($"Cannot find user with username {username}");
     }
 
     public async Task<User?> GetFullUser(string id) {
