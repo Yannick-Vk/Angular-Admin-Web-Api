@@ -33,6 +33,7 @@ public class BlogService(ILogger<BlogService> logger, BlogRepository repo, IUser
 
         await repo.SaveBlog(blog);
         await SaveBlogFile(blog.Id, blogUpload.File);
+        await SaveBlogFile(blog.Id, blogUpload.BannerImage);
         return blog.Id;
     }
 
@@ -74,7 +75,8 @@ public class BlogService(ILogger<BlogService> logger, BlogRepository repo, IUser
 
         await repo.DeleteBlog(blog);
         // Delete blog file
-        DeleteBlogFile(blog.Id.ToString());
+        DeleteBlogFile(blog.Id);
+        DeleteBlogImageFile(blog.Id);
         return blog;
     }
 
@@ -121,6 +123,7 @@ public class BlogService(ILogger<BlogService> logger, BlogRepository repo, IUser
     /// <returns>A blog with file content</returns>
     private static async Task<BlogWithFile> GetBlogWithContent(Blog blog) {
         var content = await BlogFilesService.GetFileContent(blog.Id.ToString());
+        blog.BannerImage = await GetBanner(blog.Id);
         var newBlog = new BlogWithFile(blog, content);
         return newBlog;
     }
@@ -140,7 +143,7 @@ public class BlogService(ILogger<BlogService> logger, BlogRepository repo, IUser
         return blogsWithFile;
     }
 
-    private static void DeleteBlogFile(string blogId) => BlogFilesService.DeleteFile(blogId);
+    private static void DeleteBlogFile(Guid blogId) => BlogFilesService.DeleteFile(blogId.ToString());
 
     private static bool UserIsAuthor(Blog blog, User user) => blog.Authors.Exists(author => author.Id == user.Id);
 
