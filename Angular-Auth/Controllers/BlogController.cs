@@ -119,7 +119,24 @@ public class BlogController(
 
     [HttpPost("{blogId}/authors/add/{userId}")]
     public async Task<IActionResult> AddAuthor(string blogId, string userId) {
-        await blogService.AddAuthor(blogId, userId);
-        return Ok();
+        var user = authService.GetUserFromClaimsPrincipal(HttpContext.User);
+        if (user is null) {
+            return Unauthorized();
+        }
+
+        try {
+            await blogService.AddAuthor(blogId, userId, user);
+            return Ok();
+        }
+        catch (BlogNotFoundException e) {
+            return NotFound(e.Message);
+        }
+        catch (NotBlogAuthorException e) {
+            logger.LogError("{message}", e.Message);
+            return StatusCode(Status403Forbidden, e.Message);
+        }
+        catch (Exception e) {
+            return BadRequest(e.Message);
+        }
     }
 }

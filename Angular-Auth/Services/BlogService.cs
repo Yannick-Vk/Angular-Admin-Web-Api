@@ -37,12 +37,11 @@ public class BlogService(ILogger<BlogService> logger, BlogRepository repo, IUser
         var blog = await repo.GetBlog(dto.Id);
         if (blog is null) throw new BlogNotFoundException($"Blog with ID {dto.Id} was not found.");
 
-        var author = loggedInUser.Username;
+        var author = await userService.GetFullUser(loggedInUser.Username);
+        if (author is null) throw new UnauthorizedAccessException("Could not find user");
 
-        if (!UserIsAuthor(blog, new User {
-                UserName = author,
-            })) {
-            logger.LogError("User {user} attempted to updated a blog without being its author.", author);
+        if (!UserIsAuthor(blog, author)) {
+            logger.LogError("User {user} attempted to updated a blog without being its author.", author.UserName);
             throw new NotBlogAuthorException("You do not have permission to update this blog.");
         }
 
@@ -59,14 +58,15 @@ public class BlogService(ILogger<BlogService> logger, BlogRepository repo, IUser
 
     public async Task<Blog> DeleteBlog(string id, UserDto user) {
         var success = Guid.TryParse(id, out var guid);
-        if (!success) throw new BlogNotFoundException($"Blog with ID {id} was not found.");;
+        if (!success) throw new BlogNotFoundException($"Blog with ID {id} was not found.");
 
         var blog = await repo.GetBlog(guid);
         if (blog is null) throw new BlogNotFoundException($"Blog with ID {id} was not found.");
 
-        if (UserIsAuthor(blog, new User {
-                UserName = user.Username,
-            }))
+        var fullUser = await userService.GetFullUser(user.Username);
+        if (fullUser is null) throw new UnauthorizedAccessException("Could not find user");
+
+        if (!UserIsAuthor(blog, fullUser))
             throw new NotBlogAuthorException("You do not have permission to delete this blog.");
 
         await repo.DeleteBlog(blog);
@@ -85,17 +85,24 @@ public class BlogService(ILogger<BlogService> logger, BlogRepository repo, IUser
     }
 
     // Find user and blog, then add user to authors and send an update
-    public async Task AddAuthor(string blogId, string userId) {
+    public async Task AddAuthor(string blogId, string userId, UserDto loggedInUser) {
         var success = Guid.TryParse(blogId, out var guid);
         if (!success) return;
 
         var blog = await repo.GetBlog(guid);
         if (blog is null) throw new BlogNotFoundException($"Blog with ID {blogId} was not found.");
 
+        var loggedInUserFull = await userService.GetFullUser(loggedInUser.Username);
+        if (loggedInUserFull is null) throw new UnauthorizedAccessException("Could not find logged in user");
+
+        if (!UserIsAuthor(blog, loggedInUserFull)) {
+            throw new NotBlogAuthorException("You do not have permission to add an author to this blog.");
+        }
+
         var user = await userService.GetFullUser(userId);
         if (user is null) return;
 
-        if (!UserIsAuthor(blog, user)) {
+        if (UserIsAuthor(blog, user)) {
             return;
         }
 
