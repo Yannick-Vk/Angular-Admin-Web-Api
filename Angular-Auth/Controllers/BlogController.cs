@@ -78,7 +78,6 @@ public class BlogController(
 
         try {
             var blog = await blogService.DeleteBlog(id, user);
-            if (blog is null) return NotFound($"Cannot find blog with ID: ${id}");
 
             return Ok(blog);
         }

@@ -57,9 +57,9 @@ public class BlogService(ILogger<BlogService> logger, BlogRepository repo, IUser
         return await GetBlogWithContent(updatedBlog);
     }
 
-    public async Task<Blog?> DeleteBlog(string id, UserDto user) {
+    public async Task<Blog> DeleteBlog(string id, UserDto user) {
         var success = Guid.TryParse(id, out var guid);
-        if (!success) return null;
+        if (!success) throw new BlogNotFoundException($"Blog with ID {id} was not found.");;
 
         var blog = await repo.GetBlog(guid);
         if (blog is null) throw new BlogNotFoundException($"Blog with ID {id} was not found.");
@@ -69,9 +69,9 @@ public class BlogService(ILogger<BlogService> logger, BlogRepository repo, IUser
             }))
             throw new NotBlogAuthorException("You do not have permission to delete this blog.");
 
-        blog = await repo.DeleteBlog(blog);
+        await repo.DeleteBlog(blog);
         // Delete blog file
-        if (blog is not null) DeleteFile(blog.Id.ToString());
+        DeleteFile(blog.Id.ToString());
         return blog;
     }
 
@@ -90,7 +90,7 @@ public class BlogService(ILogger<BlogService> logger, BlogRepository repo, IUser
         if (!success) return;
 
         var blog = await repo.GetBlog(guid);
-        if (blog is null) return;
+        if (blog is null) throw new BlogNotFoundException($"Blog with ID {blogId} was not found.");
 
         var user = await userService.GetFullUser(userId);
         if (user is null) return;
