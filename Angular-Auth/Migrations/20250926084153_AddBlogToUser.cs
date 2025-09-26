@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Angular_Auth.Migrations
 {
     /// <inheritdoc />
-    public partial class MultipleAuthors : Migration
+    public partial class AddBlogToUser : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Angular_Auth.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250926075839_MultipleAuthors")]
-    partial class MultipleAuthors
+    [Migration("20250926084233_AddManyToManyRelationship")]
+    partial class AddManyToManyRelationship
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -59,9 +59,6 @@ namespace Angular_Auth.Migrations
 
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("int");
-
-                    b.Property<Guid?>("BlogId")
-                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
@@ -116,8 +113,6 @@ namespace Angular_Auth.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("BlogId");
-
                     b.HasIndex("NormalizedEmail")
                         .HasDatabaseName("EmailIndex");
 
@@ -127,6 +122,21 @@ namespace Angular_Auth.Migrations
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.ToTable("AspNetUsers", (string)null);
+                });
+
+            modelBuilder.Entity("BlogUser", b =>
+                {
+                    b.Property<string>("AuthorsId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<Guid>("BlogId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("AuthorsId", "BlogId");
+
+                    b.HasIndex("BlogId");
+
+                    b.ToTable("BlogUser");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -262,11 +272,19 @@ namespace Angular_Auth.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("Angular_Auth.Models.User", b =>
+            modelBuilder.Entity("BlogUser", b =>
                 {
+                    b.HasOne("Angular_Auth.Models.User", null)
+                        .WithMany()
+                        .HasForeignKey("AuthorsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("Angular_Auth.Models.Blog", null)
-                        .WithMany("Authors")
-                        .HasForeignKey("BlogId");
+                        .WithMany()
+                        .HasForeignKey("BlogId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -318,11 +336,6 @@ namespace Angular_Auth.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("Angular_Auth.Models.Blog", b =>
-                {
-                    b.Navigation("Authors");
                 });
 #pragma warning restore 612, 618
         }
