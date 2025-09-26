@@ -7,7 +7,7 @@ public class BlogWithFile {
     public BlogWithFile() { }
 
     [SetsRequiredMembers]
-    public BlogWithFile(Blog blog, string fileContent) {
+    public BlogWithFile(Blog blog, string fileContent, string bannerImage) {
         Id = blog.Id;
         Title = blog.Title;
         Description = blog.Description;
@@ -15,7 +15,7 @@ public class BlogWithFile {
         CreatedAt = blog.CreatedAt;
         UpdatedAt = blog.UpdatedAt;
         BlogContent = fileContent;
-        BannerImage = blog.BannerImage;
+        BannerImage = bannerImage;
     }
 
     public required Guid Id { get; set; }

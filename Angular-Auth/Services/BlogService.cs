@@ -123,8 +123,8 @@ public class BlogService(ILogger<BlogService> logger, BlogRepository repo, IUser
     /// <returns>A blog with file content</returns>
     private static async Task<BlogWithFile> GetBlogWithContent(Blog blog) {
         var content = await BlogFilesService.GetFileContent(blog.Id.ToString());
-        blog.BannerImage = await GetBanner(blog.Id);
-        var newBlog = new BlogWithFile(blog, content);
+        var banner = await GetBanner(blog.Id);
+        var newBlog = new BlogWithFile(blog, content, banner);
         return newBlog;
     }
 
