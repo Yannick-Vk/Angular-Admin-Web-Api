@@ -7,8 +7,9 @@ using Angular_Auth.Repositories;
 namespace Angular_Auth.Services;
 
 public class BlogService(ILogger<BlogService> logger, BlogRepository repo, IUserService userService) : IBlogService {
-    private static readonly FileService FileService = new("blogs", ".md");
-    
+    private static readonly FileService BlogFilesService = new("blogs", ".md");
+    private static readonly FileService BlogBannerService = new("blogs", ".png");
+
     public async Task<IEnumerable<BlogWithFile>> GetAllBlogs() {
         var blogs = await repo.GetAllBlogs();
         return await GetBlogsWithFile(blogs);
@@ -77,9 +78,8 @@ public class BlogService(ILogger<BlogService> logger, BlogRepository repo, IUser
         return blog;
     }
 
-    public async Task<IEnumerable<BlogWithAuthor>> GetBlogsWithAuthor(string username) {
-        return await repo.GetAllBlogsWithAuthor(username);
-    }
+    public async Task<IEnumerable<BlogWithAuthor>> GetBlogsWithAuthor(string username) =>
+        await repo.GetAllBlogsWithAuthor(username);
 
     public async Task<IEnumerable<BlogWithFile>> SearchBlog(string searchText) {
         var blogs = await repo.FindBlogs(searchText);
@@ -89,7 +89,8 @@ public class BlogService(ILogger<BlogService> logger, BlogRepository repo, IUser
     // Find user and blog, then add user to authors and send an update
     public async Task<BlogWithAuthor> AddAuthor(string blogId, string userId, UserDto loggedInUser) {
         var success = Guid.TryParse(blogId, out var guid);
-        if (!success) throw new BlogNotFoundException($"Blog with ID {blogId} was not found.");;
+        if (!success) throw new BlogNotFoundException($"Blog with ID {blogId} was not found.");
+        ;
 
         var blog = await repo.GetBlog(guid);
         if (blog is null) throw new BlogNotFoundException($"Blog with ID {blogId} was not found.");
@@ -119,14 +120,14 @@ public class BlogService(ILogger<BlogService> logger, BlogRepository repo, IUser
     /// <param name="blog"></param>
     /// <returns>A blog with file content</returns>
     private static async Task<BlogWithFile> GetBlogWithContent(Blog blog) {
-        var content = await FileService.GetFileContent(blog.Id.ToString());
+        var content = await BlogFilesService.GetFileContent(blog.Id.ToString());
         var newBlog = new BlogWithFile(blog, content);
         return newBlog;
     }
 
-    private static async Task SaveBlogFile(Guid id, string fileContent) {
-        await FileService.SaveFile(id.ToString(), fileContent);
-    }
+    private static async Task SaveBlogFile(Guid id, string fileContent) =>
+        await BlogFilesService.SaveFile(id.ToString(), fileContent);
+
 
     private async Task<IEnumerable<BlogWithFile>> GetBlogsWithFile(IEnumerable<Blog> blogs) {
         var blogsWithFile = new List<BlogWithFile>();
@@ -139,11 +140,13 @@ public class BlogService(ILogger<BlogService> logger, BlogRepository repo, IUser
         return blogsWithFile;
     }
 
-    public static void DeleteBlogFile(string blogId) {
-        FileService.DeleteFile(blogId);
-    }
+    private static void DeleteBlogFile(string blogId) => BlogFilesService.DeleteFile(blogId);
 
-    private static bool UserIsAuthor(Blog blog, User user) {
-        return blog.Authors.Exists(author => author.Id == user.Id);
-    }
+    private static bool UserIsAuthor(Blog blog, User user) => blog.Authors.Exists(author => author.Id == user.Id);
+
+    private static async Task SaveBlogImageFile(Guid id, string fileContent) =>
+        await BlogBannerService.SaveFile(id.ToString(), fileContent);
+
+    private static void DeleteBlogImageFile(Guid id) => BlogFilesService.DeleteFile(id.ToString());
+    private static async Task<string> GetBanner(Guid guid) => await BlogFilesService.GetFileContent(guid.ToString());
 }

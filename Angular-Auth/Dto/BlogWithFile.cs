@@ -15,6 +15,7 @@ public class BlogWithFile {
         CreatedAt = blog.CreatedAt;
         UpdatedAt = blog.UpdatedAt;
         BlogContent = fileContent;
+        BannerImage = blog.BannerImage;
     }
 
     public required Guid Id { get; set; }
@@ -22,6 +23,7 @@ public class BlogWithFile {
     public required string Description { get; set; }
     public required string BlogContent { get; set; }
     public required List<string> Authors { get; set; } = [];
+    public required string BannerImage { get; set; }
     public required DateTime CreatedAt { get; set; }
     public DateTime? UpdatedAt { get; set; }
 }
