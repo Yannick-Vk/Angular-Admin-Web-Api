@@ -7,6 +7,8 @@ using Angular_Auth.Repositories;
 namespace Angular_Auth.Services;
 
 public class BlogService(ILogger<BlogService> logger, BlogRepository repo, IUserService userService) : IBlogService {
+    private static readonly FileService FileService = new("blogs", ".md");
+    
     public async Task<IEnumerable<BlogWithFile>> GetAllBlogs() {
         var blogs = await repo.GetAllBlogs();
         return await GetBlogsWithFile(blogs);
@@ -116,40 +118,13 @@ public class BlogService(ILogger<BlogService> logger, BlogRepository repo, IUser
     /// <param name="blog"></param>
     /// <returns>A blog with file content</returns>
     private static async Task<BlogWithFile> GetBlogWithContent(Blog blog) {
-        var content = await GetFileContent(blog.Id.ToString(), "blogs", ".md");
+        var content = await FileService.GetFileContent(blog.Id.ToString());
         var newBlog = new BlogWithFile(blog, content);
         return newBlog;
     }
 
     private static async Task SaveBlogFile(Guid id, string fileContent) {
-        await SaveFile(id.ToString(), fileContent, "blogs", ".md");
-    }
-
-    private static async Task<string> GetFileContent(string filename, string folder, string extension) {
-        var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), $"uploads/{folder}");
-        var uniqueFileName = filename + extension;
-        var filePath = Path.Combine(uploadsFolder, uniqueFileName);
-
-        // Initialize an empty string, if the file exist add the contents
-        var content = string.Empty;
-        if (File.Exists(filePath)) content = await File.ReadAllTextAsync(filePath, Encoding.UTF8);
-        return content;
-    }
-
-
-    private static async Task SaveFile(string filename, string fileContent, string folder, string ext) {
-        var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), $"uploads/{folder}");
-        // Create the directory when it does not exist
-        if (!Directory.Exists(uploadsFolder)) Directory.CreateDirectory(uploadsFolder);
-
-        var uniqueFileName = filename + ext;
-        var fullPath = Path.Combine(uploadsFolder, uniqueFileName);
-
-        var fileBytes = Encoding.UTF8.GetBytes(fileContent);
-
-        // Save the file.
-        await using var stream = new FileStream(fullPath, FileMode.Create);
-        await stream.WriteAsync(fileBytes);
+        await FileService.SaveFile(id.ToString(), fileContent);
     }
 
     private async Task<IEnumerable<BlogWithFile>> GetBlogsWithFile(IEnumerable<Blog> blogs) {
@@ -164,14 +139,7 @@ public class BlogService(ILogger<BlogService> logger, BlogRepository repo, IUser
     }
 
     public static void DeleteBlogFile(string blogId) {
-        DeleteFile(blogId, "blogs", ".md");
-    }
-
-    private static void DeleteFile(string filename, string folder, string extension) {
-        var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "uploads/{folder}");
-        var uniqueFileName = filename + extension;
-        var filePath = Path.Combine(uploadsFolder, uniqueFileName);
-        File.Delete(filePath);
+        FileService.DeleteFile(blogId);
     }
 
     private static bool UserIsAuthor(Blog blog, User user) {
