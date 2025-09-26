@@ -11,7 +11,7 @@ public class BlogWithFile {
         Id = blog.Id;
         Title = blog.Title;
         Description = blog.Description;
-        Author = blog.Author.UserName ?? "NULL USER";
+        Authors = blog.Authors.Select(user => user.UserName?? "[NULL]").ToList();
         CreatedAt = blog.CreatedAt;
         UpdatedAt = blog.UpdatedAt;
         BlogContent = fileContent;
@@ -21,7 +21,7 @@ public class BlogWithFile {
     public required string Title { get; set; }
     public required string Description { get; set; }
     public required string BlogContent { get; set; }
-    public required string Author { get; set; }
+    public required List<string> Authors { get; set; } = [];
     public required DateTime CreatedAt { get; set; }
     public DateTime? UpdatedAt { get; set; }
 }

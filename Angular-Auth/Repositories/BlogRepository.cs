@@ -12,7 +12,7 @@ public class BlogRepository(AppDbContext context) {
 
     public async Task<List<Blog>> GetAllBlogs() {
         return await context.Blogs
-            .Include(b => b.Author)
+            .Include(b => b.Authors)
             .AsNoTracking()
             .OrderByDescending(b => b.CreatedAt)
             .ToListAsync();
@@ -20,7 +20,7 @@ public class BlogRepository(AppDbContext context) {
 
     public async Task<Blog?> GetBlog(Guid guid) {
         return await context.Blogs
-            .Include(b => b.Author)
+            .Include(b => b.Authors)
             .FirstOrDefaultAsync(b => b.Id == guid);
     }
 
@@ -38,8 +38,10 @@ public class BlogRepository(AppDbContext context) {
 
     public async Task<IEnumerable<BlogWithAuthor>> GetAllBlogsWithAuthor(string author) {
         return await context.Blogs
-            .Include(b => b.Author)
-            .Where(b => b.Author.UserName == author)
+            .Include(b => b.Authors)
+            .Where(b => b.Authors.Contains(new User() {
+                UserName = author
+            }))
             .OrderByDescending(b => b.CreatedAt)
             .Select(blog => new BlogWithAuthor(blog))
             .AsNoTracking()
@@ -50,7 +52,7 @@ public class BlogRepository(AppDbContext context) {
         searchWord = searchWord.Trim().ToLower();
 
         return await context.Blogs
-                .Include(b => b.Author)
+                .Include(b => b.Authors)
                 .Where(b => b.Title.ToLower().Contains(searchWord))
                 .OrderByDescending(b => b.CreatedAt)
                 .AsNoTracking()

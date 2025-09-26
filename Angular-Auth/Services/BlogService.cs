@@ -39,9 +39,10 @@ public class BlogService(ILogger<BlogService> logger, BlogRepository repo, IUser
 
         var author = loggedInUser.Username;
 
-        if (blog.Author.UserName != author) {
-            logger.LogError("User {user} attempted to update a blog belonging to {author}", author,
-                blog.Author.UserName);
+        if (!blog.Authors.Contains(new User() {
+                UserName = author,
+            })) {
+            logger.LogError("User {user} attempted to updated a blog without being its author.", author);
             throw new NotBlogAuthorException("You do not have permission to update this blog.");
         }
 
@@ -63,7 +64,9 @@ public class BlogService(ILogger<BlogService> logger, BlogRepository repo, IUser
         var blog = await repo.GetBlog(guid);
         if (blog is null) throw new BlogNotFoundException($"Blog with ID {id} was not found.");
 
-        if (blog.Author.UserName != user.Username)
+        if (!blog.Authors.Contains(new User() {
+                UserName = user.Username,
+            }))
             throw new NotBlogAuthorException("You do not have permission to delete this blog.");
 
         blog = await repo.DeleteBlog(blog);
