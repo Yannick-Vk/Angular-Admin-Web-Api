@@ -18,7 +18,11 @@ public class UserService(UserManager<User> manager) : IUserService {
         return user is null ? null : new UserDto(user);
     }
 
-    public async Task<User?> GetFullUser(string username) {
+    public async Task<User?> GetUserByUsername(string username) {
         return await manager.Users.FirstOrDefaultAsync(u => u.UserName == username);
+    }
+
+    public async Task<User?> GetFullUser(string id) {
+        return await manager.FindByIdAsync(id);
     }
 }

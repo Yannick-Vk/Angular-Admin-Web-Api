@@ -125,8 +125,8 @@ public class BlogController(
         }
 
         try {
-            await blogService.AddAuthor(blogId, userId, user);
-            return Ok();
+            var blog = await blogService.AddAuthor(blogId, userId, user);
+            return Ok(blog);
         }
         catch (BlogNotFoundException e) {
             return NotFound(e.Message);

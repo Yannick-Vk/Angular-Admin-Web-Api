@@ -25,7 +25,7 @@ public class BlogService(ILogger<BlogService> logger, BlogRepository repo, IUser
     }
 
     public async Task<Guid> UploadBlog(UserDto user, BlogUpload blogUpload) {
-        var author = await userService.GetFullUser(user.Username);
+        var author = await userService.GetUserByUsername(user.Username);
         if (author is null) throw new UnauthorizedAccessException($"Cannot find user {user.Username}");
 
         var blog = new Blog(blogUpload, author);
@@ -39,7 +39,7 @@ public class BlogService(ILogger<BlogService> logger, BlogRepository repo, IUser
         var blog = await repo.GetBlog(dto.Id);
         if (blog is null) throw new BlogNotFoundException($"Blog with ID {dto.Id} was not found.");
 
-        var author = await userService.GetFullUser(loggedInUser.Username);
+        var author = await userService.GetUserByUsername(loggedInUser.Username);
         if (author is null) throw new UnauthorizedAccessException("Could not find user");
 
         if (!UserIsAuthor(blog, author)) {
@@ -65,7 +65,7 @@ public class BlogService(ILogger<BlogService> logger, BlogRepository repo, IUser
         var blog = await repo.GetBlog(guid);
         if (blog is null) throw new BlogNotFoundException($"Blog with ID {id} was not found.");
 
-        var fullUser = await userService.GetFullUser(user.Username);
+        var fullUser = await userService.GetUserByUsername(user.Username);
         if (fullUser is null) throw new UnauthorizedAccessException("Could not find user");
 
         if (!UserIsAuthor(blog, fullUser))
@@ -87,14 +87,14 @@ public class BlogService(ILogger<BlogService> logger, BlogRepository repo, IUser
     }
 
     // Find user and blog, then add user to authors and send an update
-    public async Task AddAuthor(string blogId, string userId, UserDto loggedInUser) {
+    public async Task<BlogWithAuthor> AddAuthor(string blogId, string userId, UserDto loggedInUser) {
         var success = Guid.TryParse(blogId, out var guid);
-        if (!success) return;
+        if (!success) throw new BlogNotFoundException($"Blog with ID {blogId} was not found.");;
 
         var blog = await repo.GetBlog(guid);
         if (blog is null) throw new BlogNotFoundException($"Blog with ID {blogId} was not found.");
 
-        var loggedInUserFull = await userService.GetFullUser(loggedInUser.Username);
+        var loggedInUserFull = await userService.GetUserByUsername(loggedInUser.Username);
         if (loggedInUserFull is null) throw new UnauthorizedAccessException("Could not find logged in user");
 
         if (!UserIsAuthor(blog, loggedInUserFull)) {
@@ -102,14 +102,15 @@ public class BlogService(ILogger<BlogService> logger, BlogRepository repo, IUser
         }
 
         var user = await userService.GetFullUser(userId);
-        if (user is null) return;
+        if (user is null) throw new UserNotFoundException($"Cannot find user with id: {userId}");
 
         if (UserIsAuthor(blog, user)) {
-            return;
+            return new BlogWithAuthor(blog);
         }
 
         blog.Authors.Add(user);
         await repo.UpdateBlog(blog);
+        return new BlogWithAuthor(blog);
     }
 
     /// <summary>
