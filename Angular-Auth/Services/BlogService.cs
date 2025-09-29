@@ -33,7 +33,7 @@ public class BlogService(ILogger<BlogService> logger, BlogRepository repo, IUser
 
         await repo.SaveBlog(blog);
         await SaveBlogFile(blog.Id, blogUpload.File);
-        await SaveBlogFile(blog.Id, blogUpload.BannerImage);
+        await SaveBlogImageFile(blog.Id, blogUpload.BannerImage);
         return blog.Id;
     }
 
@@ -130,7 +130,6 @@ public class BlogService(ILogger<BlogService> logger, BlogRepository repo, IUser
 
     private static async Task SaveBlogFile(Guid id, string fileContent) =>
         await BlogFilesService.SaveFile(id.ToString(), fileContent);
-
 
     private async Task<IEnumerable<BlogWithFile>> GetBlogsWithFile(IEnumerable<Blog> blogs) {
         var blogsWithFile = new List<BlogWithFile>();
