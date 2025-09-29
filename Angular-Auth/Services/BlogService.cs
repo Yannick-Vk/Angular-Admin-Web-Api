@@ -8,7 +8,7 @@ namespace Angular_Auth.Services;
 
 public class BlogService(ILogger<BlogService> logger, BlogRepository repo, IUserService userService) : IBlogService {
     private static readonly FileService BlogFilesService = new("blogs", ".md");
-    private static readonly FileService BlogBannerService = new("blogs", ".png");
+    private static readonly FileService BlogBannerService = new("blogs/banners", ".png");
 
     public async Task<IEnumerable<BlogWithFile>> GetAllBlogs() {
         var blogs = await repo.GetAllBlogs();
