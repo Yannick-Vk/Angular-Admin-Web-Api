@@ -15,7 +15,7 @@ public class BlogController(
     IBlogService blogService,
     IAuthenticationService authService) : Controller {
     [HttpPost]
-    public async Task<IActionResult> UploadBlog(BlogUpload blogUpload) {
+    public async Task<IActionResult> UploadBlog([FromForm] BlogUpload blogUpload) {
         try {
             var user = authService.GetUserFromClaimsPrincipal(HttpContext.User);
             if (user is null) throw new UnauthorizedAccessException($"Cannot find user {HttpContext.User}");

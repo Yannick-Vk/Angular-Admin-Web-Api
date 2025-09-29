@@ -1,4 +1,3 @@
-﻿using System.Text;
 using Angular_Auth.Dto;
 using Angular_Auth.Exceptions;
 using Angular_Auth.Models;
@@ -8,7 +7,6 @@ namespace Angular_Auth.Services;
 
 public class BlogService(ILogger<BlogService> logger, BlogRepository repo, IUserService userService) : IBlogService {
     private static readonly FileService BlogFilesService = new("blogs", ".md");
-    private static readonly FileService BlogBannerService = new("blogs/banners", ".png");
 
     public async Task<IEnumerable<BlogWithFile>> GetAllBlogs() {
         var blogs = await repo.GetAllBlogs();
@@ -33,7 +31,9 @@ public class BlogService(ILogger<BlogService> logger, BlogRepository repo, IUser
 
         await repo.SaveBlog(blog);
         await SaveBlogFile(blog.Id, blogUpload.File);
-        await SaveBlogImageFile(blog.Id, blogUpload.BannerImage);
+        if (blogUpload.BannerImage is not null)
+            await SaveBanner(blog.Id, blogUpload.BannerImage);
+    
         return blog.Id;
     }
 
@@ -76,7 +76,7 @@ public class BlogService(ILogger<BlogService> logger, BlogRepository repo, IUser
         await repo.DeleteBlog(blog);
         // Delete blog file
         DeleteBlogFile(blog.Id);
-        DeleteBlogImageFile(blog.Id);
+        DeleteBanner(blog.Id);
         return blog;
     }
 
@@ -146,9 +146,14 @@ public class BlogService(ILogger<BlogService> logger, BlogRepository repo, IUser
 
     private static bool UserIsAuthor(Blog blog, User user) => blog.Authors.Exists(author => author.Id == user.Id);
 
-    private static async Task SaveBlogImageFile(Guid id, string fileContent) =>
-        await BlogBannerService.SaveFile(id.ToString(), fileContent);
+    private static async Task SaveBanner(Guid id, IFormFile fileContent) {
+        var extension = Path.GetExtension(fileContent.FileName);
+        await FileService.SaveFile(id.ToString(), fileContent, "blogs/banners", extension);
+    }
 
-    private static void DeleteBlogImageFile(Guid id) => BlogFilesService.DeleteFile(id.ToString());
-    private static async Task<string> GetBanner(Guid guid) => await BlogFilesService.GetFileContent(guid.ToString());
+    private static void DeleteBanner(Guid id) => FileService.DeleteFile(id.ToString(), "blogs/banners", ".*");
+
+    private static async Task<string> GetBanner(Guid guid) {
+        return await FileService.GetFileContent(guid.ToString(), "blogs/banners", ".*");
+    }
 }
