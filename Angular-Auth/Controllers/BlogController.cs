@@ -19,7 +19,7 @@ public class BlogController(
         try {
             var user = authService.GetUserFromClaimsPrincipal(HttpContext.User);
             if (user is null) throw new UnauthorizedAccessException($"Cannot find user {HttpContext.User}");
-            
+
             var id = await blogService.UploadBlog(user, blogUpload);
             return Ok(id);
         }
@@ -28,19 +28,28 @@ public class BlogController(
         }
     }
 
-    [HttpGet("{blogId}")]
+    [HttpGet]
     [AllowAnonymous]
-    public async Task<IActionResult> GetBlog(string blogId) {
-        var blog = await blogService.GetBlog(blogId);
-        if (blog is null) return NotFound("Cannot find a blog with ID : " + blogId);
+    public async Task<IEnumerable<BlogWithContent>> GetAllBlogs() => await blogService.GetAllBlogs();
 
+    [HttpGet("{id}")]
+    [AllowAnonymous]
+    public async Task<IActionResult> GetBlog(string id) {
+        var blog = await blogService.GetBlog(id);
+        if (blog is null) return NotFound();
         return Ok(blog);
     }
 
-    [HttpGet]
+    [HttpGet("banner/{id}")]
     [AllowAnonymous]
-    public async Task<IEnumerable<BlogWithFile>> GetAllBlogs() {
-        return await blogService.GetAllBlogs();
+    public async Task<ActionResult> GetBanner(string id) {
+        var success = Guid.TryParse(id, out var guid);
+        if (!success) return BadRequest();
+
+        var banner = await blogService.GetBanner(guid);
+        if (banner.Length == 0) return NotFound();
+
+        return new FileContentResult(banner, "image/jpeg");
     }
 
     [HttpPatch]

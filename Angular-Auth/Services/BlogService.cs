@@ -8,12 +8,18 @@ namespace Angular_Auth.Services;
 public class BlogService(ILogger<BlogService> logger, BlogRepository repo, IUserService userService) : IBlogService {
     private static readonly FileService BlogFilesService = new("blogs", ".md");
 
-    public async Task<IEnumerable<BlogWithFile>> GetAllBlogs() {
+    public async Task<IEnumerable<BlogWithContent>> GetAllBlogs() {
         var blogs = await repo.GetAllBlogs();
-        return await GetBlogsWithFile(blogs);
+        var blogsWithContent = new List<BlogWithContent>();
+        foreach (var blog in blogs) {
+            var content = await BlogFilesService.GetFileContent(blog.Id.ToString());
+            blogsWithContent.Add(new BlogWithContent(blog, content));
+        }
+
+        return blogsWithContent;
     }
 
-    public async Task<BlogWithFile?> GetBlog(string id) {
+    public async Task<BlogWithContent?> GetBlog(string id) {
         var success = Guid.TryParse(id, out var guid);
         if (!success) return null;
 
@@ -31,13 +37,11 @@ public class BlogService(ILogger<BlogService> logger, BlogRepository repo, IUser
 
         await repo.SaveBlog(blog);
         await SaveBlogFile(blog.Id, blogUpload.File);
-        if (blogUpload.BannerImage is not null)
-            await SaveBanner(blog.Id, blogUpload.BannerImage);
-    
+        if (blogUpload.BannerImage is not null) await SaveBanner(blog.Id, blogUpload.BannerImage);
         return blog.Id;
     }
 
-    public async Task<BlogWithFile> UpdateBlog(BlogUpdate dto, UserDto loggedInUser) {
+    public async Task<BlogWithContent> UpdateBlog(BlogUpdate dto, UserDto loggedInUser) {
         var blog = await repo.GetBlog(dto.Id);
         if (blog is null) throw new BlogNotFoundException($"Blog with ID {dto.Id} was not found.");
 
@@ -83,7 +87,7 @@ public class BlogService(ILogger<BlogService> logger, BlogRepository repo, IUser
     public async Task<IEnumerable<BlogWithAuthor>> GetBlogsWithAuthor(string username) =>
         await repo.GetAllBlogsWithAuthor(username);
 
-    public async Task<IEnumerable<BlogWithFile>> SearchBlog(string searchText) {
+    public async Task<IEnumerable<BlogWithContent>> SearchBlog(string searchText) {
         var blogs = await repo.FindBlogs(searchText);
         return await GetBlogsWithFile(blogs);
     }
@@ -121,18 +125,17 @@ public class BlogService(ILogger<BlogService> logger, BlogRepository repo, IUser
     /// </summary>
     /// <param name="blog"></param>
     /// <returns>A blog with file content</returns>
-    private static async Task<BlogWithFile> GetBlogWithContent(Blog blog) {
+    private static async Task<BlogWithContent> GetBlogWithContent(Blog blog) {
         var content = await BlogFilesService.GetFileContent(blog.Id.ToString());
-        var banner = await GetBanner(blog.Id);
-        var newBlog = new BlogWithFile(blog, content, banner);
+        var newBlog = new BlogWithContent(blog, content);
         return newBlog;
     }
 
     private static async Task SaveBlogFile(Guid id, string fileContent) =>
         await BlogFilesService.SaveFile(id.ToString(), fileContent);
 
-    private async Task<IEnumerable<BlogWithFile>> GetBlogsWithFile(IEnumerable<Blog> blogs) {
-        var blogsWithFile = new List<BlogWithFile>();
+    private async Task<IEnumerable<BlogWithContent>> GetBlogsWithFile(IEnumerable<Blog> blogs) {
+        var blogsWithFile = new List<BlogWithContent>();
 
         foreach (var blog in blogs) {
             var blogContent = await GetBlogWithContent(blog);
@@ -153,7 +156,11 @@ public class BlogService(ILogger<BlogService> logger, BlogRepository repo, IUser
 
     private static void DeleteBanner(Guid id) => FileService.DeleteFile(id.ToString(), "blogs/banners", ".*");
 
-    private static async Task<string> GetBanner(Guid guid) {
+    private static async Task<string> GetBannerContent(Guid guid) {
         return await FileService.GetFileContent(guid.ToString(), "blogs/banners", ".*");
+    }
+
+    public async Task<byte[]> GetBanner(Guid guid) {
+        return await FileService.GetFileBytes(guid.ToString(), "blogs/banners", ".*");
     }
 }

@@ -4,12 +4,13 @@ using Angular_Auth.Models;
 namespace Angular_Auth.Services;
 
 public interface IBlogService {
-    public Task<BlogWithFile?> GetBlog(string id);
-    public Task<Guid> UploadBlog(UserDto user, BlogUpload blogUpload);
-    public Task<IEnumerable<BlogWithFile>> GetAllBlogs();
-    public Task<BlogWithFile> UpdateBlog(BlogUpdate dto, UserDto loggedInUser);
-    public Task<Blog> DeleteBlog(string id, UserDto user);
-    public Task<IEnumerable<BlogWithAuthor>> GetBlogsWithAuthor(string username);
-    public Task<IEnumerable<BlogWithFile>> SearchBlog(string searchText);
-    public Task<BlogWithAuthor> AddAuthor(string blogId, string userId, UserDto loggedInUser);
+    Task<IEnumerable<BlogWithContent>> GetAllBlogs();
+    Task<BlogWithContent?> GetBlog(string id);
+    Task<Guid> UploadBlog(UserDto user, BlogUpload blogUpload);
+    Task<BlogWithContent> UpdateBlog(BlogUpdate dto, UserDto loggedInUser);
+    Task<Blog> DeleteBlog(string id, UserDto user);
+    Task<IEnumerable<BlogWithAuthor>> GetBlogsWithAuthor(string username);
+    Task<IEnumerable<BlogWithContent>> SearchBlog(string searchText);
+    Task<BlogWithAuthor> AddAuthor(string blogId, string userId, UserDto loggedInUser);
+    Task<byte[]> GetBanner(Guid guid);
 }
