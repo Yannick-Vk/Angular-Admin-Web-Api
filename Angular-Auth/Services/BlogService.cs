@@ -100,7 +100,6 @@ public class BlogService(ILogger<BlogService> logger, BlogRepository repo, IUser
     public async Task<BlogWithAuthor> AddAuthor(string blogId, string userId, UserDto loggedInUser) {
         var success = Guid.TryParse(blogId, out var guid);
         if (!success) throw new BlogNotFoundException($"Blog with ID {blogId} was not found.");
-        ;
 
         var blog = await repo.GetBlog(guid);
         if (blog is null) throw new BlogNotFoundException($"Blog with ID {blogId} was not found.");
@@ -120,6 +119,88 @@ public class BlogService(ILogger<BlogService> logger, BlogRepository repo, IUser
         }
 
         blog.Authors.Add(user);
+        await repo.UpdateBlog(blog);
+        return new BlogWithAuthor(blog);
+    }
+
+    public async Task<BlogWithAuthor> AddMultipleAuthors(string blogId, IEnumerable<string> userIds,
+        UserDto loggedInUser) {
+        var success = Guid.TryParse(blogId, out var guid);
+        if (!success) throw new BlogNotFoundException($"Blog with ID {blogId} was not found.");
+
+        var blog = await repo.GetBlog(guid);
+        if (blog is null) throw new BlogNotFoundException($"Blog with ID {blogId} was not found.");
+
+        var loggedInUserFull = await userService.GetUserByUsername(loggedInUser.Username);
+        if (loggedInUserFull is null) throw new UnauthorizedAccessException("Could not find logged in user");
+
+        if (!UserIsAuthor(blog, loggedInUserFull)) {
+            throw new NotBlogAuthorException("You do not have permission to add an author to this blog.");
+        }
+        
+        var list = new List<User>();
+        foreach (var userId in userIds) {
+            var user = await userService.GetFullUser(userId);
+            if (user is null) throw new UserNotFoundException($"Cannot find user with id: {userId}");
+            list.Add(user);
+        }
+
+        blog.Authors.AddRange(list);
+
+        await repo.UpdateBlog(blog);
+        return new BlogWithAuthor(blog);
+    }
+    
+    public async Task<BlogWithAuthor> RemoveAuthor(string blogId, string userId, UserDto loggedInUser) {
+        var success = Guid.TryParse(blogId, out var guid);
+        if (!success) throw new BlogNotFoundException($"Blog with ID {blogId} was not found.");
+
+        var blog = await repo.GetBlog(guid);
+        if (blog is null) throw new BlogNotFoundException($"Blog with ID {blogId} was not found.");
+
+        var loggedInUserFull = await userService.GetUserByUsername(loggedInUser.Username);
+        if (loggedInUserFull is null) throw new UnauthorizedAccessException("Could not find logged in user");
+
+        if (!UserIsAuthor(blog, loggedInUserFull)) {
+            throw new NotBlogAuthorException("You do not have permission to add an author to this blog.");
+        }
+
+        var user = await userService.GetFullUser(userId);
+        if (user is null) throw new UserNotFoundException($"Cannot find user with id: {userId}");
+
+        if (UserIsAuthor(blog, user)) {
+            return new BlogWithAuthor(blog);
+        }
+
+        blog.Authors.Remove(user);
+        await repo.UpdateBlog(blog);
+        return new BlogWithAuthor(blog);
+    }
+
+    public async Task<BlogWithAuthor> RemoveMultipleAuthors(string blogId, IEnumerable<string> userIds,
+        UserDto loggedInUser) {
+        var success = Guid.TryParse(blogId, out var guid);
+        if (!success) throw new BlogNotFoundException($"Blog with ID {blogId} was not found.");
+
+        var blog = await repo.GetBlog(guid);
+        if (blog is null) throw new BlogNotFoundException($"Blog with ID {blogId} was not found.");
+
+        var loggedInUserFull = await userService.GetUserByUsername(loggedInUser.Username);
+        if (loggedInUserFull is null) throw new UnauthorizedAccessException("Could not find logged in user");
+
+        if (!UserIsAuthor(blog, loggedInUserFull)) {
+            throw new NotBlogAuthorException("You do not have permission to add an author to this blog.");
+        }
+        
+        var list = new List<User>();
+        foreach (var userId in userIds) {
+            var user = await userService.GetFullUser(userId);
+            if (user is null) throw new UserNotFoundException($"Cannot find user with id: {userId}");
+            list.Add(user);
+        }
+
+        blog.Authors.RemoveAll(user => list.Contains(user));
+
         await repo.UpdateBlog(blog);
         return new BlogWithAuthor(blog);
     }

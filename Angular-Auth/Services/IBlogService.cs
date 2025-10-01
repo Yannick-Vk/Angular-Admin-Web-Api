@@ -12,5 +12,8 @@ public interface IBlogService {
     Task<IEnumerable<BlogWithAuthor>> GetBlogsWithAuthor(string username);
     Task<IEnumerable<BlogWithContent>> SearchBlog(string searchText);
     Task<BlogWithAuthor> AddAuthor(string blogId, string userId, UserDto loggedInUser);
+    Task<BlogWithAuthor> AddMultipleAuthors(string blogId, IEnumerable<string> userIds, UserDto loggedInUser);
+    Task<BlogWithAuthor> RemoveAuthor(string blogId, string userId, UserDto loggedInUser);
+    Task<BlogWithAuthor> RemoveMultipleAuthors(string blogId, IEnumerable<string> userIds, UserDto loggedInUser);
     Task<byte[]> GetBanner(Guid guid);
 }

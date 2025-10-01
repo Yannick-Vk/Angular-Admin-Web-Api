@@ -148,4 +148,73 @@ public class BlogController(
             return BadRequest(e.Message);
         }
     }
+    
+    [HttpPost("{blogId}/authors/remove/{userId}")]
+    public async Task<IActionResult> RemoveAuthor(string blogId, string userId) {
+        var user = authService.GetUserFromClaimsPrincipal(HttpContext.User);
+        if (user is null) {
+            return Unauthorized();
+        }
+
+        try {
+            var blog = await blogService.RemoveAuthor(blogId, userId, user);
+            return Ok(blog);
+        }
+        catch (BlogNotFoundException e) {
+            return NotFound(e.Message);
+        }
+        catch (NotBlogAuthorException e) {
+            logger.LogError("{message}", e.Message);
+            return StatusCode(Status403Forbidden, e.Message);
+        }
+        catch (Exception e) {
+            return BadRequest(e.Message);
+        }
+    }
+    
+    [HttpPost("{blogId}/authors/add/")]
+    public async Task<IActionResult> AddMultipleAuthors(string blogId, IEnumerable<string> userIds) {
+        var user = authService.GetUserFromClaimsPrincipal(HttpContext.User);
+        if (user is null) {
+            return Unauthorized();
+        }
+
+        try {
+            var blog = await blogService.AddMultipleAuthors(blogId, userIds, user);
+            return Ok(blog);
+        }
+        catch (BlogNotFoundException e) {
+            return NotFound(e.Message);
+        }
+        catch (NotBlogAuthorException e) {
+            logger.LogError("{message}", e.Message);
+            return StatusCode(Status403Forbidden, e.Message);
+        }
+        catch (Exception e) {
+            return BadRequest(e.Message);
+        }
+    }
+    
+    [HttpPost("{blogId}/authors/remove/")]
+    public async Task<IActionResult> RemoveMultipleAuthors(string blogId, IEnumerable<string> userIds) {
+        var user = authService.GetUserFromClaimsPrincipal(HttpContext.User);
+        if (user is null) {
+            return Unauthorized();
+        }
+
+        try {
+            var blog = await blogService.RemoveMultipleAuthors(blogId, userIds, user);
+            return Ok(blog);
+        }
+        catch (BlogNotFoundException e) {
+            return NotFound(e.Message);
+        }
+        catch (NotBlogAuthorException e) {
+            logger.LogError("{message}", e.Message);
+            return StatusCode(Status403Forbidden, e.Message);
+        }
+        catch (Exception e) {
+            return BadRequest(e.Message);
+        }
+    }
 }
