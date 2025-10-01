@@ -40,7 +40,7 @@ public class BlogController(
         return Ok(blog);
     }
 
-    [HttpGet("banner/{id}")]
+    [HttpGet("{id}/banner")]
     [AllowAnonymous]
     public async Task<ActionResult> GetBanner(string id) {
         var success = Guid.TryParse(id, out var guid);
