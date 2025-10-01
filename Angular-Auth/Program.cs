@@ -54,13 +54,8 @@ builder.Services.AddAuthentication(options => {
 
     options.Events = new JwtBearerEvents {
         OnMessageReceived = ctx => {
-            var logger = ctx.HttpContext.RequestServices.GetRequiredService<ILogger<Program>>();
             if (ctx.Request.Cookies.TryGetValue("accessToken", out var accessToken)) {
-                logger.LogInformation("Access token found in cookie.");
                 ctx.Token = accessToken;
-            }
-            else {
-                logger.LogInformation("Access token not found in cookie.");
             }
 
             return Task.CompletedTask;
@@ -115,7 +110,8 @@ if (app.Environment.IsDevelopment()) {
 }
 
 // Use CORS
-app.UseCors(b => b.WithOrigins("http://localhost:4200", "https://localhost:4200", "http://localhost:5175", "http://localhost:5173")
+app.UseCors(b => b
+    .WithOrigins("http://localhost:4200", "https://localhost:4200", "http://localhost:5175", "http://localhost:5173")
     .AllowAnyHeader()
     .AllowAnyMethod()
     .AllowCredentials());
