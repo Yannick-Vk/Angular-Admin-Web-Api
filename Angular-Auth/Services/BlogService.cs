@@ -88,8 +88,12 @@ public class BlogService(ILogger<BlogService> logger, BlogRepository repo, IUser
         return blog;
     }
 
-    public async Task<IEnumerable<BlogWithAuthor>> GetBlogsWithAuthor(string username) =>
-        await repo.GetAllBlogsWithAuthor(username);
+    public async Task<IEnumerable<BlogWithAuthor>> GetBlogsWithAuthor(string userId) {
+        var user =  await userService.GetUserById(userId);
+        if (user is null) throw new UserNotFoundException($"Cannot find user {userId}");
+        
+        return await repo.GetAllBlogsWithAuthor(user);
+    }
 
     public async Task<IEnumerable<BlogWithContent>> SearchBlog(string searchText) {
         var blogs = await repo.FindBlogs(searchText);

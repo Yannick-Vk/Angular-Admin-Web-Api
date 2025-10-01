@@ -9,7 +9,7 @@ public interface IBlogService {
     Task<Guid> UploadBlog(UserDto user, BlogUpload blogUpload);
     Task<BlogWithContent> UpdateBlog(BlogUpdate dto, UserDto loggedInUser);
     Task<Blog> DeleteBlog(string id, UserDto user);
-    Task<IEnumerable<BlogWithAuthor>> GetBlogsWithAuthor(string username);
+    Task<IEnumerable<BlogWithAuthor>> GetBlogsWithAuthor(string userId);
     Task<IEnumerable<BlogWithContent>> SearchBlog(string searchText);
     Task<BlogWithAuthor> AddAuthor(string blogId, string userId, UserDto loggedInUser);
     Task<BlogWithAuthor> AddMultipleAuthors(string blogId, IEnumerable<string> userIds, UserDto loggedInUser);

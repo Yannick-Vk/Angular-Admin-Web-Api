@@ -107,14 +107,20 @@ public class BlogController(
         }
     }
 
+    [AllowAnonymous]
+    [HttpGet("author/{userId}")]
+    public async Task<IActionResult> GetAllBlogsWithAuthor(string userId) {
+        return Ok(await blogService.GetBlogsWithAuthor(userId));
+    }
+
     [HttpGet("author/me")]
-    public async Task<IActionResult> GetAllBlogsWithAuthor() {
+    public async Task<IActionResult> GetMyBlogs() {
         var user = authService.GetUserFromClaimsPrincipal(HttpContext.User);
         if (user is null) {
             return Unauthorized();
         }
 
-        return Ok(await blogService.GetBlogsWithAuthor(user.Username!));
+        return Ok(await blogService.GetBlogsWithAuthor(user.Id));
     }
 
     [AllowAnonymous]

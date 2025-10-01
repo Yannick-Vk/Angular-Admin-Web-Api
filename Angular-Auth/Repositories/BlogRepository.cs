@@ -36,12 +36,10 @@ public class BlogRepository(AppDbContext context) {
         return blog;
     }
 
-    public async Task<IEnumerable<BlogWithAuthor>> GetAllBlogsWithAuthor(string author) {
+    public async Task<IEnumerable<BlogWithAuthor>> GetAllBlogsWithAuthor(User author) {
         return await context.Blogs
             .Include(b => b.Authors)
-            .Where(b => b.Authors.Contains(new User() {
-                UserName = author
-            }))
+            .Where(b => b.Authors.Contains(author))
             .OrderByDescending(b => b.CreatedAt)
             .Select(blog => new BlogWithAuthor(blog))
             .AsNoTracking()
