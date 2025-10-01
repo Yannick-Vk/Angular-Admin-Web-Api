@@ -5,5 +5,5 @@ public class BlogUpdate {
     public string? Title { get; set; }
     public string? Description { get; set; }
     public string? BlogContent { get; set; }
-    public string? BannerImage  { get; set; }
+    public IFormFile? BannerImage  { get; set; }
 }

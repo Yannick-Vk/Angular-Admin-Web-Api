@@ -57,7 +57,7 @@ public class BlogController(
     [ProducesResponseType(Status401Unauthorized)]
     [ProducesResponseType(Status403Forbidden)]
     [ProducesResponseType(Status404NotFound)]
-    public async Task<IActionResult> UpdateBlog(BlogUpdate blog) {
+    public async Task<IActionResult> UpdateBlog([FromForm] BlogUpdate blog) {
         var user = authService.GetUserFromClaimsPrincipal(HttpContext.User);
         if (user is null) {
             logger.LogError("Failed to get user from request.");
