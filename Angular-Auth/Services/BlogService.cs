@@ -60,7 +60,10 @@ public class BlogService(ILogger<BlogService> logger, BlogRepository repo, IUser
         var updatedBlog = await repo.UpdateBlog(blog);
 
         if (dto.BlogContent is not null) await SaveBlogFile(updatedBlog.Id, dto.BlogContent);
-        if (dto.BannerImage is not null) await SaveBanner(blog.Id, dto.BannerImage);
+        if (dto.BannerImage is not null) {
+            DeleteBanner(blog.Id);
+            await SaveBanner(blog.Id, dto.BannerImage);
+        }
 
         return await GetBlogWithContent(updatedBlog);
     }
