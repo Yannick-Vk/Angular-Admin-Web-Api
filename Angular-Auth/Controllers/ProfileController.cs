@@ -26,10 +26,10 @@ public class ProfileController : Controller {
         try {
             var userId = User.FindFirstValue("Id");
             if (userId == null) {
-                return Unauthorized("Invalid user id");
+                return Unauthorized("Could not get userId from JWT Token");
             }
 
-            await _profileService.UpdateEmail(userId, request.Email);
+            await _profileService.UpdateEmail(userId, request.Email, request.Password);
             return Ok();
         }
         catch (Exception ex) {
