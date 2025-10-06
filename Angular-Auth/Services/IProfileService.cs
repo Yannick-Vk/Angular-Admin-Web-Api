@@ -1,0 +1,8 @@
+﻿using Angular_Auth.Dto;
+
+namespace Angular_Auth.Services;
+
+public interface IProfileService {
+    public Task UpdateEmail(string userId, string newEmail);
+    
+}
