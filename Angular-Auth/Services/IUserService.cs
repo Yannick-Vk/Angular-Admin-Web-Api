@@ -8,4 +8,5 @@ public interface IUserService {
     public Task<User> GetUserById(string userId);
     public Task<User> GetUserByUsername(string username);
     public Task<User?> GetFullUser(string id);
+    public Task<byte[]> GetUserProfilePicture(string userId);
 }

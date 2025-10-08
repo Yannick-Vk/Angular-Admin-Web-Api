@@ -60,7 +60,7 @@ public class ProfileController : Controller {
             if (userId == null) {
                 return Unauthorized("Could not get userId from JWT Token");
             }
-            
+
             await _profileService.UploadProfilePicture(userId, upload);
             return Ok();
         }
@@ -68,7 +68,7 @@ public class ProfileController : Controller {
             return Unauthorized(ex.Message);
         }
     }
-    
+
     [HttpGet("profile-picture")]
     public async Task<IActionResult> GetProfilePicture() {
         try {
@@ -76,7 +76,7 @@ public class ProfileController : Controller {
             if (userId == null) {
                 return Unauthorized("Could not get userId from JWT Token");
             }
-            
+
             var image = await _profileService.GetProfilePicture(userId);
             if (image.Length == 0) return NotFound();
 
@@ -86,7 +86,7 @@ public class ProfileController : Controller {
             return Unauthorized(ex.Message);
         }
     }
-    
+
     [HttpDelete("profile-picture")]
     public async Task<IActionResult> DeleteProfilePicture() {
         try {
@@ -94,7 +94,7 @@ public class ProfileController : Controller {
             if (userId == null) {
                 return Unauthorized("Could not get userId from JWT Token");
             }
-            
+
             await _profileService.DeleteProfilePicture(userId);
             return Ok();
         }

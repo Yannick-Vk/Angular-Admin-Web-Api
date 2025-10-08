@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Angular_Auth.Services;
 
-public class UserService(UserManager<User> manager) : IUserService {
+public class UserService(UserManager<User> manager, IProfileService profileService) : IUserService {
     public async Task<List<UserDto>> GetUsers() {
         var users = await manager.Users
             .Select(user => new UserDto(user))
@@ -26,5 +26,9 @@ public class UserService(UserManager<User> manager) : IUserService {
 
     public async Task<User?> GetFullUser(string id) {
         return await manager.FindByIdAsync(id);
+    }
+
+    public async Task<byte[]> GetUserProfilePicture(string userId) {
+        return await profileService.GetProfilePicture(userId);
     }
 }

@@ -83,4 +83,20 @@ public class UserController(IUserService service, IRoleService roleService) : Co
             return BadRequest(ex.Message);
         }
     }
+
+    [HttpGet("{userId}/profile-picture")]
+    [ProducesResponseType(Status200OK)]
+    [ProducesResponseType(Status401Unauthorized)]
+    [ProducesResponseType(Status403Forbidden)]
+    public async Task<IActionResult> GetUserProfilePicture(string userId) {
+        try {
+            var image = await service.GetUserProfilePicture(userId);
+            if (image.Length == 0) return NotFound();
+
+            return new FileContentResult(image, "image/jpeg");
+        }
+        catch (Exception ex) {
+            return BadRequest(ex.Message);
+        }
+    }
 }
