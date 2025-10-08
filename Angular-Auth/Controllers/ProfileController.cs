@@ -54,8 +54,14 @@ public class ProfileController : Controller {
     }
 
     [HttpPost]
-    public async Task<IActionResult> UploadProfilePicture([FromForm] BlogUpload blogUpload) {
+    public async Task<IActionResult> UploadProfilePicture([FromForm] ProfilePictureUpload upload) {
         try {
+            var userId = User.FindFirstValue("Id");
+            if (userId == null) {
+                return Unauthorized("Could not get userId from JWT Token");
+            }
+            
+            await _profileService.UploadProfilePicture(userId, upload);
             return Ok();
         }
         catch (Exception ex) {
