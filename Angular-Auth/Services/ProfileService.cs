@@ -21,7 +21,7 @@ public class ProfileService(UserManager<User> userManager, ProfileRepository rep
 
     public async Task UploadProfilePicture(string userId, ProfilePictureUpload pictureUpload) {
         var user = await GetUserOrException(userId);
-        await repo.UpdateProfilePicture(user);
+        await repo.UpdateProfilePicture(user, pictureUpload.Image);
     }
 
     private async Task<User> GetUserOrException(string userId, string? message = null) {

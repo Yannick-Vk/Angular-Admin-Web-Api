@@ -53,7 +53,7 @@ public class ProfileController : Controller {
         }
     }
 
-    [HttpPost]
+    [HttpPost("change/profile-picture")]
     public async Task<IActionResult> UploadProfilePicture([FromForm] ProfilePictureUpload upload) {
         try {
             var userId = User.FindFirstValue("Id");

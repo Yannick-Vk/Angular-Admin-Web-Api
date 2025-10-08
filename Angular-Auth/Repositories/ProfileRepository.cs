@@ -1,5 +1,6 @@
 ﻿using Angular_Auth.Exceptions;
 using Angular_Auth.Models;
+using Angular_Auth.Services;
 using Microsoft.AspNetCore.Identity;
 
 namespace Angular_Auth.Repositories;
@@ -21,7 +22,8 @@ public class ProfileRepository(AppDbContext context, UserManager<User> userManag
         }
     }
 
-    public async Task UpdateProfilePicture(User user) {
-        throw new NotImplementedException();
+    public async Task UpdateProfilePicture(User user, IFormFile image) {
+        var extension = Path.GetExtension(image.FileName);
+        await FileService.SaveFile(user.Id.ToString(), image, "users/profile-pictures", extension);
     }
 }

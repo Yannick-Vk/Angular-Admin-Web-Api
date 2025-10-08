@@ -19,6 +19,7 @@ builder.Services
     .AddTransient<IBlogService, BlogService>()
     .AddTransient<IProfileService, ProfileService>()
     .AddTransient<BlogRepository>()
+    .AddTransient<ProfileRepository>()
     ;
 
 builder.Services.AddControllers();
