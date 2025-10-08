@@ -1,4 +1,5 @@
-﻿using Angular_Auth.Dto;
+﻿using System.Security.Claims;
+using Angular_Auth.Dto;
 using Angular_Auth.Exceptions;
 using Angular_Auth.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -9,9 +10,10 @@ namespace Angular_Auth.Controllers;
 
 [ApiController]
 [Route("/api/v1/users")]
-[Authorize(Roles = "Admin")]
+[Authorize]
 public class UserController(IUserService service, IRoleService roleService) : ControllerBase {
     [HttpGet]
+    [Authorize(Roles = "Admin")]
     [ProducesResponseType(Status200OK)]
     [ProducesResponseType(Status401Unauthorized)]
     [ProducesResponseType(Status403Forbidden)]
@@ -20,6 +22,7 @@ public class UserController(IUserService service, IRoleService roleService) : Co
     }
 
     [HttpGet("find/{userName}")]
+    [Authorize(Roles = "Admin")]
     [ProducesResponseType(Status200OK)]
     [ProducesResponseType(Status401Unauthorized)]
     [ProducesResponseType(Status403Forbidden)]
@@ -34,6 +37,7 @@ public class UserController(IUserService service, IRoleService roleService) : Co
     }
 
     [HttpGet("{userId}")]
+    [Authorize(Roles = "Admin")]
     [ProducesResponseType(Status200OK)]
     [ProducesResponseType(Status401Unauthorized)]
     [ProducesResponseType(Status403Forbidden)]
@@ -47,7 +51,27 @@ public class UserController(IUserService service, IRoleService roleService) : Co
         }
     }
 
+    [HttpGet("me")]
+    [ProducesResponseType(Status200OK)]
+    [ProducesResponseType(Status401Unauthorized)]
+    [ProducesResponseType(Status403Forbidden)]
+    public async Task<IActionResult> GetUserData() {
+        try {
+            var userId = User.FindFirstValue("Id");
+            if (userId == null) {
+                return Unauthorized("Could not get userId from JWT Token");
+            }
+
+            var fullUser = await service.GetUserById(userId);
+            return Ok(new UserDto(fullUser));
+        }
+        catch (UserNotFoundException ex) {
+            return NotFound(ex.Message);
+        }
+    }
+
     [HttpGet("{userName}/Roles")]
+    [Authorize(Roles = "Admin")]
     [ProducesResponseType(Status200OK)]
     [ProducesResponseType(Status401Unauthorized)]
     [ProducesResponseType(Status403Forbidden)]
