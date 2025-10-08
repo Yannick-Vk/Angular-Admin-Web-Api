@@ -21,6 +21,12 @@ public class ProfileService(UserManager<User> userManager, ProfileRepository rep
 
     public async Task UploadProfilePicture(string userId, ProfilePictureUpload pictureUpload) {
         var user = await GetUserOrException(userId);
+        string[] validExt = [".jpg", ".png", ".gif", ".webp"];
+        var extension = Path.GetExtension(pictureUpload.Image.FileName);
+        if (!validExt.Contains(extension)) {
+            throw new InvalidFileExtensionException($"Invalid image format. Please upload a JPG, PNG, GIF, or WEBP file. Got {extension}");
+        }
+        
         await repo.UpdateProfilePicture(user, pictureUpload.Image);
     }
 
