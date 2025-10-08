@@ -68,4 +68,22 @@ public class ProfileController : Controller {
             return Unauthorized(ex.Message);
         }
     }
+    
+    [HttpPost("profile-picture")]
+    public async Task<IActionResult> GetProfilePicture() {
+        try {
+            var userId = User.FindFirstValue("Id");
+            if (userId == null) {
+                return Unauthorized("Could not get userId from JWT Token");
+            }
+            
+            var image = await _profileService.GetProfilePicture(userId);
+            if (image.Length == 0) return NotFound();
+
+            return new FileContentResult(image, "image/jpeg");
+        }
+        catch (Exception ex) {
+            return Unauthorized(ex.Message);
+        }
+    }
 }

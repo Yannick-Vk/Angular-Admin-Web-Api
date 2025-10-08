@@ -1,4 +1,4 @@
-﻿using Angular_Auth.Dto;
+using Angular_Auth.Dto;
 using Angular_Auth.Exceptions;
 using Angular_Auth.Models;
 using Angular_Auth.Repositories;
@@ -22,6 +22,11 @@ public class ProfileService(UserManager<User> userManager, ProfileRepository rep
     public async Task UploadProfilePicture(string userId, ProfilePictureUpload pictureUpload) {
         var user = await GetUserOrException(userId);
         await repo.UpdateProfilePicture(user, pictureUpload.Image);
+    }
+
+    public async Task<byte[]> GetProfilePicture(string userId) {
+        var user = await GetUserOrException(userId);
+        return await repo.GetProfilePicture(user);
     }
 
     private async Task<User> GetUserOrException(string userId, string? message = null) {
