@@ -53,7 +53,7 @@ public class ProfileController : Controller {
         }
     }
 
-    [HttpPost("change/profile-picture")]
+    [HttpPut("change/profile-picture")]
     public async Task<IActionResult> UploadProfilePicture([FromForm] ProfilePictureUpload upload) {
         try {
             var userId = User.FindFirstValue("Id");
@@ -69,7 +69,7 @@ public class ProfileController : Controller {
         }
     }
     
-    [HttpPost("profile-picture")]
+    [HttpGet("profile-picture")]
     public async Task<IActionResult> GetProfilePicture() {
         try {
             var userId = User.FindFirstValue("Id");
