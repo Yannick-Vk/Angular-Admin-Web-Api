@@ -29,6 +29,11 @@ public class ProfileService(UserManager<User> userManager, ProfileRepository rep
         return await repo.GetProfilePicture(user);
     }
 
+    public async Task DeleteProfilePicture(string userId) {
+        var user = await GetUserOrException(userId);
+        repo.DeleteProfilePicture(user);
+    }
+
     private async Task<User> GetUserOrException(string userId, string? message = null) {
         var user = await userManager.FindByIdAsync(userId);
         if (user != null) return user;

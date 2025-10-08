@@ -7,4 +7,5 @@ public interface IProfileService {
     public Task UpdatePassword(string userId, string newPassword, string password);
     public Task UploadProfilePicture(string userId, ProfilePictureUpload pictureUpload);
     public Task<byte[]> GetProfilePicture(string userId);
+    public Task DeleteProfilePicture(string userId);
 }

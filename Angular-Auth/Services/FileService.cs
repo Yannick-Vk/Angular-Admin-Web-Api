@@ -21,9 +21,11 @@ public class FileService(string folder, string extension) {
         return bytes;
     }
 
-    public async Task SaveFile(string filename, string fileContent) => await SaveFile(filename, fileContent, folder, extension);
-    
-    public async Task SaveFile(string filename, IFormFile fileContent) => await SaveFile(filename, fileContent, folder, extension);
+    public async Task SaveFile(string filename, string fileContent) =>
+        await SaveFile(filename, fileContent, folder, extension);
+
+    public async Task SaveFile(string filename, IFormFile fileContent) =>
+        await SaveFile(filename, fileContent, folder, Path.GetExtension(fileContent.FileName));
 
 
     public static async Task SaveFile(string filename, string fileContent, string folder, string extension) {
@@ -35,9 +37,11 @@ public class FileService(string folder, string extension) {
         await using var stream = new FileStream(filePath, FileMode.Create);
         await stream.WriteAsync(fileBytes);
     }
-    
+
     public static async Task SaveFile(string filename, IFormFile fileContent, string folder, string extension) {
         var filePath = GetFilePath(filename, folder, extension);
+        // Delete all files before saving a new one
+        DeleteFile(filename, folder, ".*");
 
         // Save the file.
         await using var stream = new FileStream(filePath, FileMode.Create);
@@ -53,7 +57,8 @@ public class FileService(string folder, string extension) {
             foreach (var file in files) {
                 File.Delete(file);
             }
-        } else {
+        }
+        else {
             var filePath = GetFilePath(filename, folder, extension);
             File.Delete(filePath);
         }

@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Identity;
 namespace Angular_Auth.Repositories;
 
 public class ProfileRepository(AppDbContext context, UserManager<User> userManager) {
+    private static readonly FileService Files = new("users/profile-pictures", ".*");
     public async Task UpdateEmail(User user, string newEmail) {
         var emailResult = await userManager.SetEmailAsync(user, newEmail);
         if (!emailResult.Succeeded) {
@@ -24,10 +25,14 @@ public class ProfileRepository(AppDbContext context, UserManager<User> userManag
 
     public async Task UpdateProfilePicture(User user, IFormFile image) {
         var extension = Path.GetExtension(image.FileName);
-        await FileService.SaveFile(user.Id, image, "users/profile-pictures", extension);
+        await Files.SaveFile(user.Id, image);
     }
 
     public async Task<byte[]> GetProfilePicture(User user) {
-        return await FileService.GetFileBytes(user.Id, "users/profile-pictures", ".*");
+        return await Files.GetFileBytes(user.Id);
+    }
+
+    public void DeleteProfilePicture(User user) { 
+        Files.DeleteFile(user.Id);
     }
 }

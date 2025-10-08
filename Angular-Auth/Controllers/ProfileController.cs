@@ -86,4 +86,20 @@ public class ProfileController : Controller {
             return Unauthorized(ex.Message);
         }
     }
+    
+    [HttpDelete("profile-picture")]
+    public async Task<IActionResult> DeleteProfilePicture() {
+        try {
+            var userId = User.FindFirstValue("Id");
+            if (userId == null) {
+                return Unauthorized("Could not get userId from JWT Token");
+            }
+            
+            await _profileService.DeleteProfilePicture(userId);
+            return Ok();
+        }
+        catch (Exception ex) {
+            return Unauthorized(ex.Message);
+        }
+    }
 }
