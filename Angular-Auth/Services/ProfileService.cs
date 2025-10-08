@@ -1,31 +1,27 @@
 ﻿using Angular_Auth.Dto;
 using Angular_Auth.Exceptions;
 using Angular_Auth.Models;
+using Angular_Auth.Repositories;
 using Microsoft.AspNetCore.Identity;
 
 namespace Angular_Auth.Services;
 
-public class ProfileService(UserManager<User> userManager) : IProfileService {
+public class ProfileService(UserManager<User> userManager, ProfileRepository repo) : IProfileService {
     public async Task UpdateEmail(string userId, string newEmail, string password) {
         var user = await GetUserOrException(userId);
         await CheckPasswordOrException(user, password);
-
-        var setEmailResult = await userManager.SetEmailAsync(user, newEmail);
-        if (!setEmailResult.Succeeded) {
-            throw new Exception(
-                $"Failed to update email: {string.Join(", ", setEmailResult.Errors.Select(e => e.Description))}");
-        }
+        await repo.UpdateEmail(user, newEmail);
     }
 
     public async Task UpdatePassword(string userId, string newPassword, string password) {
         var user = await GetUserOrException(userId);
         await CheckPasswordOrException(user, password);
+        await repo.UpdatePassword(user, password, newPassword);
+    }
 
-        var setEmailResult = await userManager.ChangePasswordAsync(user, password, newPassword);
-        if (!setEmailResult.Succeeded) {
-            throw new Exception(
-                $"Failed to update password: {string.Join(", ", setEmailResult.Errors.Select(e => e.Description))}");
-        }
+    public async Task UploadProfilePicture(string userId, ProfilePictureUpload pictureUpload) {
+        var user = await GetUserOrException(userId);
+        await repo.UpdateProfilePicture(user);
     }
 
     private async Task<User> GetUserOrException(string userId, string? message = null) {

@@ -52,4 +52,14 @@ public class ProfileController : Controller {
             return BadRequest(ex.Message);
         }
     }
+
+    [HttpPost]
+    public async Task<IActionResult> UploadProfilePicture([FromForm] BlogUpload blogUpload) {
+        try {
+            return Ok();
+        }
+        catch (Exception ex) {
+            return Unauthorized(ex.Message);
+        }
+    }
 }
