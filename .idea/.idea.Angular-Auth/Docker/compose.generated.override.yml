@@ -1,0 +1,20 @@
+# This is a generated file. Not intended for manual editing.
+services:
+  server:
+    build:
+      context: "C:\\Users\\Yannick\\RiderProjects\\Angular-Auth\\Angular-Auth"
+      dockerfile: "Dockerfile"
+      target: "build"
+    command: []
+    entrypoint:
+    - "dotnet"
+    - "/app/bin/Debug/net9.0/Angular-Auth.dll"
+    environment:
+      ASPNETCORE_ENVIRONMENT: "Development"
+    image: "angular-auth:dev"
+    ports: []
+    volumes:
+    - "C:\\Users\\Yannick\\RiderProjects\\Angular-Auth\\Angular-Auth:/app:rw"
+    - "C:\\Users\\Yannick\\RiderProjects\\Angular-Auth:/src:rw"
+    - "C:\\Users\\Yannick\\.nuget\\packages:/root/.nuget/packages"
+    working_dir: "/app"
