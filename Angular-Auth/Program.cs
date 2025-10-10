@@ -27,7 +27,7 @@ builder.Services.AddLogging();
 
 // DbContext
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("auth")));
+    options.UseNpgsql(builder.Configuration.GetConnectionString("blogger")));
 
 // Identity
 builder.Services.AddIdentity<User, IdentityRole>()
