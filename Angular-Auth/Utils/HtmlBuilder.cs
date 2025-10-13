@@ -9,7 +9,7 @@ public class HtmlBuilder {
         return _tree.ToString();
     }
 
-    public HtmlBuilder AddTitle(string text, ushort level) {
+    public HtmlBuilder AddTitle(Text text, ushort level) {
         var last = _tree.Children.LastOrDefault();
         if (last is null) {
             _tree.Add(new TitleTag(level, _tree, text));

@@ -1,7 +1,12 @@
-﻿namespace Angular_Auth.Utils.tags;
+﻿using System.Text;
+
+namespace Angular_Auth.Utils.tags;
 
 public class Text(string text) : IHtmlTag {
-    private string _text { get; } = text;
+    public string text { get; private set; } = text;
+    public bool IsBold { get; private set; }
+    public bool IsItalic { get; private set; }
+
     public IHtmlTag Add(IHtmlTag child) {
         throw new ArgumentException("Cannot add to Text literal.", nameof(child));
     }
@@ -15,6 +20,30 @@ public class Text(string text) : IHtmlTag {
     }
 
     public override string ToString() {
-        return _text;
+        var content = text;
+        
+        if (IsBold) {
+            content = new Bold(this, content).ToString();
+        }
+
+        if (IsItalic) {
+           content = new Italic(this, content).ToString(); 
+        }
+        
+        return content;
+    }
+
+    public Text Bold() {
+        IsBold = true;
+        return this;
+    }
+
+    public Text Italic() {
+        IsItalic = true;
+        return this;
+    }
+
+    public IHtmlTag ToTag() {
+        return this;
     }
 }

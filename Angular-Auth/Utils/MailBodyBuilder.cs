@@ -1,4 +1,5 @@
-﻿using MimeKit;
+﻿using Angular_Auth.Utils.tags;
+using MimeKit;
 
 namespace Angular_Auth.Utils;
 
@@ -10,9 +11,9 @@ public class MailBodyBuilder {
         return (_htmlBuilder.Build(), _text);
     }
 
-    public MailBodyBuilder AddTitle(string text, ushort level) {
+    public MailBodyBuilder AddTitle(Text text, ushort level) {
         _htmlBuilder.AddTitle(text, level);
-        _text += text;
+        _text += text.text;
         return this;
     }
     

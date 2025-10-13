@@ -1,6 +1,7 @@
 ﻿using Angular_Auth.Dto.Mail;
 using Angular_Auth.Services.Interfaces;
 using Angular_Auth.Utils;
+using Angular_Auth.Utils.tags;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MimeKit;
@@ -29,7 +30,7 @@ public class MailController(
                 .From(("JS-Blogger api", "js-blogger@yannick.be"))
                 .Subject(("Demo mail with builders"))
                 .Body(new MailBodyBuilder()
-                    .AddTitle("Welcome to Js-Blogger", 1)
+                    .AddTitle(new Text("Welcome to Js-Blogger").Italic().Bold(), 1)
                 )
                 .Build();
 
