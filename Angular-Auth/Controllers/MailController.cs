@@ -31,6 +31,7 @@ public class MailController(
                 .Subject(("Demo mail with builders"))
                 .Body(new MailBodyBuilder()
                     .AddTitle(new Text("Welcome to Js-Blogger").Italic().Bold(), 1)
+                    .AddText(new Text("Hi there! We welcome you to our blog!"))
                 )
                 .Build();
 

@@ -9,24 +9,11 @@ public class HtmlBuilder {
         return _tree.ToString();
     }
 
-    public HtmlBuilder AddTitle(Text text, ushort level) {
-        var last = _tree.Children.LastOrDefault();
-        if (last is null) {
-            _tree.Add(new TitleTag(level, _tree, text));
-            return this;
-        }
-        
-        _addLast(new TitleTag(level, last, text), last);
-        return this;
+    public void AddTitle(Text text, ushort level) {
+        _tree.Add(new TitleTag(level, _tree, text));
     }
 
-    private HtmlBuilder _addLast(IHtmlTag tag, IHtmlTag last) {
-        var child = last.LastChild();
-        if (child is not null) {
-            return _addLast(tag, child);
-        }
-
-        last.Add(tag);
-        return this;
+    public void AddParagraph(Text text) {
+        _tree.Add(new Paragraph(_tree, text));
     }
 }
