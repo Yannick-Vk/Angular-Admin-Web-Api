@@ -1,5 +1,6 @@
 ﻿using Angular_Auth.Dto.Mail;
 using Angular_Auth.Services.Interfaces;
+using Angular_Auth.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MimeKit;
@@ -10,7 +11,7 @@ namespace Angular_Auth.Controllers;
 [Authorize]
 [ApiController]
 [Route("api/v1/[controller]")]
-public class MailController(IAuthenticationService authService, IMailService mailService) : ControllerBase {
+public class MailController(ILogger<MailController> _logger, IAuthenticationService authService, IMailService mailService) : ControllerBase {
     [HttpPost("demo")]
     // Demo route for development, this route is to send a confirm account email
     public async Task<IActionResult> DemoMail() {
@@ -19,32 +20,18 @@ public class MailController(IAuthenticationService authService, IMailService mai
             if (user == null) {
                 return Problem("Cannot find user token, user is not logged in.");
             }
+            
+            var builder = new MailBuilder()
+                .To((user.Username, user.Email))
+                .From(("JS-Blogger api", "js-blogger@yannick.be"))
+                .Subject(("Demo mail with builders"))
+                .Body(new MailBodyBuilder()
+                    .AddTitle("Welcome to Js-Blogger", 1))
+                ;
 
-            const string linkAddr = "#";
-
-            await mailService.SendEmail(new SendMailDto {
-                ToUsername = user.Username,
-                ToEmail = user.Email,
-                Subject = "Confirm your email",
-                Body = new BodyBuilder {
-                    HtmlBody =
-                        $"""
-                         <html>
-                         <h1>Welcome to JS-Blogger!</h1>
-                         <p>Please confirm your email by clicking the following link <a href=\"{linkAddr}\">Confirm my email</a></p>
-                         </br>
-                         <p><b>Thanks</b></p>
-                         <p><i>Dev Team</i></p></html>"
-                         """,
-                    TextBody = $"""
-                                Hey, welcome to JS-Blogger!
-                                Please confirm your email with this link: {linkAddr}
-
-                                Thanks
-                                -- Dev Team
-                                """,
-                }
-            }.CreateEmail());
+            var mail = builder.Build();
+            _logger.LogInformation(mail.ToString());
+            await mailService.SendEmail(mail);
             return Ok();
         }
         catch (Exception ex) {
