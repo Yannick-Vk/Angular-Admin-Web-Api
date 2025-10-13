@@ -13,7 +13,7 @@ namespace Angular_Auth.Controllers;
 public class MailController : ControllerBase {
     [HttpGet("demo")]
     public async Task<IActionResult> DemoMail(string username, string email) {
-        return await SendEmail(CreateEmail(new SendMailDto {
+        return await SendEmail(new SendMailDto {
             ToUsername = username,
             ToEmail = email,
             Subject = "Demo Mail",
@@ -24,7 +24,7 @@ public class MailController : ControllerBase {
                            -- Code guy
                            """,
             }
-        }));
+        }.CreateEmail());
     }
 
     private async Task<IActionResult> SendEmail(MimeMessage email) {
@@ -37,14 +37,5 @@ public class MailController : ControllerBase {
         await smtp.SendAsync(email);
         await smtp.DisconnectAsync(true);
         return Ok($"Mail '{email.Subject}' has been sent to {string.Join(",", email.To)}");
-    }
-
-    private MimeMessage CreateEmail(SendMailDto mail) {
-        var email = new MimeMessage();
-        email.From.Add(new MailboxAddress("Web Api", "js-blogger@yannick.be"));
-        email.To.Add(new MailboxAddress(mail.ToUsername, mail.ToEmail));
-        email.Subject = mail.Subject;
-        email.Body = mail.Body.ToMessageBody();
-        return email;
     }
 }
