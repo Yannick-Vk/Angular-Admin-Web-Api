@@ -5,7 +5,7 @@ namespace Angular_Auth.Services.Interfaces;
 
 public interface IMailService {
     public Task SendEmail(MimeMessage email);
-    public Task SendEmail(SendMailDto dto);
+    public Task SendEmail(SendMailDto dto) => SendEmail(CreateEmail(dto));
 
     public static MimeMessage CreateEmail(SendMailDto dto) {
         var email = new MimeMessage();

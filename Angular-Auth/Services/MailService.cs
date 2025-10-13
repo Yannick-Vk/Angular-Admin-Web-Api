@@ -16,6 +16,4 @@ public class MailService : IMailService {
         await smtp.SendAsync(email);
         await smtp.DisconnectAsync(true);
     }
-
-    public async Task SendEmail(SendMailDto dto) => await SendEmail(IMailService.CreateEmail(dto));
 }
