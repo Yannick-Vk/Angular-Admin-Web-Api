@@ -1,6 +1,5 @@
 ﻿using Angular_Auth.Dto.Mail;
 using Angular_Auth.Services.Interfaces;
-using MailKit;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MimeKit;
@@ -17,7 +16,7 @@ public class MailController(IAuthenticationService authService, IMailService mai
         try {
             var user = authService.GetUserFromClaimsPrincipal(HttpContext.User);
             if (user == null) {
-                return Unauthorized("Cannot find user, user is not logged in.");
+                return Problem("Cannot find user token, user is not logged in.");
             }
             
             await mailService.SendEmail(new SendMailDto {
