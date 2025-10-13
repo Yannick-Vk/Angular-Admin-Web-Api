@@ -20,20 +20,29 @@ public class MailController(IAuthenticationService authService, IMailService mai
                 return Problem("Cannot find user token, user is not logged in.");
             }
 
+            const string linkAddr = "#";
+
             await mailService.SendEmail(new SendMailDto {
                 ToUsername = user.Username,
                 ToEmail = user.Email,
                 Subject = "Confirm your email",
-                Body = new BodyBuilder() {
+                Body = new BodyBuilder {
                     HtmlBody =
-                        "<html><h1>Welcome to JS-Blogger!</h1><p>Please confirm your email by clicking the following link <a href=\"#\">Confirm my email</a></p></br><p><b>Thanks</b></p><p><i>Dev Team</i></p></html>",
-                    TextBody = """
-                               Hey, welcome to JS-Blogger!
-                               Please confirm your email with this link: {#}
-                               
-                               Thanks
-                               -- Dev Team
-                               """,
+                        $"""
+                         <html>
+                         <h1>Welcome to JS-Blogger!</h1>
+                         <p>Please confirm your email by clicking the following link <a href=\"{linkAddr}\">Confirm my email</a></p>
+                         </br>
+                         <p><b>Thanks</b></p>
+                         <p><i>Dev Team</i></p></html>"
+                         """,
+                    TextBody = $"""
+                                Hey, welcome to JS-Blogger!
+                                Please confirm your email with this link: {linkAddr}
+
+                                Thanks
+                                -- Dev Team
+                                """,
                 }
             }.CreateEmail());
             return Ok();
