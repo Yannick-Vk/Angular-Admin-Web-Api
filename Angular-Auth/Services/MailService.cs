@@ -1,4 +1,5 @@
-﻿using MailKit.Net.Smtp;
+﻿using Angular_Auth.Dto.Mail;
+using MailKit.Net.Smtp;
 using MimeKit;
 using IMailService = Angular_Auth.Services.Interfaces.IMailService;
 
@@ -15,4 +16,6 @@ public class MailService : IMailService {
         await smtp.SendAsync(email);
         await smtp.DisconnectAsync(true);
     }
+
+    public async Task SendEmail(SendMailDto dto) => await SendEmail(IMailService.CreateEmail(dto));
 }
