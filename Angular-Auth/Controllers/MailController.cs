@@ -34,6 +34,6 @@ public class MailController : ControllerBase {
 
         await smtp.SendAsync(email);
         await smtp.DisconnectAsync(true);
-        return Ok("Mail has been sent");
+        return Ok($"Mail '{email.Subject}' has been sent to {String.Join(",", email.To)}");
     }
 }
