@@ -10,7 +10,7 @@ namespace Angular_Auth.Controllers;
 [ApiController]
 [Route("api/v1/[controller]")]
 public class MailController : ControllerBase {
-    [HttpGet]
+    [HttpGet("demo")]
     public async Task<IActionResult> DemoMail(string username, string email) {
         var htmlBody = "<p>Hey,<br>Just wanted to say hi all the way from the land of C#.<br>-- Code guy</p>";
         var textBody = """
