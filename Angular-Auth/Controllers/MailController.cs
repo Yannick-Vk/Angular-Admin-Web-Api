@@ -12,6 +12,7 @@ namespace Angular_Auth.Controllers;
 [Route("api/v1/[controller]")]
 public class MailController(IAuthenticationService authService, IMailService mailService) : ControllerBase {
     [HttpPost("demo")]
+    // Demo route for development, this route is to send a confirm account email
     public async Task<IActionResult> DemoMail() {
         try {
             var user = authService.GetUserFromClaimsPrincipal(HttpContext.User);
