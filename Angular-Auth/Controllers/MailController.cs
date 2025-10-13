@@ -11,8 +11,8 @@ namespace Angular_Auth.Controllers;
 [ApiController]
 [Route("api/v1/[controller]")]
 public class MailController(IAuthenticationService authService, IMailService mailService) : ControllerBase {
-    [HttpGet("demo")]
-    public async Task<IActionResult> DemoMail(string username, string email) {
+    [HttpPost("demo")]
+    public async Task<IActionResult> DemoMail() {
         try {
             var user = authService.GetUserFromClaimsPrincipal(HttpContext.User);
             if (user == null) {
@@ -20,8 +20,8 @@ public class MailController(IAuthenticationService authService, IMailService mai
             }
             
             await mailService.SendEmail(new SendMailDto {
-                ToUsername = username,
-                ToEmail = email,
+                ToUsername = user.Username,
+                ToEmail = user.Email,
                 Subject = "Demo Mail",
                 Body = new BodyBuilder() {
                     HtmlBody = "<p>Hey,<br>Just wanted to say hi all the way from the land of C#.<br>-- Code guy</p>",
