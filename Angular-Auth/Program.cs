@@ -19,6 +19,7 @@ builder.Services
     .AddTransient<IRoleService, RoleService>()
     .AddTransient<IBlogService, BlogService>()
     .AddTransient<IProfileService, ProfileService>()
+    .AddTransient<IMailService, MailService>()
     .AddTransient<BlogRepository>()
     .AddTransient<ProfileRepository>()
     ;
