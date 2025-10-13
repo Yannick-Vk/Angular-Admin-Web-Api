@@ -18,16 +18,20 @@ public class MailController(IAuthenticationService authService, IMailService mai
             if (user == null) {
                 return Problem("Cannot find user token, user is not logged in.");
             }
-            
+
             await mailService.SendEmail(new SendMailDto {
                 ToUsername = user.Username,
                 ToEmail = user.Email,
-                Subject = "Demo Mail",
+                Subject = "Confirm your email",
                 Body = new BodyBuilder() {
-                    HtmlBody = "<p>Hey,<br>Just wanted to say hi all the way from the land of C#.<br>-- Code guy</p>",
+                    HtmlBody =
+                        "<html><h1>Welcome to JS-Blogger!</h1><p>Please confirm your email by clicking the following link <a href=\"#\">Confirm my email</a></p></br><p><b>Thanks</b></p><p><i>Dev Team</i></p></html>",
                     TextBody = """
-                               Hey, Just wanted to say hi all the way from the land of C#.
-                               -- Code guy
+                               Hey, welcome to JS-Blogger!
+                               Please confirm your email with this link: {#}
+                               
+                               Thanks
+                               -- Dev Team
                                """,
                 }
             }.CreateEmail());
