@@ -2,6 +2,7 @@ using System.Text;
 using Angular_Auth.Models;
 using Angular_Auth.Repositories;
 using Angular_Auth.Services;
+using Angular_Auth.Services.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;

@@ -1,6 +1,6 @@
 ﻿using MimeKit;
 
-namespace Angular_Auth.Dto;
+namespace Angular_Auth.Dto.Mail;
 
 public class SendMailDto {
     public required string ToUsername { get; init; }

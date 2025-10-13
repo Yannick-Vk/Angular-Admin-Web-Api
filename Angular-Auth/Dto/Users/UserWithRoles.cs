@@ -1,6 +1,4 @@
-using Angular_Auth.Models;
-
-namespace Angular_Auth.Dto;
+namespace Angular_Auth.Dto.Users;
 
 public class UserWithRoles {
     public string Id { get; set; }

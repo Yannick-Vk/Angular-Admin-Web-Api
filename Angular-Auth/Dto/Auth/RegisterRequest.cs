@@ -1,4 +1,4 @@
-﻿namespace Angular_Auth.Dto;
+﻿namespace Angular_Auth.Dto.Auth;
 
 public class RegisterRequest {
     public string? Username { get; init; }

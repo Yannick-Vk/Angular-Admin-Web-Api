@@ -1,9 +1,9 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using Angular_Auth.Dto;
-using Microsoft.IdentityModel.Tokens;
+using Angular_Auth.Dto.Auth;
+using Angular_Auth.Dto.Users;
 
-namespace Angular_Auth.Services;
+namespace Angular_Auth.Services.Interfaces;
 
 public interface IAuthenticationService {
     public Task<LoginResponseWithToken> Login(LoginRequest request);

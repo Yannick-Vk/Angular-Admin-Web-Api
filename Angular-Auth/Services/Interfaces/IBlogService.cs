@@ -1,7 +1,8 @@
-﻿using Angular_Auth.Dto;
+﻿using Angular_Auth.Dto.Blogs;
+using Angular_Auth.Dto.Users;
 using Angular_Auth.Models;
 
-namespace Angular_Auth.Services;
+namespace Angular_Auth.Services.Interfaces;
 
 public interface IBlogService {
     Task<IEnumerable<BlogWithContent>> GetAllBlogs();

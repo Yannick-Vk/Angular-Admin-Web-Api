@@ -1,4 +1,5 @@
 ﻿using Angular_Auth.Dto;
+using Angular_Auth.Dto.Mail;
 using MailKit;
 using MailKit.Net.Smtp;
 using Microsoft.AspNetCore.Authorization;

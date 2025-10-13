@@ -1,6 +1,7 @@
+using Angular_Auth.Dto.Users;
 using Angular_Auth.Models;
 
-namespace Angular_Auth.Dto;
+namespace Angular_Auth.Dto.Blogs;
 
 public class BlogWithContent {
     public BlogWithContent(Blog blog, string content) {

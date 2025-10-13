@@ -1,8 +1,8 @@
-﻿using Angular_Auth.Dto;
+﻿using Angular_Auth.Dto.Users;
 using Angular_Auth.Models;
 using Microsoft.AspNetCore.Identity;
 
-namespace Angular_Auth.Services;
+namespace Angular_Auth.Services.Interfaces;
 
 public interface IRoleService {
     Task CreateNewRole(Role role);

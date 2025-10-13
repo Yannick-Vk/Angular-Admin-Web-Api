@@ -1,7 +1,7 @@
-﻿using Angular_Auth.Dto;
+﻿using Angular_Auth.Dto.Users;
 using Angular_Auth.Models;
 
-namespace Angular_Auth.Services;
+namespace Angular_Auth.Services.Interfaces;
 
 public interface IUserService {
     public Task<List<UserDto>> GetUsers();

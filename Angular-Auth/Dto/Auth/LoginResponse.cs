@@ -1,4 +1,4 @@
-﻿namespace Angular_Auth.Dto;
+﻿namespace Angular_Auth.Dto.Auth;
 
 public class LoginResponse(string id, string username, string email, DateTime expiration) {
     public string Id { get; set; } = id;

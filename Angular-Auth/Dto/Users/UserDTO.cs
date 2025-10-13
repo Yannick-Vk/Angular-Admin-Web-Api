@@ -1,7 +1,6 @@
-﻿using System.IdentityModel.Tokens.Jwt;
-using Angular_Auth.Models;
+﻿using Angular_Auth.Models;
 
-namespace Angular_Auth.Dto;
+namespace Angular_Auth.Dto.Users;
 
 public class UserDto {
 

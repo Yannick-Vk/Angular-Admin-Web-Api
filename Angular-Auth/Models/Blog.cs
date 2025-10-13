@@ -2,6 +2,7 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics.CodeAnalysis;
 using Angular_Auth.Dto;
+using Angular_Auth.Dto.Blogs;
 
 namespace Angular_Auth.Models;
 

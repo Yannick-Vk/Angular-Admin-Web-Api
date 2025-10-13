@@ -1,4 +1,4 @@
-﻿namespace Angular_Auth.Dto;
+﻿namespace Angular_Auth.Dto.Blogs;
 
 public class BlogUpdate {
     public required Guid Id { get; set; }

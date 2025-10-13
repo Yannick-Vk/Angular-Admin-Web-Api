@@ -1,4 +1,4 @@
-﻿namespace Angular_Auth.Dto;
+﻿namespace Angular_Auth.Dto.Blogs;
 
 public class BlogUpload {
     public required string Title { get; set; }

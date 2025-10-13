@@ -2,8 +2,11 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using Angular_Auth.Dto;
+using Angular_Auth.Dto.Auth;
+using Angular_Auth.Dto.Users;
 using Angular_Auth.Exceptions;
 using Angular_Auth.Models;
+using Angular_Auth.Services.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 

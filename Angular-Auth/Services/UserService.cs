@@ -1,6 +1,8 @@
 ﻿using Angular_Auth.Dto;
+using Angular_Auth.Dto.Users;
 using Angular_Auth.Exceptions;
 using Angular_Auth.Models;
+using Angular_Auth.Services.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 

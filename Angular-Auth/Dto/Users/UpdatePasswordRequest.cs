@@ -1,4 +1,4 @@
-namespace Angular_Auth.Dto;
+namespace Angular_Auth.Dto.Users;
 
 public class UpdatePasswordRequest {
     public required string NewPassword { get; set; }
