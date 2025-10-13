@@ -9,27 +9,25 @@ public class HtmlBuilder {
         return Tree.ToString();
     }
 
-    public void AddTitle(Text text, ushort level) {
-        Tree.Add(new TitleTag(Tree, text, level));
+    public void AddTitle(Text text, ushort level) => AddTitle(text.ToTag(), level); 
+
+    public void AddTitle(IHtmlTag tag, ushort level) {
+        Tree.Add(new TitleTag(Tree, tag, level));
     }
 
-    public void AddParagraph(Text text) {
-        Tree.Add(new Paragraph(Tree, text));
+    public void AddParagraph(IHtmlTag tag) {
+        Tree.Add(new Paragraph(Tree, tag));
     }
 
-    public void AddLink(Text text, string link) {
-        Tree.Add(new Link(Tree, text, link));
+    public void AddParagraph(Text text) => AddParagraph(text.ToTag());
+
+    public void AddLink(Text text, string link) => AddLink(text.ToTag(), link);
+
+    public void AddLink(IHtmlTag tag, string link) {
+        Tree.Add(new Link(Tree, tag, link));
     }
 
     public void AddDiv(IHtmlTag content) {
         Tree.Add(new HtmlTag("div", Tree, content));
-    }
-
-    public void AddDiv(MailBodyBuilder bodyBuilder) {
-        var div = new HtmlTag("div", Tree, null);
-        foreach (IHtmlTag tag in bodyBuilder) {
-            div.Add(tag);
-        }
-        Tree.Add(div);
     }
 }

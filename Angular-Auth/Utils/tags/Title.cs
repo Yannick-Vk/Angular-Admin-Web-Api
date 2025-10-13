@@ -2,9 +2,11 @@
 
 public class TitleTag : HtmlTag {
     private IHtmlTag _content { get; set; }
+    public ushort Level { get; private set; } 
 
     public TitleTag(IHtmlTag parent, IHtmlTag content, ushort level) : base("h", parent, content) {
         if (level > 6) throw new ArgumentException("Level cannot be bigger than 6.", nameof(level));
+        Level = level;
         Tag += level.ToString();
         _content = content;
     }
