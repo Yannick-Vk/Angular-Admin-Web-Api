@@ -3,15 +3,11 @@
 public class TitleTag : HtmlTag {
     private IHtmlTag _content { get; set; }
 
-    public TitleTag(ushort level, IHtmlTag parent, IHtmlTag content) : base("h", parent) {
+    public TitleTag(IHtmlTag parent, IHtmlTag content, ref readonly ushort level) : base("h", parent, content) {
         if (level > 6) throw new ArgumentException("Level cannot be bigger than 6.", nameof(level));
         Tag += level.ToString();
         _content = content;
     }
 
-    public TitleTag(ushort level, IHtmlTag parent, string text) : this(level, parent, new Text(text)) { }
-
-    public override string ToString() {
-        return $"<{Tag}>{_content}</{Tag}>";
-    }
+    public TitleTag(ushort level, IHtmlTag parent, string text) : this(parent, new Text(text), level) { }
 }

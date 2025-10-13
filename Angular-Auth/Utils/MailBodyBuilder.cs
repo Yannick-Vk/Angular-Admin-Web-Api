@@ -12,14 +12,28 @@ public class MailBodyBuilder {
     }
 
     public MailBodyBuilder AddTitle(Text text, ushort level) {
-        _text += text.text;
+        _add_text(text);
         _htmlBuilder.AddTitle(text, level);
         return this;
     }
 
-    public MailBodyBuilder AddText(Text text) {
-        _text += text.text;
+    public MailBodyBuilder AddParagraph(Text text) {
+        _add_text(text);
         _htmlBuilder.AddParagraph(text);
         return this;
     }
+
+    private void _add_text(string text) {
+        _text += text + " ";
+    }
+
+    private void _add_text(Text text) => _add_text(text.text);
+
+    public MailBodyBuilder AddLink(Text text, string link) {
+       _add_text(text);
+       _htmlBuilder.AddLink(text, link);
+       return this;
+    }
+
+    public MailBodyBuilder AddLink(string text, string link) => AddLink(new Text(text), link);
 }
