@@ -30,7 +30,7 @@ public class MailBodyBuilder {
     private void _add_text(Text text) => _add_text(text.text);
 
     public MailBodyBuilder AddLink(Text text, string link) {
-       _add_text(text);
+        _add_text(text + " '" + link + "'");
        _htmlBuilder.AddLink(text, link);
        return this;
     }
