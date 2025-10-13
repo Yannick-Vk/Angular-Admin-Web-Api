@@ -33,6 +33,9 @@ public class MailController(
                     .AddTitle(new Text("Welcome to Js-Blogger"), 1)
                     .AddParagraph(new Text("Hi there! We welcome you to our blog!"))
                     .AddLink("Link to our site", "site")
+                    .AddDiv(new MailBodyBuilder()
+                        .AddTitle(new Text("Welcome to the newletter section"), 2)
+                        .AddParagraph(new Text("Hi from a div!")))
                 )
                 .Build();
 

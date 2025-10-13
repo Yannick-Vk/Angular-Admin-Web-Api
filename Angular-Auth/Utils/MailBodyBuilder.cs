@@ -1,9 +1,10 @@
-﻿using Angular_Auth.Utils.tags;
+﻿using System.Collections;
+using Angular_Auth.Utils.tags;
 using MimeKit;
 
 namespace Angular_Auth.Utils;
 
-public class MailBodyBuilder {
+public class MailBodyBuilder : IEnumerable {
     private string _text = string.Empty;
     private readonly HtmlBuilder _htmlBuilder = new();
 
@@ -31,9 +32,23 @@ public class MailBodyBuilder {
 
     public MailBodyBuilder AddLink(Text text, string link) {
         _add_text(text + " '" + link + "'");
-       _htmlBuilder.AddLink(text, link);
-       return this;
+        _htmlBuilder.AddLink(text, link);
+        return this;
     }
 
     public MailBodyBuilder AddLink(string text, string link) => AddLink(new Text(text), link);
+
+    public MailBodyBuilder AddDiv(IHtmlTag content) {
+        _htmlBuilder.AddDiv(content);
+        return this;
+    }
+
+    public MailBodyBuilder AddDiv(MailBodyBuilder bodyBuilder) {
+        _htmlBuilder.AddDiv(bodyBuilder);
+        return this;
+    }
+
+    public IEnumerator GetEnumerator() {
+        return _htmlBuilder.Tree.Children.GetEnumerator();
+    }
 }
