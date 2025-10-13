@@ -30,7 +30,7 @@ public class MailController(
                 .From(("JS-Blogger api", "js-blogger@yannick.be"))
                 .Subject(("Demo mail with builders"))
                 .Body(new MailBodyBuilder()
-                    .AddTitle(new Text("Welcome to Js-Blogger").Italic().Bold(), 1)
+                    .AddTitle(new Text("Welcome to Js-Blogger"), 1)
                     .AddText(new Text("Hi there! We welcome you to our blog!"))
                 )
                 .Build();
