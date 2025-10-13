@@ -15,12 +15,12 @@ public class MailController : ControllerBase {
     [HttpGet]
     public async Task<IActionResult> SendMail() {
         var email = new MimeMessage {
-            Sender = new MailboxAddress("Web api", "web-api@yannick.be"),
             Subject = "Hello from the Web Api",
             Body = new TextPart() {
                 Text = "Hello from the Web Api. Welcome to our mail service!"
             },
         };
+        email.From.Add(new MailboxAddress("Web Api", "js-blogger@yannick.be"));
         email.To.Add(new MailboxAddress("Mr to", "to@example.com"));
         using var smtp = new SmtpClient();
         await smtp.ConnectAsync("sandbox.smtp.mailtrap.io", 2525, false);
