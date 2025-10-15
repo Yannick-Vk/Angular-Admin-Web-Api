@@ -16,4 +16,5 @@ public interface IAuthenticationService {
     public JwtSecurityToken? GetSecurityTokenFromRequest(HttpRequest req);
     public void SetTokenCookie(HttpContext context, string token, string refreshToken);
     public void RemoveTokenCookie(HttpContext context);
+    public Task<bool> VerifyEmail(string userId, string token);
 }

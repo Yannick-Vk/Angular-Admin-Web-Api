@@ -116,7 +116,7 @@ public class AuthenticationService(
             SecurityStamp = Guid.NewGuid().ToString(),
             UserName = request.Username,
             Email = request.Email,
-            EmailConfirmed = false
+            EmailConfirmed = false,
         };
 
         var result = await userManager.CreateAsync(user, request.Password);
@@ -129,7 +129,8 @@ public class AuthenticationService(
         var encodedToken = System.Net.WebUtility.UrlEncode(token);
 
         // TODO: Get from config
-        var verificationLink = "https://localhost:7134/verify-email";
+        var verificationLink = $"https://localhost:7134/api/v1/auth/verify-email?userId={user.Id}&token={encodedToken}";
+        logger.LogInformation("DEBUG: User verification token: \n {link}", verificationLink);
 
         var mail = new MailBuilder(_mailBuilderLogger)
             .To((user.UserName, user.Email))
@@ -138,7 +139,7 @@ public class AuthenticationService(
             .AddFiles("verify-email", [("link",  verificationLink), ("user", request.Username)]) 
             .Build();
 
-        await mailService.SendEmail(mail);
+        //await mailService.SendEmail(mail);
 
         return new LoginResponseWithToken(user.Id, string.Empty, user.UserName, user.Email, DateTime.MinValue,
             string.Empty);
@@ -293,5 +294,25 @@ public class AuthenticationService(
                 Secure = true,
                 SameSite = SameSiteMode.None,
             });
+    }
+
+    public async Task<bool> VerifyEmail(string userId, string token) {
+        var user = await userManager.FindByIdAsync(userId);
+        if (user is null) {
+            logger.LogError("VerifyEmail: User with ID {UserId} not found.", userId);
+            return false;
+        }
+
+        logger.LogInformation("VerifyEmail: Found user {Email}. Attempting to confirm email with token {Token}", user.Email, token);
+
+        // The token from the URL route is automatically decoded by ASP.NET Core's model binding.
+        // Manually decoding it again would corrupt it.
+        var result = await userManager.ConfirmEmailAsync(user, token);
+
+        if (!result.Succeeded) {
+            logger.LogError("VerifyEmail: Email confirmation failed for user {Email}. Errors: {Errors}", user.Email, string.Join(", ", result.Errors.Select(e => e.Description)));
+        }
+
+        return result.Succeeded;
     }
 }

@@ -69,4 +69,12 @@ public class AuthController(ILogger<AuthController> logger, IAuthenticationServi
             return BadRequest(e.Message);
         }
     }
+
+    [AllowAnonymous]
+    [HttpGet("verify-email")]
+    public async Task<IActionResult> VerifyEmail([FromQuery] string userId, [FromQuery] string token) {
+        var result = await service.VerifyEmail(userId, token);
+
+        return Ok(result);
+    }
 }
