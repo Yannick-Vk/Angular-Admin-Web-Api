@@ -9,14 +9,20 @@ using Angular_Auth.Models;
 using Angular_Auth.Services.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
+using Angular_Auth.Utils;
+using Angular_Auth.Utils.tags;
 
 namespace Angular_Auth.Services;
 
 public class AuthenticationService(
     ILogger<AuthenticationService> logger,
     UserManager<User> userManager,
-    IConfiguration configuration)
+    IConfiguration configuration,
+    IMailService mailService,
+    ILoggerFactory loggerFactory)
     : IAuthenticationService {
+    private readonly ILogger<MailBuilder> _mailBuilderLogger = loggerFactory.CreateLogger<MailBuilder>();
+
     private DateTime TokenExpiry() {
         return DateTime.Now.AddMinutes(5);
     }
@@ -110,6 +116,7 @@ public class AuthenticationService(
             SecurityStamp = Guid.NewGuid().ToString(),
             UserName = request.Username,
             Email = request.Email,
+            EmailConfirmed = false
         };
 
         var result = await userManager.CreateAsync(user, request.Password);
@@ -118,7 +125,23 @@ public class AuthenticationService(
             throw new RegistrationFailedException(
                 $"Unable to register user {request.Username}:{Environment.NewLine}{ShowErrorsText(result.Errors)}");
 
-        return await Login(new LoginRequest { Username = request.Email, Password = request.Password, });
+        var token = await userManager.GenerateEmailConfirmationTokenAsync(user);
+        var encodedToken = System.Net.WebUtility.UrlEncode(token);
+
+        // TODO: Get from config
+        var verificationLink = "https://localhost:7134/verify-email";
+
+        var mail = new MailBuilder(_mailBuilderLogger)
+            .To((user.UserName, user.Email))
+            .From(("JS-Blogger", "no-reply@js-blogger.be"))
+            .Subject("Verify your email")
+            .AddFiles("verify-email", [("link",  verificationLink), ("user", request.Username)]) 
+            .Build();
+
+        await mailService.SendEmail(mail);
+
+        return new LoginResponseWithToken(user.Id, string.Empty, user.UserName, user.Email, DateTime.MinValue,
+            string.Empty);
     }
 
     private JwtSecurityToken GetToken(IEnumerable<Claim> authClaims) {
