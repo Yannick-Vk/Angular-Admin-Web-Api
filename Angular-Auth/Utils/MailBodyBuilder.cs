@@ -12,8 +12,10 @@ public class MailBodyBuilder : IEnumerable {
         return (_htmlBuilder.Build(), GetText());
     }
 
-    private string GetText() {
-        return string.Join("\n", _text);
+    private string GetText() => GetText(_text);
+
+    private static string GetText(List<string> text) {
+        return string.Join("\n", text);
     }
 
     public MailBodyBuilder AddTitle(Text text, ushort level) {
@@ -46,7 +48,7 @@ public class MailBodyBuilder : IEnumerable {
         var divBuilder = new MailBodyBuilder();
         builderAction(divBuilder);
 
-        _add_text(string.Join("\n", divBuilder._text));
+        _add_text(GetText(divBuilder._text));
 
         var div = new Div();
         foreach (var child in divBuilder._htmlBuilder.Tree.Children) {
