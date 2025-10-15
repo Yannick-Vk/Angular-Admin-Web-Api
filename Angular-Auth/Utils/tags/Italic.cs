@@ -1,5 +1,5 @@
 ﻿namespace Angular_Auth.Utils.tags;
 
-public class Italic(IHtmlTag parent, IHtmlTag content) : HtmlTag("i", parent, content) {
-    public Italic(IHtmlTag parent, string text) : this(parent, new Text(text)) { }
+public class Italic(IHtmlTag content) : HtmlTag("i", content) {
+    public Italic(string text) : this(new Text(text)) { }
 }

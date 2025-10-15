@@ -1,5 +1,5 @@
 ﻿namespace Angular_Auth.Utils.tags;
 
-public class Paragraph(IHtmlTag parent, IHtmlTag content) : HtmlTag("p", parent, content) {
-    public Paragraph(IHtmlTag parent, Text text) : this(parent, text.ToTag()) { }
+public class Paragraph(IHtmlTag content) : HtmlTag("p", content) {
+    public Paragraph(Text text) : this(text.ToTag()) { }
 }

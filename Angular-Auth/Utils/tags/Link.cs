@@ -1,12 +1,11 @@
 ﻿namespace Angular_Auth.Utils.tags;
 
-public class Link(IHtmlTag parent, IHtmlTag content, string linkAddr) : HtmlTag("a", parent, content) {
-    
-    public string LinkAddr { get; private set; }
-
-    public Link(IHtmlTag parent, string text, string linkAddr) : this(parent, new Text(text), linkAddr) {
+public class Link(IHtmlTag content, string linkAddr) : HtmlTag("a", content) {
+    public Link(string text, string linkAddr) : this(new Text(text), linkAddr) {
         LinkAddr = linkAddr;
     }
+
+    public string LinkAddr { get; private set; }
 
     public override string ToString() {
         return $"<a href=\"{linkAddr}\">{Content}</a>";

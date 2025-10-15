@@ -22,9 +22,7 @@ public class Root : IHtmlTag {
     public override string ToString() {
         var builder = new StringBuilder("<html><body>");
 
-        foreach (var tag in Children) {
-            builder.Append(tag);
-        }
+        foreach (var tag in Children) builder.Append(tag);
 
         builder.Append("</body></html>");
         return builder.ToString();
