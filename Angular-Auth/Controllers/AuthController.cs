@@ -10,7 +10,10 @@ namespace Angular_Auth.Controllers;
 
 [ApiController]
 [Route("/api/v1/[controller]")]
-public class AuthController(ILogger<AuthController> logger, IAuthenticationService service) : ControllerBase {
+public class AuthController(
+    ILogger<AuthController> logger,
+    IAuthenticationService service,
+    IConfiguration configuration) : ControllerBase {
     [AllowAnonymous]
     [HttpPost("login")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(string))]
@@ -21,7 +24,8 @@ public class AuthController(ILogger<AuthController> logger, IAuthenticationServi
             service.SetTokenCookie(HttpContext, resp.Token, resp.RefreshToken);
             return Ok(LoginResponse.FromResponseWithToken(resp));
         }
-        catch (Exception e) when (e is CredentialsRequiredException or WrongCredentialsException or EmailNotVerifiedException) {
+        catch (Exception e) when (e is CredentialsRequiredException or WrongCredentialsException
+                                      or EmailNotVerifiedException) {
             return BadRequest(e.Message);
         }
         catch (Exception e) {
@@ -75,6 +79,9 @@ public class AuthController(ILogger<AuthController> logger, IAuthenticationServi
     public async Task<IActionResult> VerifyEmail([FromQuery] string userId, [FromQuery] string token) {
         var result = await service.VerifyEmail(userId, token);
 
-        return Ok(result);
+        return Redirect(result
+            ? configuration["front-end:email-confirmed"]!
+            : configuration["front-end:email-verification-failed"]!
+        );
     }
 }
