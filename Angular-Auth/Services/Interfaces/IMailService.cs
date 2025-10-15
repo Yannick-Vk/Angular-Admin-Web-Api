@@ -9,8 +9,8 @@ public interface IMailService {
     public Task SendEmail(MimeMessage email);
     public Task SendEmail(SendMailDto dto) => SendEmail(CreateEmail(dto));
 
-    public static MimeMessage CreateEmail(SendMailDto dto) => CreateEmail(dto, (FromName, FromAdress)); 
-    
+    public static MimeMessage CreateEmail(SendMailDto dto) => CreateEmail(dto, (FromName, FromAdress));
+
     public static MimeMessage CreateEmail(SendMailDto dto, (string name, string address) from) {
         var email = new MimeMessage();
         email.From.Add(new MailboxAddress(from.name, from.address));
