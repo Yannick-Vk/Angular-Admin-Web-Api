@@ -11,7 +11,7 @@ public class MailService : IMailService {
         await smtp.ConnectAsync("localhost", 1025, false);
 
         // Note: only needed if the SMTP server requires authentication
-        await smtp.AuthenticateAsync("8dc84259c8b865", "4556e06746fa6b");
+        // await smtp.AuthenticateAsync("8dc84259c8b865", "4556e06746fa6b");
 
         await smtp.SendAsync(email);
         await smtp.DisconnectAsync(true);
