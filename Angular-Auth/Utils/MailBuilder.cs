@@ -205,7 +205,9 @@ public class MailBuilder(ILogger<MailBuilder> _logger) {
     }
 
     private string FormatString(string html, _mappings mappings) {
-        return mappings.Aggregate(html, (current, mapping) => current.Replace($"~{mapping.mapping}~", mapping.value));
+        const string pre = "{{";
+        const string post = "}}";
+        return mappings.Aggregate(html, (current, mapping) => current.Replace($"{pre}{mapping.mapping}{post}", mapping.value));
     }
 
     /// <summary>
