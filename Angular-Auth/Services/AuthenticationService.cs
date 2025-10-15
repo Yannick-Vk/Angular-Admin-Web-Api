@@ -131,7 +131,7 @@ public class AuthenticationService(
         var token = await userManager.GenerateEmailConfirmationTokenAsync(user);
         var encodedToken = System.Net.WebUtility.UrlEncode(token);
 
-        // TODO: Get from config
+        // TODO: Remove debug print
         var verificationLink = $"https://localhost:7134/api/v1/auth/verify-email?userId={user.Id}&token={encodedToken}";
         logger.LogInformation("DEBUG: User verification token: \n {link}", verificationLink);
 
