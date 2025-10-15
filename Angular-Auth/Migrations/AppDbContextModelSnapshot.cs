@@ -46,7 +46,7 @@ namespace Angular_Auth.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Blogs");
+                    b.ToTable("Blogs", (string)null);
                 });
 
             modelBuilder.Entity("Angular_Auth.Models.User", b =>
@@ -67,11 +67,6 @@ namespace Angular_Auth.Migrations
 
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("bit");
-
-                    b.Property<string>("EmailVerificationToken")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
 
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("bit");
@@ -138,7 +133,7 @@ namespace Angular_Auth.Migrations
 
                     b.HasIndex("BlogId");
 
-                    b.ToTable("BlogUser");
+                    b.ToTable("BlogUser", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
