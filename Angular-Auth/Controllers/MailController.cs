@@ -29,7 +29,7 @@ public class MailController(
                 .To((user.Username, user.Email))
                 .From(("JS-Blogger api", "js-blogger@yannick.be"))
                 .Subject(("Demo mail with builders"))
-                .Body(new MailBodyBuilder()
+                /*.Body(new MailBodyBuilder()
                     .AddTitle(new Text("Welcome to Js-Blogger"), 1)
                     .AddParagraph(new Text("Hi there! We welcome you to our blog!"))
                     .AddLink("Link to our site", "site")
@@ -37,6 +37,8 @@ public class MailController(
                         .AddTitle(new Text("Welcome to the newsletter section"), 2)
                         .AddParagraph(new Text("Hi from a div!")))
                 )
+                */
+                .AddFiles("./Mails/Demo/demo.html", "./Mails/Demo/demo.txt")
                 .Build();
             _logger.LogInformation("Mail: {mail}", mail);
 

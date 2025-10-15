@@ -40,4 +40,17 @@ public class MailBuilder {
     public MailBuilder Body(MailBodyBuilder bodyBuilder) {
         return Content(bodyBuilder.Build());
     }
+
+    public MailBuilder AddFiles(string htmlFile, string textFile) {
+        if (!File.Exists(htmlFile)) {
+            throw new Exception($"Html File [{htmlFile}] was not found");
+        }
+
+        if (!File.Exists(textFile)) {
+            throw new Exception($"Text File [{textFile}] was not found");
+        }
+
+        Content((File.ReadAllText(htmlFile), File.ReadAllText(textFile)));
+        return this;
+    }
 }
