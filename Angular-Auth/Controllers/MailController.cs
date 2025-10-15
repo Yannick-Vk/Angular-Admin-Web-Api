@@ -42,12 +42,12 @@ public class MailController(
                 )
                 */
                 //.AddFiles("./Mails/demo/demo.html", "./Mails/demo/demo.jeff")
-                .AddFiles("demo")
+                .AddFiles("demox")
                 .Build();
             
             //_logger.LogInformation("Mail: {mail}", mail);
 
-            await mailService.SendEmail(mail);
+            //await mailService.SendEmail(mail);
             return Ok(mail.ToString());
         }
         catch (Exception ex) {
