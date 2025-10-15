@@ -15,7 +15,10 @@ namespace Angular_Auth.Controllers;
 public class MailController(
     ILogger<MailController> _logger,
     IAuthenticationService authService,
-    IMailService mailService) : ControllerBase {
+    IMailService mailService,
+    ILoggerFactory loggerFactory) : ControllerBase {
+    private readonly ILogger<MailBuilder> _mailBuilderLogger = loggerFactory.CreateLogger<MailBuilder>();
+
     [HttpPost("demo")]
     // Demo route for development, this route is to send a confirm account email
     public async Task<IActionResult> DemoMail() {
@@ -25,7 +28,7 @@ public class MailController(
                 return Problem("Cannot find user token, user is not logged in.");
             }
 
-            var mail = new MailBuilder()
+            var mail = new MailBuilder(_mailBuilderLogger)
                 .To((user.Username, user.Email))
                 .From(("JS-Blogger api", "js-blogger@yannick.be"))
                 .Subject(("Demo mail with builders"))
@@ -38,11 +41,13 @@ public class MailController(
                         .AddParagraph(new Text("Hi from a div!")))
                 )
                 */
-                .AddFiles("./Mails/Demo/demo.html", "./Mails/Demo/demo.txt")
+                //.AddFiles("./Mails/demo/demo.html", "./Mails/demo/demo.jeff")
+                .AddFiles("demo")
                 .Build();
-            _logger.LogInformation("Mail: {mail}", mail);
+            
+            //_logger.LogInformation("Mail: {mail}", mail);
 
-            //await mailService.SendEmail(mail);
+            await mailService.SendEmail(mail);
             return Ok(mail.ToString());
         }
         catch (Exception ex) {
