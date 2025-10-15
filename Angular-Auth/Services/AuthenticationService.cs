@@ -41,11 +41,12 @@ public class AuthenticationService(
         var user = await userManager.FindByNameAsync(request.Username) ??
                    await userManager.FindByEmailAsync(request.Username);
 
+        if (user is null || !await userManager.CheckPasswordAsync(user, request.Password))
+            throw new WrongCredentialsException("Username and/or password are incorrect.");
+        
         if (user is not null && !user.EmailConfirmed)
             throw new EmailNotVerifiedException("Please verify your email before logging in.");
 
-        if (user is null || !await userManager.CheckPasswordAsync(user, request.Password))
-            throw new WrongCredentialsException("Username and/or password are incorrect.");
 
         var userRoles = await userManager.GetRolesAsync(user);
         var authClaims = new List<Claim> {
