@@ -5,6 +5,7 @@ namespace Angular_Auth.Utils;
 // Type aliases 
 using _mailAddress = (string name, string email);
 using _bodyContent = (string html, string text);
+using _mappings = List<(string mapping, string value)>;
 
 /// <summary>
 /// Builder pattern for creating mails
@@ -139,7 +140,7 @@ public class MailBuilder(ILogger<MailBuilder> _logger) {
         var basePath = "./Mails/" + mailName + "/";
         return AddFilesOrThrow(basePath + mailName + ".html", basePath + mailName + ".txt");
     }
-    
+
     /// <summary>
     /// Packed overloaded function, adds both html and text file to the mail body
     /// </summary>
@@ -147,6 +148,10 @@ public class MailBuilder(ILogger<MailBuilder> _logger) {
     /// <returns>MailBuilder chain</returns>
     public MailBuilder AddFilesOrThrow((string htmlFile, string textFile) files) {
         return AddFilesOrThrow(files.htmlFile, files.textFile);
+    }
+
+    private string FormatHtml(string html, _mappings mappings) {
+        return mappings.Aggregate(html, (current, mapping) => current.Replace(mapping.mapping, mapping.value));
     }
 
     /// <summary>
