@@ -27,7 +27,5 @@ public class HtmlBuilder {
         Tree.Add(new Link(Tree, tag, link));
     }
 
-    public void AddDiv(IHtmlTag content) {
-        Tree.Add(new HtmlTag("div", Tree, content));
-    }
+
 }

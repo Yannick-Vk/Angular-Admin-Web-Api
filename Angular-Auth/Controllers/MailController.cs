@@ -33,13 +33,14 @@ public class MailController(
                     .AddTitle(new Text("Welcome to Js-Blogger"), 1)
                     .AddParagraph(new Text("Hi there! We welcome you to our blog!"))
                     .AddLink("Link to our site", "site")
-                    .AddDiv(new MailBodyBuilder()
-                        .AddTitle(new Text("Welcome to the newletter section"), 2)
+                    .AddDiv(div => div
+                        .AddTitle(new Text("Welcome to the newsletter section"), 2)
                         .AddParagraph(new Text("Hi from a div!")))
                 )
                 .Build();
+            _logger.LogInformation("Mail: {mail}", mail);
 
-            await mailService.SendEmail(mail);
+            //await mailService.SendEmail(mail);
             return Ok(mail.ToString());
         }
         catch (Exception ex) {

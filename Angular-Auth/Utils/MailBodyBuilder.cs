@@ -13,9 +13,13 @@ public class MailBodyBuilder : IEnumerable {
     }
 
     private string GetText() {
-        return string.Join(" ", _text);
+        return string.Join("\n", _text);
     }
+
     public MailBodyBuilder AddTitle(Text text, ushort level) {
+        if (level != 1) 
+            _add_text("");
+        
         _add_text(text);
         _htmlBuilder.AddTitle(text, level);
         return this;
@@ -38,21 +42,18 @@ public class MailBodyBuilder : IEnumerable {
 
     public MailBodyBuilder AddLink(string text, string link) => AddLink(new Text(text), link);
 
-    public MailBodyBuilder AddDiv(MailBodyBuilder bodyBuilder) {
-        foreach (IHtmlTag tag  in bodyBuilder) {
-            switch (tag) {
-                case TitleTag title:
-                    _htmlBuilder.AddTitle(title.Content, title.Level);
-                    break;
-                case Link link:
-                    _htmlBuilder.AddLink(link.Content, link.LinkAddr);
-                    break;
-                case Paragraph paragraph:
-                    _htmlBuilder.AddParagraph(paragraph.Content);
-                    break;
-           
-            }
+    public MailBodyBuilder AddDiv(Action<MailBodyBuilder> builderAction) {
+        var divBuilder = new MailBodyBuilder();
+        builderAction(divBuilder);
+
+        _add_text(string.Join("\n", divBuilder._text));
+
+        var div = new Div();
+        foreach (var child in divBuilder._htmlBuilder.Tree.Children) {
+            div.Add(child);
         }
+        _htmlBuilder.Tree.Add(div);
+
         return this;
     }
 
