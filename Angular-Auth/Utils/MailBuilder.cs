@@ -131,6 +131,32 @@ public class MailBuilder(ILogger<MailBuilder> _logger) {
         return this;
     }
 
+    public MailBuilder AddFiles(string htmlFile, string textFile, _mappings mappings) {
+        try {
+            return AddFilesOrThrow(htmlFile, textFile, mappings);
+        }
+        catch (Exception e) {
+            _logger.LogError(e, "Failed to add files");
+        }
+
+        return this;
+    }
+
+    public MailBuilder AddFiles((string htmlFile, string textFile) files, _mappings mappings) {
+        return AddFiles(files.htmlFile, files.textFile, mappings);
+    }
+
+    public MailBuilder AddFiles(string mailName, _mappings mappings) {
+        try {
+            return AddFilesOrThrow(mailName, mappings);
+        }
+        catch (Exception ex) {
+            _logger.LogError(ex, "Failed to add files.");
+        }
+
+        return this;
+    }
+
     /// <summary>
     /// Tries to add files via name to the mail or throws if it cannot find the files
     /// </summary>
@@ -139,6 +165,34 @@ public class MailBuilder(ILogger<MailBuilder> _logger) {
     public MailBuilder AddFilesOrThrow(string mailName) {
         var basePath = "./Mails/" + mailName + "/";
         return AddFilesOrThrow(basePath + mailName + ".html", basePath + mailName + ".txt");
+    }
+
+    public MailBuilder AddFilesOrThrow(string htmlFile, string textFile, _mappings mappings) {
+        if (!File.Exists(htmlFile)) {
+            throw new HtmlFileNotFoundException(htmlFile);
+        }
+
+        if (!File.Exists(textFile)) {
+            throw new TextFileNotFoundException(textFile);
+        }
+
+        var htmlContent = File.ReadAllText(htmlFile);
+        var formattedHtml = FormatString(htmlContent, mappings);
+        
+        var textContent = File.ReadAllText(textFile);
+        var formattedText = FormatString(textContent, mappings);
+
+        Content((formattedHtml, formattedText));
+        return this;
+    }
+
+    public MailBuilder AddFilesOrThrow((string htmlFile, string textFile) files, _mappings mappings) {
+        return AddFilesOrThrow(files.htmlFile, files.textFile, mappings);
+    }
+
+    public MailBuilder AddFilesOrThrow(string mailName, _mappings mappings) {
+        var basePath = "./Mails/" + mailName + "/";
+        return AddFilesOrThrow(basePath + mailName + ".html", basePath + mailName + ".txt", mappings);
     }
 
     /// <summary>
@@ -150,8 +204,8 @@ public class MailBuilder(ILogger<MailBuilder> _logger) {
         return AddFilesOrThrow(files.htmlFile, files.textFile);
     }
 
-    private string FormatHtml(string html, _mappings mappings) {
-        return mappings.Aggregate(html, (current, mapping) => current.Replace(mapping.mapping, mapping.value));
+    private string FormatString(string html, _mappings mappings) {
+        return mappings.Aggregate(html, (current, mapping) => current.Replace($"~{mapping.mapping}~", mapping.value));
     }
 
     /// <summary>

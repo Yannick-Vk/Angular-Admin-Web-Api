@@ -1,12 +1,10 @@
 ﻿
-Hi [name],
+Hi ~user~,
 
-Thanks for getting started with our [customer portal]!
+Thanks for getting started with JS-Blogger!
 
 We need a little more information to complete your registration, including a confirmation of your email address.
 
 Click below to confirm your email address:
 
-[link]
-
-If you have problems, please paste the above URL into your web browser.
+~link~

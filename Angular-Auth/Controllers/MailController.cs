@@ -43,10 +43,10 @@ public class MailController(
                 )
                 */
                 //.AddFiles("./Mails/demo/demo.html", "./Mails/demo/demo.jeff")
-                .AddFiles("verify-email")
+                .AddFiles("verify-email", [("link","my link"), ("user", "UNKNOW USER")])
                 .Build();
             
-            //_logger.LogInformation("Mail: {mail}", mail);
+            _logger.LogInformation("Mail: {mail}", mail);
 
             //await mailService.SendEmail(mail);
             
