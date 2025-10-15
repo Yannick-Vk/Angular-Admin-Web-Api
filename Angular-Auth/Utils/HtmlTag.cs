@@ -14,7 +14,7 @@ public class HtmlTag(string tag, IHtmlTag content) : IHtmlTag {
 
     public override string ToString() {
         var builder = new StringBuilder($"<{Tag}>")
-            .Append(content);
+            .Append(Content);
 
         foreach (var child in Children) builder.Append(child);
 
