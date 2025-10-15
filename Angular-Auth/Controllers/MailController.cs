@@ -3,6 +3,7 @@ using Angular_Auth.Services.Interfaces;
 using Angular_Auth.Utils;
 using Angular_Auth.Utils.tags;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc;
 using MimeKit;
 using IMailService = Angular_Auth.Services.Interfaces.IMailService;
@@ -42,12 +43,13 @@ public class MailController(
                 )
                 */
                 //.AddFiles("./Mails/demo/demo.html", "./Mails/demo/demo.jeff")
-                .AddFiles("demo")
+                .AddFiles("verify-email")
                 .Build();
             
             //_logger.LogInformation("Mail: {mail}", mail);
 
-            await mailService.SendEmail(mail);
+            //await mailService.SendEmail(mail);
+            
             return Ok(mail.ToString());
         }
         catch (Exception ex) {
