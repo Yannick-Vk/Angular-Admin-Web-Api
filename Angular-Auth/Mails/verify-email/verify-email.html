@@ -11,20 +11,21 @@
 
         #main {
             font-family: Avenir, Helvetica, Arial, sans-serif;
-            width: 80%;
+            width: 800px;
+            max-width: 90vw;
             margin: auto;
-            padding: 8px 12px;
+            padding: 12px 28px;
             background-color: #e7e7e7;
             border-radius: 10px;
         }
-        
+
         a {
             display: block;
             margin: 25px 0;
-            padding: 8px 12px;
+            padding: 12px 20px;
             border-radius: 10px;
             background: #2385ce;
-            color: white;
+            color: #ffffff;
             text-decoration: none;
             cursor: pointer;
             width: fit-content;
@@ -47,7 +48,7 @@
     <p><a href="{{link}}">Confirm email</a></p>
 
     <p>If you have problems, please paste the above URL into your web browser.</p>
-    <p>{{link}}</p>
+    <p style="overflow-wrap: normal">{{link}}</p>
 </div>
 </body>
 </html>
