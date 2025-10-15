@@ -21,7 +21,7 @@ public class AuthController(ILogger<AuthController> logger, IAuthenticationServi
             service.SetTokenCookie(HttpContext, resp.Token, resp.RefreshToken);
             return Ok(LoginResponse.FromResponseWithToken(resp));
         }
-        catch (Exception e) when (e is CredentialsRequiredException or WrongCredentialsException) {
+        catch (Exception e) when (e is CredentialsRequiredException or WrongCredentialsException or EmailNotVerifiedException) {
             return BadRequest(e.Message);
         }
         catch (Exception e) {
