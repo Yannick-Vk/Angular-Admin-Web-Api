@@ -139,6 +139,15 @@ public class MailBuilder(ILogger<MailBuilder> _logger) {
         var basePath = "./Mails/" + mailName + "/";
         return AddFilesOrThrow(basePath + mailName + ".html", basePath + mailName + ".txt");
     }
+    
+    /// <summary>
+    /// Packed overloaded function, adds both html and text file to the mail body
+    /// </summary>
+    /// <param name="files">A tuple of a htmlFile and textFile</param>
+    /// <returns>MailBuilder chain</returns>
+    public MailBuilder AddFilesOrThrow((string htmlFile, string textFile) files) {
+        return AddFilesOrThrow(files.htmlFile, files.textFile);
+    }
 
     /// <summary>
     /// An exception for when you can't find a file
