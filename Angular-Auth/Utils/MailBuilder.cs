@@ -46,7 +46,7 @@ public class MailBuilder(ILogger<MailBuilder> _logger) {
     /// </summary>
     /// <param name="htmlFile">The path to the html file</param>
     /// <param name="textFile">The path to the text file</param>
-    /// <returns>Mailbuilder chaining</returns>
+    /// <returns>MailBuilder chaining</returns>
     public MailBuilder AddFiles(string htmlFile, string textFile) {
         if (!File.Exists(htmlFile)) {
             _logger.LogWarning("Html File [{HtmlFile}] was not found", htmlFile);
@@ -62,11 +62,16 @@ public class MailBuilder(ILogger<MailBuilder> _logger) {
         return this;
     }
 
+    /// <summary>
+    /// Add both html and text files to the mail body, this is done via mail name as it will search for the folder
+    /// in the mails directory with the same name and then the files ending in .html, .txt
+    /// </summary>
+    /// <param name="mailName">The name of the mail folder and files</param>
+    /// <returns>MailBuilder chain</returns>
     public MailBuilder AddFiles(string mailName) {
-
         var basePath = "./Mails/" + mailName + "/";
         //_logger.LogInformation("{path}",  basePath);
-        
+
         return AddFiles(basePath + mailName + ".html", basePath + mailName + ".txt");
     }
 }
