@@ -28,8 +28,10 @@ builder.Services.AddControllers();
 builder.Services.AddLogging();
 
 // DbContext
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("blogger")));
+builder.Services.AddDbContext<AppDbContext>(options => {
+    options.UseNpgsql(builder.Configuration.GetConnectionString("blogger"));
+    options.UseOpenIddict();
+});
 
 // Identity
 builder.Services.AddIdentity<User, IdentityRole>()
@@ -103,6 +105,32 @@ builder.Services.AddSwaggerGen(c => {
 
 // Add CORS policy
 builder.Services.AddCors();
+
+builder.Services.AddOpenIddict()
+    .AddClient(options => {
+        // Allow the OpenIddict client to negotiate the authorization code flow.
+        options.AllowAuthorizationCodeFlow();
+
+        // Register the signing and encryption credentials used to protect
+        // sensitive data like the state tokens produced by OpenIddict.
+        options.AddDevelopmentEncryptionCertificate()
+            .AddDevelopmentSigningCertificate();
+
+        // Register the ASP.NET Core host and configure the ASP.NET Core-specific options.
+        options.UseAspNetCore()
+            .EnableRedirectionEndpointPassthrough();
+
+        // Register the GitHub integration.
+        options.UseWebProviders()
+            .AddGitHub(githubOptions => {
+                githubOptions.SetClientId("Ov23libmQBQcEuG5LIat ")
+                    .SetClientSecret("743f52005c48c3be78d0ea0093c131b63ef11972")
+                    .SetRedirectUri("callback/login/github");
+            });
+    }).AddCore(options => {
+        // Configure OpenIddict to use the Entity Framework Core stores and models.
+        options.UseEntityFrameworkCore().UseDbContext<AppDbContext>();
+    });
 
 var app = builder.Build();
 

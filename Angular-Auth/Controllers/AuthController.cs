@@ -84,4 +84,11 @@ public class AuthController(
             : configuration["front-end:email-verification-failed"]!
         );
     }
+
+    [AllowAnonymous]
+    [HttpGet("callback/login/github")]
+    [HttpPost("callback/login/github")]
+    public async Task<IActionResult> GithubCallbackLogin() {
+        return Ok();
+    }
 }
