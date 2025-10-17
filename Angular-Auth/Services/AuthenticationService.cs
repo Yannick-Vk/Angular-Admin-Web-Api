@@ -15,7 +15,7 @@ public class AuthenticationService(
     IConfiguration configuration)
     : IAuthenticationService {
     private DateTime TokenExpiry() {
-        return DateTime.Now.AddMinutes(5);
+        return DateTime.UtcNow.AddMinutes(5);
     }
 
     private string GenerateRefreshToken() {
@@ -52,7 +52,7 @@ public class AuthenticationService(
         _ = int.TryParse(configuration["JWT:RefreshTokenValidityInDays"], out int refreshTokenValidityInDays);
 
         user.RefreshToken = refreshToken;
-        user.RefreshTokenExpiryTime = DateTime.Now.AddDays(refreshTokenValidityInDays);
+        user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(refreshTokenValidityInDays);
 
         await userManager.UpdateAsync(user);
 
@@ -64,7 +64,7 @@ public class AuthenticationService(
 
         var user = userManager.Users.SingleOrDefault(u => u.RefreshToken == refreshToken);
 
-        if (user is null || user.RefreshTokenExpiryTime <= DateTime.Now)
+        if (user is null || user.RefreshTokenExpiryTime <= DateTime.UtcNow)
             throw new WrongCredentialsException("Invalid or expired refresh token.");
 
         var userRoles = await userManager.GetRolesAsync(user);
@@ -84,7 +84,7 @@ public class AuthenticationService(
         _ = int.TryParse(configuration["JWT:RefreshTokenValidityInDays"], out int refreshTokenValidityInDays);
 
         user.RefreshToken = newRefreshToken;
-        user.RefreshTokenExpiryTime = DateTime.Now.AddDays(refreshTokenValidityInDays);
+        user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(refreshTokenValidityInDays);
 
         await userManager.UpdateAsync(user);
 
@@ -242,7 +242,7 @@ public class AuthenticationService(
             });
         context.Response.Cookies.Append("refreshToken", refreshToken,
             new CookieOptions {
-                Expires = DateTime.Now.AddDays(int.Parse(configuration["JWT:RefreshTokenValidityInDays"] ?? "1")),
+                Expires = DateTime.UtcNow.AddDays(int.Parse(configuration["JWT:RefreshTokenValidityInDays"] ?? "1")),
                 HttpOnly = true, // Set as Http-only cookie
                 IsEssential = true, // Cookie is required for the app to work
                 Secure = true, // Via Https or SSL only
@@ -253,7 +253,7 @@ public class AuthenticationService(
     public void RemoveTokenCookie(HttpContext context) {
         context.Response.Cookies.Append("accessToken", "",
             new CookieOptions {
-                Expires = DateTime.Now.AddDays(-1),
+                Expires = DateTime.UtcNow.AddDays(-1),
                 HttpOnly = true,
                 IsEssential = true,
                 Secure = true,
@@ -261,7 +261,7 @@ public class AuthenticationService(
             });
         context.Response.Cookies.Append("refreshToken", "",
             new CookieOptions {
-                Expires = DateTime.Now.AddDays(-1),
+                Expires = DateTime.UtcNow.AddDays(-1),
                 HttpOnly = true,
                 IsEssential = true,
                 Secure = true,

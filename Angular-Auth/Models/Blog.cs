@@ -14,7 +14,7 @@ public class Blog {
         Id = Guid.NewGuid();
         Title = upload.Title.Trim();
         Description = upload.Description.Trim();
-        CreatedAt = DateTime.Now;
+        CreatedAt = DateTime.UtcNow;
         Authors = [author];
     }
 
