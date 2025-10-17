@@ -2,9 +2,11 @@ using Angular_Auth.Dto;
 using Angular_Auth.Dto.Auth;
 using Angular_Auth.Exceptions;
 using Angular_Auth.Services;
-using Angular_Auth.Services.Interfaces;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using OpenIddict.Client.WebIntegration;
+using IAuthenticationService = Angular_Auth.Services.Interfaces.IAuthenticationService;
 
 namespace Angular_Auth.Controllers;
 
@@ -86,9 +88,22 @@ public class AuthController(
     }
 
     [AllowAnonymous]
+    [HttpGet("challenge")]
+    public IResult ChallengeSomething() {
+        logger.LogInformation("Challenge Something");
+        return Results.Challenge(
+            properties: null,
+            authenticationSchemes: [OpenIddictClientWebIntegrationConstants.Providers.GitHub]);
+    }
+
+    [AllowAnonymous]
     [HttpGet("callback/login/github")]
-    [HttpPost("callback/login/github")]
-    public async Task<IActionResult> GithubCallbackLogin() {
-        return Ok();
+    public async Task<IResult> GithubCallbackLogin() {
+        logger.LogInformation("Github callback login");
+        var result = await HttpContext.AuthenticateAsync(OpenIddictClientWebIntegrationConstants.Providers.GitHub);
+
+        return Results.Text(string.Format("{0} has {1} public repositories.",
+            result.Principal!.FindFirst("name")!.Value,
+            result.Principal!.FindFirst("public_repos")!.Value));
     }
 }
