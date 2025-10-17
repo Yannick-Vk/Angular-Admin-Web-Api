@@ -11,7 +11,7 @@ public class MailService : IMailService {
         await smtp.ConnectAsync("smtp.gmail.com", 587, false);
 
         // Note: only needed if the SMTP server requires authentication
-        await smtp.AuthenticateAsync("shawn.froste.sf@gmail.com", "ufsw pzzt wnzn uabo");
+        await smtp.AuthenticateAsync("", "");
 
         await smtp.SendAsync(email);
         await smtp.DisconnectAsync(true);
