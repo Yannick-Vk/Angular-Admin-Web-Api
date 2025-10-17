@@ -5,7 +5,7 @@
 namespace Angular_Auth.Migrations
 {
     /// <inheritdoc />
-    public partial class BannerImage : Migration
+    public partial class InitialCreate_Postgres : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

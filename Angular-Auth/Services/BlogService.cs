@@ -58,7 +58,7 @@ public class BlogService(ILogger<BlogService> logger, BlogRepository repo, IUser
 
         blog.Title = dto.Title ?? blog.Title;
         blog.Description = dto.Description ?? blog.Description;
-        blog.UpdatedAt = DateTime.Now;
+        blog.UpdatedAt = DateTime.UtcNow;
 
         var updatedBlog = await repo.UpdateBlog(blog);
 

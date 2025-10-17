@@ -29,7 +29,7 @@ builder.Services.AddLogging();
 
 // DbContext
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("auth")));
+    options.UseNpgsql(builder.Configuration.GetConnectionString("blogger")));
 
 // Identity
 builder.Services.AddIdentity<User, IdentityRole>()
@@ -107,11 +107,11 @@ builder.Services.AddCors();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment()) {
-    app.MapOpenApi();
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+if (app.Environment.IsDevelopment()) { }
+
+app.MapOpenApi();
+app.UseSwagger();
+app.UseSwaggerUI();
 
 // Use CORS
 app.UseCors(b => b
