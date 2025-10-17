@@ -123,9 +123,9 @@ builder.Services.AddOpenIddict()
         // Register the GitHub integration.
         options.UseWebProviders()
             .AddGitHub(githubOptions => {
-                githubOptions.SetClientId("Ov23libmQBQcEuG5LIat ")
+                githubOptions.SetClientId("Ov23libmQBQcEuG5LIat")
                     .SetClientSecret("743f52005c48c3be78d0ea0093c131b63ef11972")
-                    .SetRedirectUri("callback/login/github");
+                    .SetRedirectUri("api/v1/auth/callback/login/github");
             });
     }).AddCore(options => {
         // Configure OpenIddict to use the Entity Framework Core stores and models.

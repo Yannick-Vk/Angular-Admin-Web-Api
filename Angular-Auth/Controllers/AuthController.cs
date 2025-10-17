@@ -3,6 +3,7 @@ using Angular_Auth.Dto.Auth;
 using Angular_Auth.Exceptions;
 using Angular_Auth.Services;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using OpenIddict.Client.WebIntegration;
