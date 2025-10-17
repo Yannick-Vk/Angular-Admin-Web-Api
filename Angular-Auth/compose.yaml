@@ -14,7 +14,14 @@ services:
       target: final
     ports:
       # HOST_PORT : CONTAINER_PORT
-      - "7134:8080"
+      - "7134:7134"
+      - "5241:5241"
+    environment:
+      - ASPNETCORE_URLS=https://+:7134;http://+:5241
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=Password123!
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetapp.pfx
+    volumes:
+      - ./.certs:/https/:ro
     depends_on:
        db:
          condition: service_healthy
