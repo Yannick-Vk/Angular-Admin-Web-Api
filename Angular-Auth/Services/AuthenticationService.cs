@@ -2,18 +2,27 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using Angular_Auth.Dto;
+using Angular_Auth.Dto.Auth;
+using Angular_Auth.Dto.Users;
 using Angular_Auth.Exceptions;
 using Angular_Auth.Models;
+using Angular_Auth.Services.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
+using Angular_Auth.Utils;
+using Angular_Auth.Utils.tags;
 
 namespace Angular_Auth.Services;
 
 public class AuthenticationService(
     ILogger<AuthenticationService> logger,
     UserManager<User> userManager,
-    IConfiguration configuration)
+    IConfiguration configuration,
+    IMailService mailService,
+    ILoggerFactory loggerFactory)
     : IAuthenticationService {
+    private readonly ILogger<MailBuilder> _mailBuilderLogger = loggerFactory.CreateLogger<MailBuilder>();
+
     private DateTime TokenExpiry() {
         return DateTime.Now.AddMinutes(5);
     }
@@ -34,6 +43,10 @@ public class AuthenticationService(
 
         if (user is null || !await userManager.CheckPasswordAsync(user, request.Password))
             throw new WrongCredentialsException("Username and/or password are incorrect.");
+        
+        if (user is not null && !user.EmailConfirmed)
+            throw new EmailNotVerifiedException("Please verify your email before logging in.");
+
 
         var userRoles = await userManager.GetRolesAsync(user);
         var authClaims = new List<Claim> {
@@ -107,6 +120,7 @@ public class AuthenticationService(
             SecurityStamp = Guid.NewGuid().ToString(),
             UserName = request.Username,
             Email = request.Email,
+            EmailConfirmed = false,
         };
 
         var result = await userManager.CreateAsync(user, request.Password);
@@ -115,7 +129,24 @@ public class AuthenticationService(
             throw new RegistrationFailedException(
                 $"Unable to register user {request.Username}:{Environment.NewLine}{ShowErrorsText(result.Errors)}");
 
-        return await Login(new LoginRequest { Username = request.Email, Password = request.Password, });
+        var token = await userManager.GenerateEmailConfirmationTokenAsync(user);
+        var encodedToken = System.Net.WebUtility.UrlEncode(token);
+
+        // TODO: Remove debug print
+        var verificationLink = $"https://localhost:7134/api/v1/auth/verify-email?userId={user.Id}&token={encodedToken}";
+        logger.LogInformation("DEBUG: User verification token: \n {link}", verificationLink);
+
+        var mail = new MailBuilder(_mailBuilderLogger)
+            .To((user.UserName, user.Email))
+            .From(("JS-Blogger", "no-reply@js-blogger.be"))
+            .Subject("Verify your email")
+            .AddFiles("verify-email", [("link",  verificationLink), ("user", request.Username)]) 
+            .Build();
+
+        await mailService.SendEmail(mail);
+
+        return new LoginResponseWithToken(user.Id, string.Empty, user.UserName, user.Email, DateTime.MinValue,
+            string.Empty);
     }
 
     private JwtSecurityToken GetToken(IEnumerable<Claim> authClaims) {
@@ -267,5 +298,25 @@ public class AuthenticationService(
                 Secure = true,
                 SameSite = SameSiteMode.None,
             });
+    }
+
+    public async Task<bool> VerifyEmail(string userId, string token) {
+        var user = await userManager.FindByIdAsync(userId);
+        if (user is null) {
+            logger.LogError("VerifyEmail: User with ID {UserId} not found.", userId);
+            return false;
+        }
+
+        logger.LogInformation("VerifyEmail: Found user {Email}. Attempting to confirm email with token {Token}", user.Email, token);
+
+        // The token from the URL route is automatically decoded by ASP.NET Core's model binding.
+        // Manually decoding it again would corrupt it.
+        var result = await userManager.ConfirmEmailAsync(user, token);
+
+        if (!result.Succeeded) {
+            logger.LogError("VerifyEmail: Email confirmation failed for user {Email}. Errors: {Errors}", user.Email, string.Join(", ", result.Errors.Select(e => e.Description)));
+        }
+
+        return result.Succeeded;
     }
 }
