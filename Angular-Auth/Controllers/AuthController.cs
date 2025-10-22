@@ -95,7 +95,7 @@ public class AuthController(
     public IResult ChallengeSomething() {
         logger.LogInformation("Challenge Something");
         return Results.Challenge(
-            properties: null,
+            properties: new AuthenticationProperties { RedirectUri = "/api/v1/Auth/whoami" },
             authenticationSchemes: [OpenIddictClientWebIntegrationConstants.Providers.GitHub]);
     }
 
@@ -122,10 +122,11 @@ public class AuthController(
                 result.Principal!.GetClaim(OpenIddictConstants.Claims.Private.ProviderName));
 
         // Build the authentication properties based on the properties that were added when the challenge was triggered.
+        logger.LogInformation("result redirectUri {uri}", result.Properties?.RedirectUri ?? "NULL");
         var properties = new AuthenticationProperties(result.Properties.Items) {
-            RedirectUri = result.Properties.RedirectUri ?? "/whoami"
+            RedirectUri = result.Properties.RedirectUri ?? "/api/v1/Auth/whoami"
         };
-        
+
         logger.LogInformation("Redirecting to {redirectUri}", properties.RedirectUri);
 
         // Ask the default sign-in handler to return a new cookie and redirect the
