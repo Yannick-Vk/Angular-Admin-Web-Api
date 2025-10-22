@@ -47,29 +47,7 @@ public class AuthenticationService(
         if (user is not null && !user.EmailConfirmed)
             throw new EmailNotVerifiedException("Please verify your email before logging in.");
 
-
-        var userRoles = await userManager.GetRolesAsync(user);
-        var authClaims = new List<Claim> {
-            new("Id", user.Id),
-            new("Username", user.UserName ?? string.Empty),
-            new("Email", user.Email ?? string.Empty),
-            new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-        };
-
-        authClaims.AddRange(userRoles.Select(userRole => new Claim(ClaimTypes.Role, userRole)));
-
-        var token = GetToken(authClaims);
-        var jwt = new JwtSecurityTokenHandler().WriteToken(token);
-        var refreshToken = GenerateRefreshToken();
-
-        _ = int.TryParse(configuration["JWT:RefreshTokenValidityInDays"], out int refreshTokenValidityInDays);
-
-        user.RefreshToken = refreshToken;
-        user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(refreshTokenValidityInDays);
-
-        await userManager.UpdateAsync(user);
-
-        return new LoginResponseWithToken(user.Id, jwt, user.UserName!, user.Email!, TokenExpiry(), refreshToken);
+        return await CreateLoginResponseWithTokenAsync(user);
     }
 
     public async Task<LoginResponseWithToken> RefreshToken(string? refreshToken) {
@@ -80,28 +58,7 @@ public class AuthenticationService(
         if (user is null || user.RefreshTokenExpiryTime <= DateTime.UtcNow)
             throw new WrongCredentialsException("Invalid or expired refresh token.");
 
-        var userRoles = await userManager.GetRolesAsync(user);
-        var authClaims = new List<Claim> {
-            new("Id", user.Id),
-            new("Username", user.UserName ?? string.Empty),
-            new("Email", user.Email ?? string.Empty),
-            new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-        };
-
-        authClaims.AddRange(userRoles.Select(userRole => new Claim(ClaimTypes.Role, userRole)));
-
-        var token = GetToken(authClaims);
-        var jwt = new JwtSecurityTokenHandler().WriteToken(token);
-        var newRefreshToken = GenerateRefreshToken();
-
-        _ = int.TryParse(configuration["JWT:RefreshTokenValidityInDays"], out int refreshTokenValidityInDays);
-
-        user.RefreshToken = newRefreshToken;
-        user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(refreshTokenValidityInDays);
-
-        await userManager.UpdateAsync(user);
-
-        return new LoginResponseWithToken(user.Id, jwt, user.UserName!, user.Email!, TokenExpiry(), newRefreshToken);
+        return await CreateLoginResponseWithTokenAsync(user);
     }
 
     public async Task<LoginResponseWithToken> Register(RegisterRequest request) {
@@ -147,6 +104,32 @@ public class AuthenticationService(
 
         return new LoginResponseWithToken(user.Id, string.Empty, user.UserName, user.Email, DateTime.MinValue,
             string.Empty);
+    }
+    
+    private async Task<LoginResponseWithToken> CreateLoginResponseWithTokenAsync(User user)
+    {
+        var userRoles = await userManager.GetRolesAsync(user);
+        var authClaims = new List<Claim> {
+            new("Id", user.Id),
+            new("Username", user.UserName ?? string.Empty),
+            new("Email", user.Email ?? string.Empty),
+            new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+        };
+
+        authClaims.AddRange(userRoles.Select(userRole => new Claim(ClaimTypes.Role, userRole)));
+
+        var token = GetToken(authClaims);
+        var jwt = new JwtSecurityTokenHandler().WriteToken(token);
+        var refreshToken = GenerateRefreshToken();
+
+        _ = int.TryParse(configuration["JWT:RefreshTokenValidityInDays"], out int refreshTokenValidityInDays);
+
+        user.RefreshToken = refreshToken;
+        user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(refreshTokenValidityInDays);
+
+        await userManager.UpdateAsync(user);
+
+        return new LoginResponseWithToken(user.Id, jwt, user.UserName!, user.Email!, TokenExpiry(), refreshToken);
     }
 
     private JwtSecurityToken GetToken(IEnumerable<Claim> authClaims) {
@@ -320,7 +303,35 @@ public class AuthenticationService(
         return result.Succeeded;
     }
 
-    public Task<(User, LoginResponseWithToken)> LoginWithProvider(string email, string name, string provider) {
-        throw new NotImplementedException();
+    public async Task<(User, LoginResponseWithToken)> LoginWithProvider(string email, string name, string provider) {
+        var user = await userManager.FindByEmailAsync(email);
+
+        if (user is null) {
+            // To prevent username collision
+            var existingUserWithSameName = await userManager.FindByNameAsync(name);
+            if (existingUserWithSameName != null) {
+                name = $"{name}#{new Random().Next(1000, 9999)}";
+            }
+            
+            user = new User {
+                UserName = name,
+                Email = email,
+                EmailConfirmed = true // Email is considered verified from an external provider
+            };
+            var result = await userManager.CreateAsync(user);
+            if (!result.Succeeded) {
+                throw new RegistrationFailedException($"Unable to create user {name}. Errors: {ShowErrorsText(result.Errors)}");
+            }
+            await userManager.AddLoginAsync(user, new UserLoginInfo(provider, email, provider));
+        }
+        else {
+            var logins = await userManager.GetLoginsAsync(user);
+            if (logins.All(l => l.LoginProvider != provider)) {
+                await userManager.AddLoginAsync(user, new UserLoginInfo(provider, email, provider));
+            }
+        }
+
+        var loginResponse = await CreateLoginResponseWithTokenAsync(user);
+        return (user, loginResponse);
     }
 }

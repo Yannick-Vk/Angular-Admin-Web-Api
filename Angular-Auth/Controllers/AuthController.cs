@@ -92,10 +92,10 @@ public class AuthController(
 
     [AllowAnonymous]
     [HttpGet("challenge")]
-    public IResult ChallengeSomething() {
-        logger.LogInformation("Challenge Something");
+    public IResult ChallengeSomething(string provider = "GitHub") {
+        logger.LogInformation("Challenging {provider}", provider);
         return Results.Challenge(
-            properties: new AuthenticationProperties { RedirectUri = "/api/v1/Auth/whoami" },
+            properties: new AuthenticationProperties { RedirectUri = configuration["front-end:login-success"] },
             authenticationSchemes: [OpenIddictClientWebIntegrationConstants.Providers.GitHub]);
     }
 
@@ -129,9 +129,22 @@ public class AuthController(
     public async Task<IActionResult> WhoAmI() {
         var result = await HttpContext.AuthenticateAsync();
         if (result is not { Succeeded: true }) {
-            return Ok("You're not logged in.");
+            logger.LogError("[WhoAmI]: You are not logged in!");
+            return Problem("You're not logged in.");
         }
+        logger.LogInformation("[WhoAmI]: You are logged in!");
+        var name = result.Principal.FindFirst("Username")?.Value;
 
-        return Ok($"You are {result.Principal.FindFirst(ClaimTypes.Name)!.Value}.");
+        if (name is null) {
+            logger.LogError("[WhoAmI]: You are not logged in!");
+            return Problem("Failed to get loggedIn user claim");
+        }
+        
+        logger.LogInformation("[WhoAmI]: Welcome {name}!", name);
+        var success = configuration["front-end:login-success"];
+        if (success is null) {
+            return Problem("[WhoAmI]: Failed to find success page!");
+        }
+        return Redirect(success);
     }
 }
