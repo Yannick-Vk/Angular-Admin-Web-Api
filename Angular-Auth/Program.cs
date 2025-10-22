@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using OpenIddict.Abstractions;
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
@@ -36,7 +37,7 @@ builder.Services.AddDbContext<AppDbContext>(options => {
 // Identity
 builder.Services.AddIdentity<User, IdentityRole>(options => {
         options.User.RequireUniqueEmail = true;
-        options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_#";
+        options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_#.@";
     })
     .AddEntityFrameworkStores<AppDbContext>()
     .AddDefaultTokenProviders();
@@ -129,13 +130,20 @@ builder.Services.AddOpenIddict()
                 githubOptions
                     .SetClientId("Ov23libmQBQcEuG5LIat")
                     .SetClientSecret("743f52005c48c3be78d0ea0093c131b63ef11972")
-                    .SetRedirectUri("/api/v1/auth/callback/login/github");
+                    .SetRedirectUri("/api/v1/auth/callback/login/github")
+                    ;
             })
             .AddGoogle(googleOptions => {
                 googleOptions
                     .SetClientId("65217649793-6k8gbt29f906i91g9akjt4ur5nkdprmk.apps.googleusercontent.com")
                     .SetClientSecret("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")
-                    .SetRedirectUri("/api/v1/auth/callback/login/google");
+                    .SetRedirectUri("/api/v1/auth/callback/login/google")
+                    .AddScopes([
+                        OpenIddictConstants.Scopes.Email, 
+                        OpenIddictConstants.Scopes.Profile,
+                        OpenIddictConstants.Scopes.OpenId,
+                    ])
+                    ;
             })
             ;
     }).AddCore(options => {

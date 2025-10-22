@@ -135,8 +135,8 @@ public class AuthController(
         logger.LogInformation("[Google] callback login");
         var result = await HttpContext.AuthenticateAsync(OpenIddictClientWebIntegrationConstants.Providers.Google);
 
-        var email = result.Principal!.GetClaim(ClaimTypes.Email);
-        var name = result.Principal!.GetClaim(ClaimTypes.Name);
+        var email = result.Principal!.GetClaim("email");
+        var name = result.Principal!.GetClaim("given_name");
 
         if (email is null || name is null) {
             return BadRequest("Could not retrieve user information from Google.");
