@@ -31,7 +31,7 @@ public class ProfileController : Controller {
                 return Unauthorized("Could not get userId from JWT Token");
             }
 
-            await _profileService.UpdateEmail(userId, request.Email, request.Password);
+            await _profileService.UpdateEmail(userId, request.Email);
             return Ok();
         }
         catch (Exception ex) {
@@ -47,8 +47,9 @@ public class ProfileController : Controller {
                 return Unauthorized("Could not get userId from JWT Token");
             }
 
-            await _profileService.UpdateUsername(userId, request.Username, request.Password);
-            return Ok();
+            var success = await _profileService.UpdateUsername(userId, request.Username);
+            if (success) return Ok();
+            return Problem("Username already exists");
         }
         catch (Exception ex) {
             return BadRequest(ex.Message);
@@ -64,7 +65,7 @@ public class ProfileController : Controller {
                 return Unauthorized("Could not get userId from JWT Token");
             }
 
-            await _profileService.UpdatePassword(userId, request.NewPassword, request.Password);
+            await _profileService.UpdatePassword(userId, request.Password, request.NewPassword);
             return Ok();
         }
         catch (Exception ex) {

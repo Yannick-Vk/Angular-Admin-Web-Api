@@ -12,21 +12,18 @@ namespace Angular_Auth.Services;
 
 public class ProfileService(UserManager<User> userManager, ProfileRepository repo)
     : IProfileService {
-    public async Task UpdateEmail(string userId, string newEmail, string password) {
+    public async Task UpdateEmail(string userId, string newEmail) {
         var user = await GetUserOrException(userId);
-        await CheckPasswordOrException(user, password);
         await repo.UpdateEmail(user, newEmail);
     }
 
-    public async Task UpdatePassword(string userId, string newPassword, string password) {
+    public async Task UpdatePassword(string userId, string password, string newPassword) {
         var user = await GetUserOrException(userId);
-        await CheckPasswordOrException(user, password);
         await repo.UpdatePassword(user, password, newPassword);
     }
 
-    public async Task<bool> UpdateUsername(string userId, string newUsername, string password) {
+    public async Task<bool> UpdateUsername(string userId, string newUsername) {
         var user = await GetUserOrException(userId);
-        await CheckPasswordOrException(user, password);
         if (!IsUsernameAvailable(newUsername)) {
             return false;
         }
@@ -102,8 +99,8 @@ public class ProfileService(UserManager<User> userManager, ProfileRepository rep
         message ??= "Username and/or password is incorrect";
         if (!correctPassword) throw new WrongCredentialsException(message);
     }
-    
+
     public bool IsUsernameAvailable(string username) {
-        return ! userManager.Users.Any(u => u.UserName == username);
+        return !userManager.Users.Any(u => u.UserName == username);
     }
 }
