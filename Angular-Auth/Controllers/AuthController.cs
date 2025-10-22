@@ -105,36 +105,23 @@ public class AuthController(
         logger.LogInformation("Github callback login");
         var result = await HttpContext.AuthenticateAsync(OpenIddictClientWebIntegrationConstants.Providers.GitHub);
 
-        // Build an identity based on the external claims and that will be used to create the authentication cookie.
-        var identity = new ClaimsIdentity(authenticationType: "ExternalLogin");
+        var email = result.Principal!.GetClaim(ClaimTypes.Email);
+        var name = result.Principal!.GetClaim(ClaimTypes.Name);
 
-        // By default, OpenIddict will automatically try to map the email/name and name identifier claims from
-        // their standard OpenID Connect or provider-specific equivalent, if available. If needed, additional
-        // claims can be resolved from the external identity and copied to the final authentication cookie.
-        identity.SetClaim(ClaimTypes.Email, result.Principal!.GetClaim(ClaimTypes.Email))
-            .SetClaim(ClaimTypes.Name, result.Principal!.GetClaim(ClaimTypes.Name))
-            .SetClaim(ClaimTypes.NameIdentifier, result.Principal!.GetClaim(ClaimTypes.NameIdentifier));
+        if (email is null || name is null) {
+            return BadRequest("Could not retrieve user information from GitHub.");
+        }
 
-        // Preserve the registration details to be able to resolve them later.
-        identity.SetClaim(OpenIddictConstants.Claims.Private.RegistrationId,
-                result.Principal!.GetClaim(OpenIddictConstants.Claims.Private.RegistrationId))
-            .SetClaim(OpenIddictConstants.Claims.Private.ProviderName,
-                result.Principal!.GetClaim(OpenIddictConstants.Claims.Private.ProviderName));
+        var (user, token) = await service.LoginWithProvider(email, name, "GitHub");
+        logger.LogInformation("Logged in with user {user}", user.UserName);
+        
+        service.SetTokenCookie(HttpContext, token.Token, token.RefreshToken);
 
-        // Build the authentication properties based on the properties that were added when the challenge was triggered.
-        logger.LogInformation("result redirectUri {uri}", result.Properties?.RedirectUri ?? "NULL");
-        var properties = new AuthenticationProperties(result.Properties.Items) {
-            RedirectUri = result.Properties.RedirectUri ?? "/api/v1/Auth/whoami"
-        };
+        var redirectUri = result.Properties?.RedirectUri ?? configuration["front-end:base-url"] ?? "/";
+        
+        logger.LogInformation("Redirecting to {redirectUri}", redirectUri);
 
-        logger.LogInformation("Redirecting to {redirectUri}", properties.RedirectUri);
-
-        // Ask the default sign-in handler to return a new cookie and redirect the
-        // user agent to the return URL stored in the authentication properties.
-        //
-        // For scenarios where the default sign-in handler configured in the ASP.NET Core
-        // authentication options shouldn't be used, a specific scheme can be specified here.
-        return SignIn(new ClaimsPrincipal(identity), properties);
+        return Redirect(redirectUri);
     }
 
     [AllowAnonymous]

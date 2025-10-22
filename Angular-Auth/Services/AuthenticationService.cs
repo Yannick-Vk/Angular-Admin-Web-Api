@@ -319,4 +319,8 @@ public class AuthenticationService(
 
         return result.Succeeded;
     }
+
+    public Task<(User, LoginResponseWithToken)> LoginWithProvider(string email, string name, string provider) {
+        throw new NotImplementedException();
+    }
 }
