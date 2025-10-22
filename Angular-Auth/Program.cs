@@ -133,7 +133,7 @@ builder.Services.AddOpenIddict()
             })
             .AddGoogle(googleOptions => {
                 googleOptions
-                    .SetClientId("65217649793-6k8gbt29f906i91g9akjt4ur5nkdprmk.apps.googleusercontent.com ")
+                    .SetClientId("65217649793-6k8gbt29f906i91g9akjt4ur5nkdprmk.apps.googleusercontent.com")
                     .SetClientSecret("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")
                     .SetRedirectUri("/api/v1/auth/callback/login/google");
             })

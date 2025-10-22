@@ -133,16 +133,16 @@ public class AuthController(
     [HttpGet("callback/login/google")]
     public async Task<IActionResult> GoogleCallbackLogin() {
         logger.LogInformation("[Google] callback login");
-        var result = await HttpContext.AuthenticateAsync(OpenIddictClientWebIntegrationConstants.Providers.GitHub);
+        var result = await HttpContext.AuthenticateAsync(OpenIddictClientWebIntegrationConstants.Providers.Google);
 
         var email = result.Principal!.GetClaim(ClaimTypes.Email);
         var name = result.Principal!.GetClaim(ClaimTypes.Name);
 
         if (email is null || name is null) {
-            return BadRequest("Could not retrieve user information from GitHub.");
+            return BadRequest("Could not retrieve user information from Google.");
         }
 
-        var (user, token) = await service.LoginWithProvider(email, name, "GitHub");
+        var (user, token) = await service.LoginWithProvider(email, name, "Google");
         logger.LogInformation("Logged in with user {user}", user.UserName);
 
         service.SetTokenCookie(HttpContext, token.Token, token.RefreshToken);
