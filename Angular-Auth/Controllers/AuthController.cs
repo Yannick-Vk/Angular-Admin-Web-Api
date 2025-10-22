@@ -1,10 +1,7 @@
 using System.Security.Claims;
-using Angular_Auth.Dto;
 using Angular_Auth.Dto.Auth;
 using Angular_Auth.Exceptions;
-using Angular_Auth.Services;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using OpenIddict.Abstractions;
@@ -95,7 +92,7 @@ public class AuthController(
     public IResult ChallengeSomething(string provider = "GitHub") {
         logger.LogInformation("Challenging {provider}", provider);
         return Results.Challenge(
-            properties: new AuthenticationProperties { RedirectUri = configuration["front-end:login-success"] },
+            properties: new AuthenticationProperties { RedirectUri = configuration["front-end:login-success"] + "/" + provider },
             authenticationSchemes: [OpenIddictClientWebIntegrationConstants.Providers.GitHub]);
     }
 
@@ -124,27 +121,16 @@ public class AuthController(
         return Redirect(redirectUri);
     }
 
-    [AllowAnonymous]
-    [HttpGet("whoami")]
-    public async Task<IActionResult> WhoAmI() {
-        var result = await HttpContext.AuthenticateAsync();
-        if (result is not { Succeeded: true }) {
-            logger.LogError("[WhoAmI]: You are not logged in!");
-            return Problem("You're not logged in.");
-        }
-        logger.LogInformation("[WhoAmI]: You are logged in!");
-        var name = result.Principal.FindFirst("Username")?.Value;
+        [Authorize]
 
-        if (name is null) {
-            logger.LogError("[WhoAmI]: You are not logged in!");
-            return Problem("Failed to get loggedIn user claim");
+        [HttpGet("whoami")]
+
+        public IActionResult WhoAmI() {
+            var user = service.GetUserWithRolesFromClaimsPrincipal(User);
+            if (user is null) {
+                logger.LogWarning("WhoAmI: User is authorized, but claims (Id, Name, or Email) could not be retrieved from token.");
+                return Problem("Could not retrieve complete user information from token.");
+            }
+            return Ok(user);
         }
-        
-        logger.LogInformation("[WhoAmI]: Welcome {name}!", name);
-        var success = configuration["front-end:login-success"];
-        if (success is null) {
-            return Problem("[WhoAmI]: Failed to find success page!");
-        }
-        return Redirect(success);
-    }
 }
