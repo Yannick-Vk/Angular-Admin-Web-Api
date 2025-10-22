@@ -119,12 +119,14 @@ public class AuthController(
             return BadRequest("Could not retrieve user information from GitHub.");
         }
 
-        var (user, token) = await service.LoginWithProvider(email, name, "GitHub");
-        logger.LogInformation("Logged in with user {user}", user.UserName);
+        var loginResponse = await service.LoginWithProvider(email, name, "GitHub");
+        logger.LogInformation("Logged in with user {user}", loginResponse.User.UserName);
 
-        service.SetTokenCookie(HttpContext, token.Token, token.RefreshToken);
+        service.SetTokenCookie(HttpContext, loginResponse.Token.Token, loginResponse.Token.RefreshToken);
 
-        var redirectUri = result.Properties?.RedirectUri ?? configuration["front-end:base-url"] ?? "/";
+        var redirectUri = loginResponse.IsNewUser
+            ? configuration["front-end:create-profile"] ?? configuration["front-end:base-url"] ?? "/"
+            : result.Properties?.RedirectUri ?? configuration["front-end:base-url"] ?? "/";
 
         logger.LogInformation("Redirecting to {redirectUri}", redirectUri);
 
@@ -145,16 +147,18 @@ public class AuthController(
             return BadRequest("Could not retrieve user information from Google.");
         }
 
-        var (user, token) = await service.LoginWithProvider(email, name, "Google");
-        logger.LogInformation("Logged in with user {user}", user.UserName);
+        var loginResponse = await service.LoginWithProvider(email, name, "Google");
+        logger.LogInformation("Logged in with user {user}", loginResponse.User.UserName);
 
         if (picture is not null) {
-            await profileService.UploadProfilePictureFromUrl(user.Id, picture);
+            await profileService.UploadProfilePictureFromUrl(loginResponse.User.Id, picture);
         }
 
-        service.SetTokenCookie(HttpContext, token.Token, token.RefreshToken);
+        service.SetTokenCookie(HttpContext, loginResponse.Token.Token, loginResponse.Token.RefreshToken);
 
-        var redirectUri = result.Properties?.RedirectUri ?? configuration["front-end:base-url"] ?? "/";
+        var redirectUri = loginResponse.IsNewUser
+            ? configuration["front-end:create-profile"] ?? configuration["front-end:base-url"] ?? "/"
+            : result.Properties?.RedirectUri ?? configuration["front-end:base-url"] ?? "/";
 
         logger.LogInformation("Redirecting to {redirectUri}", redirectUri);
 

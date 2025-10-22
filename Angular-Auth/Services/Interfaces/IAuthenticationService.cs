@@ -18,5 +18,5 @@ public interface IAuthenticationService {
     public void SetTokenCookie(HttpContext context, string token, string refreshToken);
     public void RemoveTokenCookie(HttpContext context);
     public Task<bool> VerifyEmail(string userId, string token);
-    Task<(User, LoginResponseWithToken)> LoginWithProvider(string email, string name, string provider);
+    Task<LoginResponseWithProvider> LoginWithProvider(string email, string name, string provider);
 }

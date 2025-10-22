@@ -303,10 +303,12 @@ public class AuthenticationService(
         return result.Succeeded;
     }
 
-    public async Task<(User, LoginResponseWithToken)> LoginWithProvider(string email, string name, string provider) {
+    public async Task<LoginResponseWithProvider> LoginWithProvider(string email, string name, string provider) {
         var user = await userManager.FindByEmailAsync(email);
+        bool isNewUser = false;
 
         if (user is null) {
+            logger.LogInformation("Creating new user");
             // To prevent username collision
             var existingUserWithSameName = await userManager.FindByNameAsync(name);
             if (existingUserWithSameName != null) {
@@ -323,6 +325,7 @@ public class AuthenticationService(
                 throw new RegistrationFailedException($"Unable to create user {name}. Errors: {ShowErrorsText(result.Errors)}");
             }
             await userManager.AddLoginAsync(user, new UserLoginInfo(provider, email, provider));
+            isNewUser = true;
         }
         else {
             var logins = await userManager.GetLoginsAsync(user);
@@ -332,6 +335,10 @@ public class AuthenticationService(
         }
 
         var loginResponse = await CreateLoginResponseWithTokenAsync(user);
-        return (user, loginResponse);
+        return new LoginResponseWithProvider {
+            User = user,
+            Token = loginResponse,
+            IsNewUser = isNewUser
+        };
     }
 }
