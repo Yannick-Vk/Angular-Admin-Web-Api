@@ -89,17 +89,25 @@ public class AuthController(
 
     [AllowAnonymous]
     [HttpGet("challenge")]
-    public IResult ChallengeSomething(string provider = "GitHub") {
+    public IResult ChallengeSomething(string provider) {
         logger.LogInformation("Challenging {provider}", provider);
+
+        var schema = provider switch {
+            "GitHub" => OpenIddictClientWebIntegrationConstants.Providers.GitHub,
+            "Google" => OpenIddictClientWebIntegrationConstants.Providers.Google,
+            _ => throw new Exception("Unknown provider"),
+        };
+
         return Results.Challenge(
-            properties: new AuthenticationProperties { RedirectUri = configuration["front-end:login-success"] + "/" + provider },
-            authenticationSchemes: [OpenIddictClientWebIntegrationConstants.Providers.GitHub]);
+            properties: new AuthenticationProperties
+                { RedirectUri = configuration["front-end:login-success"] + "/" + provider },
+            authenticationSchemes: [schema]);
     }
 
     [AllowAnonymous]
     [HttpGet("callback/login/github")]
     public async Task<IActionResult> GithubCallbackLogin() {
-        logger.LogInformation("Github callback login");
+        logger.LogInformation("[Github] callback login");
         var result = await HttpContext.AuthenticateAsync(OpenIddictClientWebIntegrationConstants.Providers.GitHub);
 
         var email = result.Principal!.GetClaim(ClaimTypes.Email);
@@ -111,26 +119,51 @@ public class AuthController(
 
         var (user, token) = await service.LoginWithProvider(email, name, "GitHub");
         logger.LogInformation("Logged in with user {user}", user.UserName);
-        
+
         service.SetTokenCookie(HttpContext, token.Token, token.RefreshToken);
 
         var redirectUri = result.Properties?.RedirectUri ?? configuration["front-end:base-url"] ?? "/";
-        
+
         logger.LogInformation("Redirecting to {redirectUri}", redirectUri);
 
         return Redirect(redirectUri);
     }
 
-        [Authorize]
+    [AllowAnonymous]
+    [HttpGet("callback/login/google")]
+    public async Task<IActionResult> GoogleCallbackLogin() {
+        logger.LogInformation("[Google] callback login");
+        var result = await HttpContext.AuthenticateAsync(OpenIddictClientWebIntegrationConstants.Providers.GitHub);
 
-        [HttpGet("whoami")]
+        var email = result.Principal!.GetClaim(ClaimTypes.Email);
+        var name = result.Principal!.GetClaim(ClaimTypes.Name);
 
-        public IActionResult WhoAmI() {
-            var user = service.GetUserWithRolesFromClaimsPrincipal(User);
-            if (user is null) {
-                logger.LogWarning("WhoAmI: User is authorized, but claims (Id, Name, or Email) could not be retrieved from token.");
-                return Problem("Could not retrieve complete user information from token.");
-            }
-            return Ok(user);
+        if (email is null || name is null) {
+            return BadRequest("Could not retrieve user information from GitHub.");
         }
+
+        var (user, token) = await service.LoginWithProvider(email, name, "GitHub");
+        logger.LogInformation("Logged in with user {user}", user.UserName);
+
+        service.SetTokenCookie(HttpContext, token.Token, token.RefreshToken);
+
+        var redirectUri = result.Properties?.RedirectUri ?? configuration["front-end:base-url"] ?? "/";
+
+        logger.LogInformation("Redirecting to {redirectUri}", redirectUri);
+
+        return Redirect(redirectUri);
+    }
+
+    [Authorize]
+    [HttpGet("whoami")]
+    public IActionResult WhoAmI() {
+        var user = service.GetUserWithRolesFromClaimsPrincipal(User);
+        if (user is null) {
+            logger.LogWarning(
+                "WhoAmI: User is authorized, but claims (Id, Name, or Email) could not be retrieved from token.");
+            return Problem("Could not retrieve complete user information from token.");
+        }
+
+        return Ok(user);
+    }
 }
