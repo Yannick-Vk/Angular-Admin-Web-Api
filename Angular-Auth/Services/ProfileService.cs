@@ -1,3 +1,5 @@
+using System.Net.Http;
+using Microsoft.AspNetCore.Http;
 using Angular_Auth.Dto;
 using Angular_Auth.Dto.Users;
 using Angular_Auth.Exceptions;
@@ -23,13 +25,46 @@ public class ProfileService(UserManager<User> userManager, ProfileRepository rep
 
     public async Task UploadProfilePicture(string userId, ProfilePictureUpload pictureUpload) {
         var user = await GetUserOrException(userId);
-        string[] validExt = [".jpg", ".png", ".gif", ".webp"];
+        string[] validExt = [".jpeg", ".png", ".gif", ".webp"];
         var extension = Path.GetExtension(pictureUpload.Image.FileName);
         if (!validExt.Contains(extension)) {
-            throw new InvalidFileExtensionException($"Invalid image format. Please upload a JPG, PNG, GIF, or WEBP file. Got {extension}");
+            throw new InvalidFileExtensionException(
+                $"Invalid image format. Please upload a JPG, PNG, GIF, or WEBP file. Got {extension}");
         }
-        
+
         await repo.UpdateProfilePicture(user, pictureUpload.Image);
+    }
+
+    public async Task UploadProfilePictureFromUrl(string userId, string pictureUrl) {
+        var user = await GetUserOrException(userId);
+        using var httpClient = new HttpClient();
+        var response = await httpClient.GetAsync(pictureUrl);
+        response.EnsureSuccessStatusCode();
+
+        var imageBytes = await response.Content.ReadAsByteArrayAsync();
+        var contentType = response.Content.Headers.ContentType?.MediaType;
+
+        string extension = ".jpeg"; // Default extension
+        if (contentType != null) {
+            extension = contentType switch {
+                "image/jpeg" => ".jpeg",
+                "image/png" => ".png",
+                "image/gif" => ".gif",
+                "image/webp" => ".webp",
+                _ => extension
+            };
+        }
+
+        string[] validExt = [".jpeg", ".png", ".gif", ".webp"];
+        if (!validExt.Contains(extension)) {
+            throw new InvalidFileExtensionException($"Invalid image format from URL. Content type: {contentType}");
+        }
+
+        var fileName = user.Id + extension;
+        using var stream = new MemoryStream(imageBytes);
+        IFormFile formFile = new FormFile(stream, 0, imageBytes.Length, fileName, fileName);
+
+        await repo.UpdateProfilePicture(user, formFile);
     }
 
     public async Task<byte[]> GetProfilePicture(string userId) {

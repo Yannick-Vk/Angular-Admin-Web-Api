@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using OpenIddict.Abstractions;
 using OpenIddict.Client.WebIntegration;
 using IAuthenticationService = Angular_Auth.Services.Interfaces.IAuthenticationService;
+using Angular_Auth.Services.Interfaces;
 
 namespace Angular_Auth.Controllers;
 
@@ -15,7 +16,8 @@ namespace Angular_Auth.Controllers;
 public class AuthController(
     ILogger<AuthController> logger,
     IAuthenticationService service,
-    IConfiguration configuration) : ControllerBase {
+    IConfiguration configuration,
+    IProfileService profileService) : ControllerBase {
     [AllowAnonymous]
     [HttpPost("login")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(string))]
@@ -137,6 +139,7 @@ public class AuthController(
 
         var email = result.Principal!.GetClaim("email");
         var name = result.Principal!.GetClaim("given_name");
+        var picture = result.Principal!.GetClaim("picture");
 
         if (email is null || name is null) {
             return BadRequest("Could not retrieve user information from Google.");
@@ -144,6 +147,10 @@ public class AuthController(
 
         var (user, token) = await service.LoginWithProvider(email, name, "Google");
         logger.LogInformation("Logged in with user {user}", user.UserName);
+
+        if (picture is not null) {
+            await profileService.UploadProfilePictureFromUrl(user.Id, picture);
+        }
 
         service.SetTokenCookie(HttpContext, token.Token, token.RefreshToken);
 
