@@ -39,6 +39,23 @@ public class ProfileController : Controller {
         }
     }
 
+    [HttpPut("change/username")]
+    public async Task<IActionResult> UpdateUsername(UpdateUsernameRequest request) {
+        try {
+            var userId = User.FindFirstValue("Id");
+            if (userId == null) {
+                return Unauthorized("Could not get userId from JWT Token");
+            }
+
+            await _profileService.UpdateUsername(userId, request.Username, request.Password);
+            return Ok();
+        }
+        catch (Exception ex) {
+            return BadRequest(ex.Message);
+        }
+    }
+
+
     [HttpPut("change/password")]
     public async Task<IActionResult> UpdatePassword(UpdatePasswordRequest request) {
         try {

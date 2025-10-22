@@ -10,7 +10,8 @@ using Microsoft.AspNetCore.Identity;
 
 namespace Angular_Auth.Services;
 
-public class ProfileService(UserManager<User> userManager, ProfileRepository repo) : IProfileService {
+public class ProfileService(UserManager<User> userManager, ProfileRepository repo)
+    : IProfileService {
     public async Task UpdateEmail(string userId, string newEmail, string password) {
         var user = await GetUserOrException(userId);
         await CheckPasswordOrException(user, password);
@@ -21,6 +22,17 @@ public class ProfileService(UserManager<User> userManager, ProfileRepository rep
         var user = await GetUserOrException(userId);
         await CheckPasswordOrException(user, password);
         await repo.UpdatePassword(user, password, newPassword);
+    }
+
+    public async Task<bool> UpdateUsername(string userId, string newUsername, string password) {
+        var user = await GetUserOrException(userId);
+        await CheckPasswordOrException(user, password);
+        if (!IsUsernameAvailable(newUsername)) {
+            return false;
+        }
+
+        await repo.UpdateUsername(user, newUsername);
+        return true;
     }
 
     public async Task UploadProfilePicture(string userId, ProfilePictureUpload pictureUpload) {
@@ -89,5 +101,9 @@ public class ProfileService(UserManager<User> userManager, ProfileRepository rep
         var correctPassword = await userManager.CheckPasswordAsync(user, password);
         message ??= "Username and/or password is incorrect";
         if (!correctPassword) throw new WrongCredentialsException(message);
+    }
+    
+    public bool IsUsernameAvailable(string username) {
+        return ! userManager.Users.Any(u => u.UserName == username);
     }
 }
