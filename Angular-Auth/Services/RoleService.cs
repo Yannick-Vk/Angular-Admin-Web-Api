@@ -33,21 +33,21 @@ public class RoleService(
         return result;
     }
 
-    public async Task AddRoleToUser(string roleName, string userName) {
+    public async Task AddRoleToUser(string roleName, string userId) {
         var role = await manager.Roles.FirstOrDefaultAsync(r => r.Name == roleName);
         if (role == null) throw new ArgumentException($"Role with name `{roleName}` doesn't exist");
 
-        var user = await userManager.Users.FirstOrDefaultAsync(u => u.UserName == userName);
-        if (user == null) throw new ArgumentException($"User with name `{userName}` doesn't exist");
+        var user = await userManager.Users.FirstOrDefaultAsync(u => u.Id == userId);
+        if (user == null) throw new ArgumentException($"User with name `{userId}` doesn't exist");
 
-        logger.LogInformation("Adding role `{RoleName}` to user `{UserName}`", roleName, userName);
+        logger.LogInformation("Adding role `{RoleName}` to user `{UserName}`", roleName, userId);
 
         await userManager.AddToRoleAsync(user, roleName);
     }
 
-    public async Task RemoveRoleFromUser(string roleName, string userName) {
-        var user = await userManager.Users.FirstOrDefaultAsync(u => u.UserName == userName);
-        if (user == null) throw new ArgumentException($"User with name `{userName}` doesn't exist");
+    public async Task RemoveRoleFromUser(string roleName, string userId) {
+        var user = await userManager.Users.FirstOrDefaultAsync(u => u.Id == userId);
+        if (user == null) throw new ArgumentException($"User with ID `{userId}` doesn't exist");
 
         await userManager.RemoveFromRoleAsync(user, roleName);
     }
@@ -61,9 +61,9 @@ public class RoleService(
         return role is null ? throw new ArgumentException($"Role with name `{roleName}` doesn't exist") : user.Roles.Contains(roleName);
     }
 
-    public async Task<IEnumerable<string>> GetRolesFromUser(string username) {
-        var user = await userManager.Users.FirstOrDefaultAsync(u => u.UserName == username);
-        if (user == null) throw new ArgumentException($"User with name `{username}` doesn't exist");
+    public async Task<IEnumerable<string>> GetRolesFromUser(string userId) {
+        var user = await userManager.Users.FirstOrDefaultAsync(u => u.Id == userId);
+        if (user == null) throw new ArgumentException($"User with ID `{userId}` doesn't exist");
 
         var roles = await userManager.GetRolesAsync(user);
         return roles;
