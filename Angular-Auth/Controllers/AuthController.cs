@@ -114,6 +114,7 @@ public class AuthController(
 
         var email = result.Principal!.GetClaim(ClaimTypes.Email);
         var name = result.Principal!.GetClaim(ClaimTypes.Name);
+        var picture = result.Principal!.GetClaim("avatar_url");
 
         if (email is null || name is null) {
             return BadRequest("Could not retrieve user information from GitHub.");
@@ -124,9 +125,14 @@ public class AuthController(
 
         service.SetTokenCookie(HttpContext, loginResponse.Token.Token, loginResponse.Token.RefreshToken);
 
-        var redirectUri = loginResponse.IsNewUser
-            ? configuration["front-end:create-profile"] ?? configuration["front-end:base-url"] ?? "/"
-            : result.Properties?.RedirectUri ?? configuration["front-end:base-url"] ?? "/";
+        var redirectUri = configuration["front-end:home"]!;
+        if (loginResponse.IsNewUser) {
+            logger.LogInformation("[New login]: {username}", name);
+            redirectUri = configuration["front-end:create-profile"]!;
+            if (picture is not null) {
+                await profileService.UploadProfilePictureFromUrl(loginResponse.User.Id, picture);
+            }
+        }
 
         logger.LogInformation("Redirecting to {redirectUri}", redirectUri);
 
@@ -150,15 +156,17 @@ public class AuthController(
         var loginResponse = await service.LoginWithProvider(email, name, "Google");
         logger.LogInformation("Logged in with user {user}", loginResponse.User.UserName);
 
-        if (picture is not null) {
-            await profileService.UploadProfilePictureFromUrl(loginResponse.User.Id, picture);
-        }
 
         service.SetTokenCookie(HttpContext, loginResponse.Token.Token, loginResponse.Token.RefreshToken);
 
-        var redirectUri = loginResponse.IsNewUser
-            ? configuration["front-end:create-profile"] ?? configuration["front-end:base-url"] ?? "/"
-            : result.Properties?.RedirectUri ?? configuration["front-end:base-url"] ?? "/";
+        var redirectUri = configuration["front-end:home"]!;
+
+        if (loginResponse.IsNewUser) {
+            redirectUri = configuration["front-end:create-profile"]!;
+            if (picture is not null) {
+                await profileService.UploadProfilePictureFromUrl(loginResponse.User.Id, picture);
+            }
+        }
 
         logger.LogInformation("Redirecting to {redirectUri}", redirectUri);
 
