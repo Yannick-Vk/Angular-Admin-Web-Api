@@ -49,7 +49,7 @@ public class ProfileController : Controller {
 
             var success = await _profileService.UpdateUsername(userId, request.Username);
             if (success) return Ok();
-            return Problem("Username already exists");
+            return BadRequest("Username already exists");
         }
         catch (Exception ex) {
             return BadRequest(ex.Message);
