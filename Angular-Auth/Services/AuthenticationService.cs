@@ -99,8 +99,9 @@ public class AuthenticationService(
             .Subject("Verify your email")
             .AddFiles("verify-email", [("link", verificationLink), ("user", request.Username)])
             .Build();
-
-        await mailService.SendEmail(mail);
+        
+        // TODO: Add better email provider
+        // await mailService.SendEmail(mail);
 
         return new LoginResponseWithToken(user.Id, string.Empty, user.UserName, user.Email, DateTime.MinValue,
             string.Empty);

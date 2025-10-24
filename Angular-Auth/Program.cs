@@ -123,8 +123,8 @@ builder.Services.AddOpenIddict()
         // Register the ASP.NET Core host and configure the ASP.NET Core-specific options.
         options.UseAspNetCore()
             .EnableRedirectionEndpointPassthrough();
-
-        // Register the GitHub integration.
+        
+        // TODO: Generate new secrets and use a secret manager
         options.UseWebProviders()
             .AddGitHub(githubOptions => {
                 githubOptions
