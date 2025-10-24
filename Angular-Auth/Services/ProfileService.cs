@@ -34,7 +34,7 @@ public class ProfileService(UserManager<User> userManager, ProfileRepository rep
 
     public async Task UploadProfilePicture(string userId, ProfilePictureUpload pictureUpload) {
         var user = await GetUserOrException(userId);
-        string[] validExt = [".jpeg", ".png", ".gif", ".webp"];
+        string[] validExt = [".jpg", ".jpeg", ".png", ".gif", ".webp"];
         var extension = Path.GetExtension(pictureUpload.Image.FileName);
         if (!validExt.Contains(extension)) {
             throw new InvalidFileExtensionException(
@@ -64,7 +64,7 @@ public class ProfileService(UserManager<User> userManager, ProfileRepository rep
             };
         }
 
-        string[] validExt = [".jpeg", ".png", ".gif", ".webp"];
+        string[] validExt = [".jpg", ".jpeg", ".png", ".gif", ".webp"];
         if (!validExt.Contains(extension)) {
             throw new InvalidFileExtensionException($"Invalid image format from URL. Content type: {contentType}");
         }
