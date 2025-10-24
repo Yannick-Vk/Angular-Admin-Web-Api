@@ -162,7 +162,7 @@ app.UseSwaggerUI();
 
 // Use CORS
 app.UseCors(b => b
-    .WithOrigins("http://localhost:4200", "https://localhost:4200", "https://localhost:5175", "https://localhost:5173")
+    .WithOrigins("https://localhost:4200", "https://localhost:5175", "https://localhost:5173", "https://localhost:8443")
     .AllowAnyHeader()
     .AllowAnyMethod()
     .AllowCredentials());

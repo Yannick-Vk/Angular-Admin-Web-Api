@@ -43,11 +43,11 @@ public class AuthenticationService(
 
         if (user is null || !await userManager.CheckPasswordAsync(user, request.Password))
             throw new WrongCredentialsException("Username and/or password are incorrect.");
-        
+
         if (user is not null && !user.EmailConfirmed)
             throw new EmailNotVerifiedException("Please verify your email before logging in.");
 
-        return await CreateLoginResponseWithTokenAsync(user);
+        return await CreateLoginResponseWithTokenAsync(user!);
     }
 
     public async Task<LoginResponseWithToken> RefreshToken(string? refreshToken) {
@@ -97,7 +97,7 @@ public class AuthenticationService(
             .To((user.UserName, user.Email))
             .From(("JS-Blogger", "no-reply@js-blogger.be"))
             .Subject("Verify your email")
-            .AddFiles("verify-email", [("link",  verificationLink), ("user", request.Username)]) 
+            .AddFiles("verify-email", [("link", verificationLink), ("user", request.Username)])
             .Build();
 
         await mailService.SendEmail(mail);
@@ -105,9 +105,8 @@ public class AuthenticationService(
         return new LoginResponseWithToken(user.Id, string.Empty, user.UserName, user.Email, DateTime.MinValue,
             string.Empty);
     }
-    
-    private async Task<LoginResponseWithToken> CreateLoginResponseWithTokenAsync(User user)
-    {
+
+    private async Task<LoginResponseWithToken> CreateLoginResponseWithTokenAsync(User user) {
         var userRoles = await userManager.GetRolesAsync(user);
         var authClaims = new List<Claim> {
             new("Id", user.Id),
@@ -290,14 +289,16 @@ public class AuthenticationService(
             return false;
         }
 
-        logger.LogInformation("VerifyEmail: Found user {Email}. Attempting to confirm email with token {Token}", user.Email, token);
+        logger.LogInformation("VerifyEmail: Found user {Email}. Attempting to confirm email with token {Token}",
+            user.Email, token);
 
         // The token from the URL route is automatically decoded by ASP.NET Core's model binding.
         // Manually decoding it again would corrupt it.
         var result = await userManager.ConfirmEmailAsync(user, token);
 
         if (!result.Succeeded) {
-            logger.LogError("VerifyEmail: Email confirmation failed for user {Email}. Errors: {Errors}", user.Email, string.Join(", ", result.Errors.Select(e => e.Description)));
+            logger.LogError("VerifyEmail: Email confirmation failed for user {Email}. Errors: {Errors}", user.Email,
+                string.Join(", ", result.Errors.Select(e => e.Description)));
         }
 
         return result.Succeeded;
@@ -314,7 +315,7 @@ public class AuthenticationService(
             if (existingUserWithSameName != null) {
                 name = $"{name}#{new Random().Next(1000, 9999)}";
             }
-            
+
             user = new User {
                 UserName = name,
                 Email = email,
@@ -322,8 +323,10 @@ public class AuthenticationService(
             };
             var result = await userManager.CreateAsync(user);
             if (!result.Succeeded) {
-                throw new RegistrationFailedException($"Unable to create user {name}. Errors: {ShowErrorsText(result.Errors)}");
+                throw new RegistrationFailedException(
+                    $"Unable to create user {name}. Errors: {ShowErrorsText(result.Errors)}");
             }
+
             await userManager.AddLoginAsync(user, new UserLoginInfo(provider, email, provider));
             isNewUser = true;
         }
