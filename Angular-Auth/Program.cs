@@ -26,7 +26,6 @@ builder.Services
     ;
 
 builder.Services.AddControllers();
-builder.Services.AddLogging();
 
 // DbContext
 builder.Services.AddDbContext<AppDbContext>(options => {
@@ -123,7 +122,7 @@ builder.Services.AddOpenIddict()
         // Register the ASP.NET Core host and configure the ASP.NET Core-specific options.
         options.UseAspNetCore()
             .EnableRedirectionEndpointPassthrough();
-        
+
         // TODO: Generate new secrets and use a secret manager
         options.UseWebProviders()
             .AddGitHub(githubOptions => {
@@ -139,7 +138,7 @@ builder.Services.AddOpenIddict()
                     .SetClientSecret("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")
                     .SetRedirectUri("/api/v1/auth/callback/login/google")
                     .AddScopes([
-                        OpenIddictConstants.Scopes.Email, 
+                        OpenIddictConstants.Scopes.Email,
                         OpenIddictConstants.Scopes.Profile,
                         OpenIddictConstants.Scopes.OpenId,
                     ])
@@ -154,11 +153,11 @@ builder.Services.AddOpenIddict()
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment()) { }
-
-app.MapOpenApi();
-app.UseSwagger();
-app.UseSwaggerUI();
+if (app.Environment.IsDevelopment()) {
+    app.MapOpenApi();
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
 
 // Use CORS
 app.UseCors(b => b
