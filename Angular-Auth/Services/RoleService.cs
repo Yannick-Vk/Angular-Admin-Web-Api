@@ -38,7 +38,7 @@ public class RoleService(
         if (role == null) throw new ArgumentException($"Role with name `{roleName}` doesn't exist");
 
         var user = await userManager.Users.FirstOrDefaultAsync(u => u.Id == userId);
-        if (user == null) throw new ArgumentException($"User with name `{userId}` doesn't exist");
+        if (user == null) throw new ArgumentException($"User with ID `{userId}` doesn't exist");
 
         logger.LogInformation("Adding role `{RoleName}` to user `{UserName}`", roleName, userId);
 
