@@ -19,6 +19,7 @@ public class ProfileService(UserManager<User> userManager, ProfileRepository rep
 
     public async Task UpdatePassword(string userId, string password, string newPassword) {
         var user = await GetUserOrException(userId);
+        await CheckPasswordOrException(user, password);
         await repo.UpdatePassword(user, password, newPassword);
     }
 
