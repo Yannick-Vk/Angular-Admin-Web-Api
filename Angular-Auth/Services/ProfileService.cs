@@ -1,17 +1,25 @@
 using System.Net.Http;
 using Microsoft.AspNetCore.Http;
 using Angular_Auth.Dto;
+using Angular_Auth.Dto.Mail;
 using Angular_Auth.Dto.Users;
 using Angular_Auth.Exceptions;
 using Angular_Auth.Models;
 using Angular_Auth.Repositories;
 using Angular_Auth.Services.Interfaces;
+using Angular_Auth.Utils;
 using Microsoft.AspNetCore.Identity;
 
 namespace Angular_Auth.Services;
 
-public class ProfileService(UserManager<User> userManager, ProfileRepository repo)
+public class ProfileService(
+    UserManager<User> userManager,
+    IMailService mailService,
+    ProfileRepository repo,
+    ILoggerFactory loggerFactory)
     : IProfileService {
+    private readonly ILogger<MailBuilder> _mailBuilderLogger = loggerFactory.CreateLogger<MailBuilder>();
+
     public async Task UpdateEmail(string userId, string newEmail) {
         var user = await GetUserOrException(userId);
         await repo.UpdateEmail(user, newEmail);
@@ -95,6 +103,14 @@ public class ProfileService(UserManager<User> userManager, ProfileRepository rep
         throw new UserNotFoundException(message);
     }
 
+    private async Task<User> GetUserByEmailOrException(string email, string? message = null) {
+        var user = await userManager.FindByEmailAsync(email);
+        if (user != null) return user;
+
+        message ??= $"Cannot find user with email {email}";
+        throw new UserNotFoundException(message);
+    }
+
     private async Task CheckPasswordOrException(User user, string password, string? message = null) {
         var correctPassword = await userManager.CheckPasswordAsync(user, password);
         message ??= "Username and/or password is incorrect";
@@ -103,5 +119,20 @@ public class ProfileService(UserManager<User> userManager, ProfileRepository rep
 
     public bool IsUsernameAvailable(string username) {
         return !userManager.Users.Any(u => u.UserName == username);
+    }
+
+    public async Task ResetPassword(string email) {
+        var user = await GetUserByEmailOrException(email);
+        var token = await userManager.GeneratePasswordResetTokenAsync(user);
+        var mail = new MailBuilder(_mailBuilderLogger)
+            .From(("no-reply", "no-reply@js-blogger.be"))
+            .To((email, email))
+            .Subject("Reset Password")
+            .AddFiles("reset-password", [("token", token)])
+            .Build();
+        
+        // TODO: Remove token log and send mail
+        _mailBuilderLogger.LogInformation("Token: {token}", token);
+        // await mailService.SendEmail(mail);
     }
 }

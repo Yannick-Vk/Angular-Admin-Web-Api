@@ -122,4 +122,16 @@ public class ProfileController : Controller {
             return Unauthorized(ex.Message);
         }
     }
+
+    [HttpPost("reset-password/{email}")]
+    public async Task<IActionResult> ResetPassword(string email) {
+        try {
+            await _profileService.ResetPassword(email);
+
+            return Ok();
+        }
+        catch (Exception ex) {
+            return BadRequest("Failed to reset password. Try again later.");
+        }
+    }
 }

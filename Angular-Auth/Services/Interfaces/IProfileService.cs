@@ -11,4 +11,5 @@ public interface IProfileService {
     public Task<byte[]> GetProfilePicture(string userId);
     public Task DeleteProfilePicture(string userId);
     public bool IsUsernameAvailable(string username);
+    public Task ResetPassword(string email);
 }
