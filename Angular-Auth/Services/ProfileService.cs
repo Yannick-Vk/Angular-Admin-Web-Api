@@ -121,18 +121,27 @@ public class ProfileService(
         return !userManager.Users.Any(u => u.UserName == username);
     }
 
-    public async Task ResetPassword(string email) {
+    public async Task SendResetPasswordMail(string email) {
         var user = await GetUserByEmailOrException(email);
         var token = await userManager.GeneratePasswordResetTokenAsync(user);
+
+        var link = $"https://localhost:5173/reset-password/{user.Id}/{token}";
+        
         var mail = new MailBuilder(_mailBuilderLogger)
-            .From(("no-reply", "no-reply@js-blogger.be"))
             .To((email, email))
             .Subject("Reset Password")
-            .AddFiles("reset-password", [("token", token)])
+            .AddFiles("reset-password", [("token", link)])
             .Build();
         
+        _mailBuilderLogger.LogInformation("{mail}", mail.ToString());
         // TODO: Remove token log and send mail
         _mailBuilderLogger.LogInformation("Token: {token}", token);
         // await mailService.SendEmail(mail);
+    }
+
+    public async Task<IdentityResult> ConfirmResetPassword(string userId, string token, string newPassword) {
+        var user = await GetUserOrException(userId);
+        var result = await userManager.ResetPasswordAsync(user, token, newPassword);
+        return result;
     }
 }

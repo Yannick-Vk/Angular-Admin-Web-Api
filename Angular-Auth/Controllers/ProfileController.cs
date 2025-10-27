@@ -123,15 +123,32 @@ public class ProfileController : Controller {
         }
     }
 
-    [HttpPost("reset-password/{email}")]
+    [AllowAnonymous]
+    [HttpPost("password/reset/{email}")]
     public async Task<IActionResult> ResetPassword(string email) {
         try {
-            await _profileService.ResetPassword(email);
+            await _profileService.SendResetPasswordMail(email);
 
             return Ok();
         }
         catch (Exception ex) {
-            return BadRequest("Failed to reset password. Try again later.");
+            return BadRequest("Failed to reset password. " + ex.Message);
+        }
+    }
+
+    [HttpPost("password/confirm/")]
+    public async Task<IActionResult> ConfirmPassword(string userId, string token, string newPassword) {
+        try {
+            var result = await _profileService.ConfirmResetPassword(userId, token, newPassword);
+
+            if (result.Succeeded) {
+                return Ok();
+            }
+
+            return BadRequest(result.Errors);
+        }
+        catch (Exception ex) {
+            return BadRequest("Failed to confirm password reset: " + ex.Message);
         }
     }
 }

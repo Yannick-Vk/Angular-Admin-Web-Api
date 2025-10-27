@@ -1,4 +1,5 @@
 using Angular_Auth.Dto.Users;
+using Microsoft.AspNetCore.Identity;
 
 namespace Angular_Auth.Services.Interfaces;
 
@@ -11,5 +12,6 @@ public interface IProfileService {
     public Task<byte[]> GetProfilePicture(string userId);
     public Task DeleteProfilePicture(string userId);
     public bool IsUsernameAvailable(string username);
-    public Task ResetPassword(string email);
+    public Task SendResetPasswordMail(string email);
+    public Task<IdentityResult> ConfirmResetPassword(string userId, string token, string newPassword);
 }
