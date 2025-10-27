@@ -1,7 +1,4 @@
-using System.Net.Http;
-using Microsoft.AspNetCore.Http;
-using Angular_Auth.Dto;
-using Angular_Auth.Dto.Mail;
+using System.Net;
 using Angular_Auth.Dto.Users;
 using Angular_Auth.Exceptions;
 using Angular_Auth.Models;
@@ -103,6 +100,8 @@ public class ProfileService(
         throw new UserNotFoundException(message);
     }
 
+
+
     private async Task<User> GetUserByEmailOrException(string email, string? message = null) {
         var user = await userManager.FindByEmailAsync(email);
         if (user != null) return user;
@@ -124,8 +123,9 @@ public class ProfileService(
     public async Task SendResetPasswordMail(string email) {
         var user = await GetUserByEmailOrException(email);
         var token = await userManager.GeneratePasswordResetTokenAsync(user);
-
-        var link = $"https://localhost:5173/reset-password/{user.Id}/{token}";
+        
+        // Encode the url to remove '/' etc
+        var link = $"https://localhost:5173/reset-password/{user.Id}/{WebUtility.UrlEncode(token)}";
         
         var mail = new MailBuilder(_mailBuilderLogger)
             .To((email, email))

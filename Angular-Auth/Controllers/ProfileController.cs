@@ -1,7 +1,5 @@
 ﻿using System.Security.Claims;
-using Angular_Auth.Dto;
 using Angular_Auth.Dto.Users;
-using Angular_Auth.Services;
 using Angular_Auth.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -136,10 +134,11 @@ public class ProfileController : Controller {
         }
     }
 
-    [HttpPost("password/confirm/")]
-    public async Task<IActionResult> ConfirmPassword(string userId, string token, string newPassword) {
+    [AllowAnonymous]
+    [HttpPost("password/confirm")]
+    public async Task<IActionResult> ConfirmPassword(ConfirmPasswordResetDto dto) {
         try {
-            var result = await _profileService.ConfirmResetPassword(userId, token, newPassword);
+            var result = await _profileService.ConfirmResetPassword(dto.UserId, dto.Token, dto.NewPassword);
 
             if (result.Succeeded) {
                 return Ok();
@@ -151,4 +150,10 @@ public class ProfileController : Controller {
             return BadRequest("Failed to confirm password reset: " + ex.Message);
         }
     }
+}
+
+public class ConfirmPasswordResetDto {
+    public required string UserId { get; set; }
+    public required string Token { get; set; }
+    public required string NewPassword { get; set; }
 }
