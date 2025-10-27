@@ -31,7 +31,6 @@
 
     <ItemGroup>
         <Folder Include="Migrations\"/>
-        <Folder Include="secrets\" />
         <Folder Include="uploads\blogs\banners\" />
         <Folder Include="uploads\users\profile-pictures\" />
     </ItemGroup>
