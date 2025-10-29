@@ -21,15 +21,15 @@ public class ProfileService(
     public async Task UpdateEmail(string userId, string newEmail) {
         var user = await GetUserOrException(userId);
         await repo.UpdateEmail(user, newEmail);
-        
+
         var token = await userManager.GenerateEmailConfirmationTokenAsync(user);
         var encodedToken = System.Net.WebUtility.UrlEncode(token);
 
         var verificationLink = $"https://localhost:7134/api/v1/auth/verify-email?userId={user.Id}&token={encodedToken}";
-        
+
         var mail = new MailBuilder(_mailBuilderLogger)
             .To((user.UserName!, user.Email!))
-            .From((IMailService.FromName, IMailService.FromAdress))
+            .From(IMailService.From())
             .Subject("Updated Email")
             .AddFiles("change-email", [("link", verificationLink), ("user", user.UserName!)])
             .Build();
@@ -116,7 +116,6 @@ public class ProfileService(
     }
 
 
-
     private async Task<User> GetUserByEmailOrException(string email, string? message = null) {
         var user = await userManager.FindByEmailAsync(email);
         if (user != null) return user;
@@ -138,16 +137,17 @@ public class ProfileService(
     public async Task SendResetPasswordMail(string email) {
         var user = await GetUserByEmailOrException(email);
         var token = await userManager.GeneratePasswordResetTokenAsync(user);
-        
+
         // Encode the url to remove '/' etc
         var link = $"https://localhost:5173/reset-password/{user.Id}/{WebUtility.UrlEncode(token)}";
-        
+
         var mail = new MailBuilder(_mailBuilderLogger)
             .To((email, email))
+            .From(IMailService.From())
             .Subject("Reset Password")
             .AddFiles("reset-password", [("token", link)])
             .Build();
-        
+
         _mailBuilderLogger.LogInformation("{mail}", mail.ToString());
         // TODO: Remove token log
         _mailBuilderLogger.LogInformation("Token: {token}", token);
