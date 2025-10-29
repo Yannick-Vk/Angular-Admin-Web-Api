@@ -2,6 +2,8 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Angular-Auth", "Angular-Auth\Angular-Auth.csproj", "{B18D30CD-741E-471D-A87E-591C62D10757}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MailBuilder", "MailBuilder\MailBuilder.csproj", "{7D82563C-6723-4AB0-BF18-6E17BF8105AD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +14,9 @@ Global
 		{B18D30CD-741E-471D-A87E-591C62D10757}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B18D30CD-741E-471D-A87E-591C62D10757}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B18D30CD-741E-471D-A87E-591C62D10757}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7D82563C-6723-4AB0-BF18-6E17BF8105AD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7D82563C-6723-4AB0-BF18-6E17BF8105AD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7D82563C-6723-4AB0-BF18-6E17BF8105AD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7D82563C-6723-4AB0-BF18-6E17BF8105AD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
