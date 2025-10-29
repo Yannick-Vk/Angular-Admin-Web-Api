@@ -1,5 +1,4 @@
-﻿using Angular_Auth.Dto.Mail;
-using MailKit.Net.Smtp;
+﻿using MailKit.Net.Smtp;
 using MimeKit;
 using IMailService = Angular_Auth.Services.Interfaces.IMailService;
 

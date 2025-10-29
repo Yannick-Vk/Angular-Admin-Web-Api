@@ -1,5 +1,4 @@
-﻿using MailKit;
-using MimeKit;
+﻿using MimeKit;
 using IMailService = Angular_Auth.Services.Interfaces.IMailService;
 
 namespace Angular_Auth.Dto.Mail;

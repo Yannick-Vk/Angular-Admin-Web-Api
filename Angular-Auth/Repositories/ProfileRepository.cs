@@ -1,12 +1,12 @@
-using Angular_Auth.Exceptions;
 using Angular_Auth.Models;
 using Angular_Auth.Services;
 using Microsoft.AspNetCore.Identity;
 
 namespace Angular_Auth.Repositories;
 
-public class ProfileRepository(AppDbContext context, UserManager<User> userManager) {
+public class ProfileRepository(UserManager<User> userManager) {
     private static readonly FileService Files = new("users/profile-pictures", ".*");
+
     public async Task UpdateEmail(User user, string newEmail) {
         var emailResult = await userManager.SetEmailAsync(user, newEmail);
         if (!emailResult.Succeeded) {
@@ -32,7 +32,7 @@ public class ProfileRepository(AppDbContext context, UserManager<User> userManag
         return await Files.GetFileBytes(user.Id);
     }
 
-    public void DeleteProfilePicture(User user) { 
+    public void DeleteProfilePicture(User user) {
         Files.DeleteFile(user.Id);
     }
 

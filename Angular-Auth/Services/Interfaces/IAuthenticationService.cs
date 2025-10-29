@@ -2,7 +2,6 @@
 using System.Security.Claims;
 using Angular_Auth.Dto.Auth;
 using Angular_Auth.Dto.Users;
-using Angular_Auth.Models;
 
 namespace Angular_Auth.Services.Interfaces;
 

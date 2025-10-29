@@ -2,12 +2,12 @@
 
 public class Link(IHtmlTag content, string linkAddr) : HtmlTag("a", content) {
     public Link(string text, string linkAddr) : this(new Text(text), linkAddr) {
-        LinkAddr = linkAddr;
+        _linkAddr = linkAddr;
     }
 
-    public string LinkAddr { get; private set; }
+    private string _linkAddr { get; set; } = linkAddr;
 
     public override string ToString() {
-        return $"<a href=\"{linkAddr}\">{Content}</a>";
+        return $"<a href=\"{_linkAddr}\">{Content}</a>";
     }
 }
