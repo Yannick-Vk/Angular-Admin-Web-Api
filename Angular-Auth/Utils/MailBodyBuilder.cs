@@ -23,7 +23,11 @@ public class MailBodyBuilder : IEnumerable {
         return string.Join("\n", text);
     }
 
-    public MailBodyBuilder AddTitle(Text text, ushort level) {
+    public MailBodyBuilder AddTitle(string title, ushort level = 1) {
+        return AddTitle(new Text(title), level);
+    }
+
+    public MailBodyBuilder AddTitle(Text text, ushort level = 1) {
         if (level != 1)
             _add_text("");
 
@@ -36,6 +40,10 @@ public class MailBodyBuilder : IEnumerable {
         _add_text(text);
         _htmlBuilder.AddParagraph(text);
         return this;
+    }
+
+    public MailBodyBuilder AddParagraph(string text) {
+        return AddParagraph(new Text(text));
     }
 
     private void _add_text(string text) {
@@ -68,5 +76,23 @@ public class MailBodyBuilder : IEnumerable {
         _htmlBuilder.Tree.Add(div);
 
         return this;
+    }
+
+    public async Task<MailBodyBuilder> ToFiles(string path, string name) {
+        var (html, text) = Build();
+        await CreateAndWriteToFile(path, name, "html", html);
+        await CreateAndWriteToFile(path, name, ".txt", text);
+        return this;
+    }
+
+    private static async Task CreateAndWriteToFile(string path, string name, string extension, string data) {
+        if (extension.StartsWith('.')) {
+            extension = extension[1..];
+        }
+
+        Directory.CreateDirectory($"{path}/{name}");
+        await using var fs = File.Create($"{path}/{name}/{name}.{extension}");
+        await using var output = new StreamWriter(fs);
+        await output.WriteAsync(data);
     }
 }
