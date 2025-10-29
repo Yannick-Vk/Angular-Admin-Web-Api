@@ -23,6 +23,7 @@ services:
     volumes:
       - ./.certs:/https/:ro
       - ./uploads:/app/uploads
+      - ./Mails:/app/Mails
     depends_on:
       db:
         condition: service_healthy

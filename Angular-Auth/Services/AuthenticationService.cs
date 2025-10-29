@@ -101,7 +101,7 @@ public class AuthenticationService(
             .Build();
         
         // TODO: Add better email provider
-        // await mailService.SendEmail(mail);
+        await mailService.SendEmail(mail);
 
         return new LoginResponseWithToken(user.Id, string.Empty, user.UserName, user.Email, DateTime.MinValue,
             string.Empty);
