@@ -6,7 +6,8 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <RootNamespace>Angular_Auth</RootNamespace>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
-    </PropertyGroup>
+      <UserSecretsId>9d5cc1dd-b07e-4d71-ac8b-89a90384bb27</UserSecretsId>
+  </PropertyGroup>
 
     <ItemGroup>
         <PackageReference Include="MailKit" Version="4.14.0" />
@@ -30,7 +31,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Folder Include="Migrations\"/>
+        <Folder Include="Migrations\" />
         <Folder Include="uploads\blogs\banners\" />
         <Folder Include="uploads\users\profile-pictures\" />
     </ItemGroup>

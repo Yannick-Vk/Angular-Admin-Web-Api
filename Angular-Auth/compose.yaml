@@ -16,10 +16,8 @@ services:
       # HOST_PORT : CONTAINER_PORT
       - "7134:7134"
       - "5241:5241"
-    environment:
-      - ASPNETCORE_URLS=https://+:7134;http://+:5241
-      - ASPNETCORE_Kestrel__Certificates__Default__Password=Password123!
-      - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetapp.pfx
+    env_file:
+      - .env
     volumes:
       - ./.certs:/https/:ro
       - ./uploads:/app/uploads

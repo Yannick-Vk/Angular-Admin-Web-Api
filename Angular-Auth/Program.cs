@@ -127,15 +127,15 @@ builder.Services.AddOpenIddict()
         options.UseWebProviders()
             .AddGitHub(githubOptions => {
                 githubOptions
-                    .SetClientId("Ov23libmQBQcEuG5LIat")
-                    .SetClientSecret("743f52005c48c3be78d0ea0093c131b63ef11972")
+                    .SetClientId(builder.Configuration["Authentication:GitHub:ClientId"]?? throw new Exception("Missing [GitHub] ClientId"))
+                    .SetClientSecret(builder.Configuration["Authentication:GitHub:ClientSecret"]?? throw new Exception("Missing [GitHub] ClientSecret"))
                     .SetRedirectUri("/api/v1/auth/callback/login/github")
                     ;
             })
             .AddGoogle(googleOptions => {
                 googleOptions
-                    .SetClientId("65217649793-6k8gbt29f906i91g9akjt4ur5nkdprmk.apps.googleusercontent.com")
-                    .SetClientSecret("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")
+                    .SetClientId(builder.Configuration["Authentication:Google:ClientId"]?? throw new Exception("Missing [Google] ClientId"))
+                    .SetClientSecret(builder.Configuration["Authentication:Google:ClientSecret"]?? throw new Exception("Missing [Google] ClientSecret"))
                     .SetRedirectUri("/api/v1/auth/callback/login/google")
                     .AddScopes([
                         OpenIddictConstants.Scopes.Email,
