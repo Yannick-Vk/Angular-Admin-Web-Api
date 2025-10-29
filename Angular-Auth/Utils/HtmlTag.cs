@@ -2,8 +2,8 @@
 
 namespace Angular_Auth.Utils;
 
-public class HtmlTag(string tag, IHtmlTag content) : IHtmlTag {
-    public readonly IHtmlTag Content = content;
+public class HtmlTag(string tag, IHtmlComponent content) : IHtmlTag {
+    public readonly IHtmlComponent Content = content;
     public string Tag { get; protected set; } = tag;
     public List<IHtmlTag> Children { get; } = [];
 

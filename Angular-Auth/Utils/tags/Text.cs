@@ -1,13 +1,9 @@
 ﻿namespace Angular_Auth.Utils.tags;
 
-public class Text(string text) : IHtmlTag {
+public class Text(string text) : IHtmlComponent {
     public string text { get; } = text;
     public bool IsBold { get; private set; }
     public bool IsItalic { get; private set; }
-
-    public IHtmlTag Add(IHtmlTag child) {
-        throw new ArgumentException("Cannot add to Text literal.", nameof(child));
-    }
 
     public override string ToString() {
         var content = text;
@@ -29,7 +25,7 @@ public class Text(string text) : IHtmlTag {
         return this;
     }
 
-    public IHtmlTag ToTag() {
+    public IHtmlComponent ToComponent() {
         return this;
     }
 }
