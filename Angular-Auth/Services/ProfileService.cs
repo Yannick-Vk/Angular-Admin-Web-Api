@@ -149,9 +149,9 @@ public class ProfileService(
             .Build();
         
         _mailBuilderLogger.LogInformation("{mail}", mail.ToString());
-        // TODO: Remove token log and send mail
+        // TODO: Remove token log
         _mailBuilderLogger.LogInformation("Token: {token}", token);
-        // await mailService.SendEmail(mail);
+        await mailService.SendEmail(mail);
     }
 
     public async Task<IdentityResult> ConfirmResetPassword(string userId, string token, string newPassword) {
