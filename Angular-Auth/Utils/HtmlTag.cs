@@ -21,4 +21,8 @@ public class HtmlTag(string tag, IHtmlComponent content) : IHtmlTag {
         builder.Append($"</{Tag}>");
         return builder.ToString();
     }
+
+    public IHtmlComponent ToComponent() {
+        return this;
+    }
 }
