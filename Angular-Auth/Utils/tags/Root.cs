@@ -2,8 +2,9 @@
 
 namespace Angular_Auth.Utils.tags;
 
-public class Root(string lang = "en") : IHtmlTag {
+public class Root(string lang = "en", string charSet = "UTF-8") : IHtmlTag {
     public string Tag { get; protected set; } = "root";
+    public string? Title { get; set; }
     public List<IHtmlTag> Children { get; protected set; } = [];
 
     public IHtmlTag Add(IHtmlTag child) {
@@ -20,7 +21,16 @@ public class Root(string lang = "en") : IHtmlTag {
     }
 
     public override string ToString() {
-        var builder = new StringBuilder($"<html lang=\"{lang}\"><body>");
+        var builder = new StringBuilder($"""
+                                         <!DOCTYPE html>
+                                         <html lang="{lang}">
+                                         <head>
+                                             <meta charset="{charSet}">
+                                             <title>{Title}</title>
+                                         </head>
+                                         <body>
+                                         """
+        );
 
         foreach (var tag in Children) builder.Append(tag);
 
