@@ -1,0 +1,5 @@
+﻿Hi {{user}}, you tried to change your email address, can you please confirm your new email address?
+
+Click below to confirm your email address:
+
+{{link}}
