@@ -28,8 +28,13 @@ public class MailBodyBuilder : IEnumerable {
     }
 
     public MailBodyBuilder AddTitle(Text text, ushort level = 1) {
-        if (level != 1)
+        if (level == 1) {
+            // If its null replace it with the title
+            _htmlBuilder.Tree.Title ??= text.text;
+        }
+        else {
             _add_text("");
+        }
 
         _add_text(text);
         _htmlBuilder.AddTitle(text, level);
