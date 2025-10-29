@@ -25,7 +25,6 @@ public class ProfileService(
         var token = await userManager.GenerateEmailConfirmationTokenAsync(user);
         var encodedToken = System.Net.WebUtility.UrlEncode(token);
 
-        // TODO: Remove debug print
         var verificationLink = $"https://localhost:7134/api/v1/auth/verify-email?userId={user.Id}&token={encodedToken}";
         
         var mail = new MailBuilder(_mailBuilderLogger)
