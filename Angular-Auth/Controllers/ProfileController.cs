@@ -1,7 +1,5 @@
 ﻿using System.Security.Claims;
-using Angular_Auth.Dto;
 using Angular_Auth.Dto.Users;
-using Angular_Auth.Services;
 using Angular_Auth.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -31,13 +29,31 @@ public class ProfileController : Controller {
                 return Unauthorized("Could not get userId from JWT Token");
             }
 
-            await _profileService.UpdateEmail(userId, request.Email, request.Password);
+            await _profileService.UpdateEmail(userId, request.Email);
             return Ok();
         }
         catch (Exception ex) {
             return BadRequest(ex.Message);
         }
     }
+
+    [HttpPut("change/username")]
+    public async Task<IActionResult> UpdateUsername(UpdateUsernameRequest request) {
+        try {
+            var userId = User.FindFirstValue("Id");
+            if (userId == null) {
+                return Unauthorized("Could not get userId from JWT Token");
+            }
+
+            var success = await _profileService.UpdateUsername(userId, request.Username);
+            if (success) return Ok();
+            return BadRequest("Username already exists");
+        }
+        catch (Exception ex) {
+            return BadRequest(ex.Message);
+        }
+    }
+
 
     [HttpPut("change/password")]
     public async Task<IActionResult> UpdatePassword(UpdatePasswordRequest request) {
@@ -47,7 +63,7 @@ public class ProfileController : Controller {
                 return Unauthorized("Could not get userId from JWT Token");
             }
 
-            await _profileService.UpdatePassword(userId, request.NewPassword, request.Password);
+            await _profileService.UpdatePassword(userId, request.Password, request.NewPassword);
             return Ok();
         }
         catch (Exception ex) {
@@ -104,4 +120,40 @@ public class ProfileController : Controller {
             return Unauthorized(ex.Message);
         }
     }
+
+    [AllowAnonymous]
+    [HttpPost("password/reset/{email}")]
+    public async Task<IActionResult> ResetPassword(string email) {
+        try {
+            await _profileService.SendResetPasswordMail(email);
+
+            return Ok();
+        }
+        catch (Exception ex) {
+            return BadRequest("Failed to reset password. " + ex.Message);
+        }
+    }
+
+    [AllowAnonymous]
+    [HttpPost("password/confirm")]
+    public async Task<IActionResult> ConfirmPassword(ConfirmPasswordResetDto dto) {
+        try {
+            var result = await _profileService.ConfirmResetPassword(dto.UserId, dto.Token, dto.NewPassword);
+
+            if (result.Succeeded) {
+                return Ok();
+            }
+
+            return BadRequest(result.Errors);
+        }
+        catch (Exception ex) {
+            return BadRequest("Failed to confirm password reset: " + ex.Message);
+        }
+    }
+}
+
+public class ConfirmPasswordResetDto {
+    public required string UserId { get; set; }
+    public required string Token { get; set; }
+    public required string NewPassword { get; set; }
 }

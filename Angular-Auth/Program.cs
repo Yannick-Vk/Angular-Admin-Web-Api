@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using OpenIddict.Abstractions;
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
@@ -25,14 +26,18 @@ builder.Services
     ;
 
 builder.Services.AddControllers();
-builder.Services.AddLogging();
 
 // DbContext
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("blogger")));
+builder.Services.AddDbContext<AppDbContext>(options => {
+    options.UseNpgsql(builder.Configuration.GetConnectionString("blogger"));
+    options.UseOpenIddict();
+});
 
 // Identity
-builder.Services.AddIdentity<User, IdentityRole>()
+builder.Services.AddIdentity<User, IdentityRole>(options => {
+        options.User.RequireUniqueEmail = true;
+        options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_#.@";
+    })
     .AddEntityFrameworkStores<AppDbContext>()
     .AddDefaultTokenProviders();
 
@@ -104,21 +109,67 @@ builder.Services.AddSwaggerGen(c => {
 // Add CORS policy
 builder.Services.AddCors();
 
+builder.Services.AddOpenIddict()
+    .AddClient(options => {
+        // Allow the OpenIddict client to negotiate the authorization code flow.
+        options.AllowAuthorizationCodeFlow();
+
+        // Register the signing and encryption credentials used to protect
+        // sensitive data like the state tokens produced by OpenIddict.
+        options.AddDevelopmentEncryptionCertificate()
+            .AddDevelopmentSigningCertificate();
+
+        // Register the ASP.NET Core host and configure the ASP.NET Core-specific options.
+        options.UseAspNetCore()
+            .EnableRedirectionEndpointPassthrough();
+
+        // TODO: Generate new secrets and use a secret manager
+        options.UseWebProviders()
+            .AddGitHub(githubOptions => {
+                githubOptions
+                    .SetClientId(builder.Configuration["Authentication:GitHub:ClientId"] ??
+                                 throw new Exception("Missing [GitHub] ClientId"))
+                    .SetClientSecret(builder.Configuration["Authentication:GitHub:ClientSecret"] ??
+                                     throw new Exception("Missing [GitHub] ClientSecret"))
+                    .SetRedirectUri("/api/v1/auth/callback/login/github")
+                    ;
+            })
+            .AddGoogle(googleOptions => {
+                googleOptions
+                    .SetClientId(builder.Configuration["Authentication:Google:ClientId"] ??
+                                 throw new Exception("Missing [Google] ClientId"))
+                    .SetClientSecret(builder.Configuration["Authentication:Google:ClientSecret"] ??
+                                     throw new Exception("Missing [Google] ClientSecret"))
+                    .SetRedirectUri("/api/v1/auth/callback/login/google")
+                    .AddScopes([
+                        OpenIddictConstants.Scopes.Email,
+                        OpenIddictConstants.Scopes.Profile,
+                        OpenIddictConstants.Scopes.OpenId,
+                    ])
+                    ;
+            })
+            ;
+    }).AddCore(options => {
+        // Configure OpenIddict to use the Entity Framework Core stores and models.
+        options.UseEntityFrameworkCore().UseDbContext<AppDbContext>();
+    });
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment()) { }
-
-app.MapOpenApi();
-app.UseSwagger();
-app.UseSwaggerUI();
+if (app.Environment.IsDevelopment()) {
+    app.MapOpenApi();
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
 
 // Use CORS
 app.UseCors(b => b
-    .WithOrigins("http://localhost:4200", "https://localhost:4200", "https://localhost:5175", "https://localhost:5173")
+    .WithOrigins("https://localhost:4200", "https://localhost:5175", "https://localhost:5173", "https://localhost:8443")
     .AllowAnyHeader()
     .AllowAnyMethod()
-    .AllowCredentials());
+    .AllowCredentials()
+);
 app.UseHttpsRedirection();
 
 //  Authentication

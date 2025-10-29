@@ -35,4 +35,9 @@ public class ProfileRepository(AppDbContext context, UserManager<User> userManag
     public void DeleteProfilePicture(User user) { 
         Files.DeleteFile(user.Id);
     }
+
+    public async Task UpdateUsername(User user, string username) {
+        user.UserName = username;
+        await userManager.UpdateAsync(user);
+    }
 }

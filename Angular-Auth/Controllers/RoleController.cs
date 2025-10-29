@@ -53,7 +53,7 @@ public class RoleController(ILogger<RoleController> logger, IRoleService service
     [ProducesResponseType(Status403Forbidden)]
     public async Task<ActionResult> AddUserToRole(UserAndRoleDto dto) {
         try {
-            await service.AddRoleToUser(dto.RoleName, dto.Username);
+            await service.AddRoleToUser(dto.RoleName, dto.UserId);
             return Ok();
         }
         catch (ArgumentException e) {
@@ -68,7 +68,7 @@ public class RoleController(ILogger<RoleController> logger, IRoleService service
     [ProducesResponseType(Status403Forbidden)]
     public async Task<ActionResult> RemoveRoleFromUser(UserAndRoleDto dto) {
         try {
-            await service.RemoveRoleFromUser(dto.RoleName, dto.Username);
+            await service.RemoveRoleFromUser(dto.RoleName, dto.UserId);
             return Ok();
         }
         catch (ArgumentException e) {

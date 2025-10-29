@@ -8,9 +8,9 @@ public interface IRoleService {
     Task CreateNewRole(Role role);
     Task<IEnumerable<IdentityRole>> GetAllRoles();
     Task<IdentityResult> DeleteRole(string roleName);
-    Task AddRoleToUser(string roleName, string userName);
-    Task RemoveRoleFromUser(string roleName, string userName);
+    Task AddRoleToUser(string roleName, string userId);
+    Task RemoveRoleFromUser(string roleName, string userId);
     Task<IEnumerable<UserDto>> GetUsersWithRole(string roleName);
     Task<bool> UserHasRole(string roleName, UserWithRoles user);
-    Task<IEnumerable<string>> GetRolesFromUser(string username);
+    Task<IEnumerable<string>> GetRolesFromUser(string userId);
 }

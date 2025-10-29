@@ -2,6 +2,7 @@
 using System.Security.Claims;
 using Angular_Auth.Dto.Auth;
 using Angular_Auth.Dto.Users;
+using Angular_Auth.Models;
 
 namespace Angular_Auth.Services.Interfaces;
 
@@ -17,4 +18,5 @@ public interface IAuthenticationService {
     public void SetTokenCookie(HttpContext context, string token, string refreshToken);
     public void RemoveTokenCookie(HttpContext context);
     public Task<bool> VerifyEmail(string userId, string token);
+    Task<LoginResponseWithProvider> LoginWithProvider(string email, string name, string provider);
 }
