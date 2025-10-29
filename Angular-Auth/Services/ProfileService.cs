@@ -138,7 +138,7 @@ public class ProfileService(
         var user = await GetUserByEmailOrException(email);
         var token = await userManager.GeneratePasswordResetTokenAsync(user);
 
-        // Encode the url to remove '/' etc
+        // Encode the url to remove special chars like '/' from the token
         var link = $"https://localhost:5173/reset-password/{user.Id}/{WebUtility.UrlEncode(token)}";
 
         var mail = new MailBuilder(_mailBuilderLogger)
