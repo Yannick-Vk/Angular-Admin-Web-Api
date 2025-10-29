@@ -18,34 +18,36 @@ services:
       - "5241:5241"
     env_file:
       - .env
+    environment:
+      - ASPNETCORE_URLS=https://+:7134;http://+:5241
     volumes:
       - ./.certs:/https/:ro
       - ./uploads:/app/uploads
     depends_on:
-       db:
-         condition: service_healthy
+      db:
+        condition: service_healthy
   db:
-     image: postgres
-     restart: always
-     user: postgres
-     secrets:
-       - db-password
-     volumes:
-       - db-data:/var/lib/postgresql/data
-     container_name: postgres_db
-     environment:
-       - POSTGRES_DB=blogger
-       - POSTGRES_PASSWORD_FILE=/run/secrets/db-password
-     ports:
+    image: postgres
+    restart: always
+    user: postgres
+    secrets:
+      - db-password
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    container_name: postgres_db
+    environment:
+      - POSTGRES_DB=blogger
+      - POSTGRES_PASSWORD_FILE=/run/secrets/db-password
+    ports:
       - "5432:5432"
-     healthcheck:
-       test: [ "CMD", "pg_isready" ]
-       interval: 10s
-       timeout: 5s
-       retries: 5
+    healthcheck:
+      test: [ "CMD", "pg_isready" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 volumes:
-   db-data:
+  db-data:
 secrets:
-   db-password:
-     file: secrets/password.txt
+  db-password:
+    file: secrets/password.txt
 

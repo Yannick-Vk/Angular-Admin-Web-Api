@@ -127,15 +127,19 @@ builder.Services.AddOpenIddict()
         options.UseWebProviders()
             .AddGitHub(githubOptions => {
                 githubOptions
-                    .SetClientId(builder.Configuration["Authentication:GitHub:ClientId"]?? throw new Exception("Missing [GitHub] ClientId"))
-                    .SetClientSecret(builder.Configuration["Authentication:GitHub:ClientSecret"]?? throw new Exception("Missing [GitHub] ClientSecret"))
+                    .SetClientId(builder.Configuration["Authentication:GitHub:ClientId"] ??
+                                 throw new Exception("Missing [GitHub] ClientId"))
+                    .SetClientSecret(builder.Configuration["Authentication:GitHub:ClientSecret"] ??
+                                     throw new Exception("Missing [GitHub] ClientSecret"))
                     .SetRedirectUri("/api/v1/auth/callback/login/github")
                     ;
             })
             .AddGoogle(googleOptions => {
                 googleOptions
-                    .SetClientId(builder.Configuration["Authentication:Google:ClientId"]?? throw new Exception("Missing [Google] ClientId"))
-                    .SetClientSecret(builder.Configuration["Authentication:Google:ClientSecret"]?? throw new Exception("Missing [Google] ClientSecret"))
+                    .SetClientId(builder.Configuration["Authentication:Google:ClientId"] ??
+                                 throw new Exception("Missing [Google] ClientId"))
+                    .SetClientSecret(builder.Configuration["Authentication:Google:ClientSecret"] ??
+                                     throw new Exception("Missing [Google] ClientSecret"))
                     .SetRedirectUri("/api/v1/auth/callback/login/google")
                     .AddScopes([
                         OpenIddictConstants.Scopes.Email,
@@ -164,7 +168,8 @@ app.UseCors(b => b
     .WithOrigins("https://localhost:4200", "https://localhost:5175", "https://localhost:5173", "https://localhost:8443")
     .AllowAnyHeader()
     .AllowAnyMethod()
-    .AllowCredentials());
+    .AllowCredentials()
+);
 app.UseHttpsRedirection();
 
 //  Authentication
