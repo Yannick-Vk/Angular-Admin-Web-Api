@@ -4,8 +4,8 @@ using MimeKit;
 namespace Angular_Auth.Services.Interfaces;
 
 public interface IMailService {
-    private const string FromName = "JS Blogger";
-    private const string FromAdress = "js-blogger@yannick.be";
+    public const string FromName = "JS Blogger";
+    public const string FromAdress = "js-blogger@yannick.be";
     public Task SendEmail(MimeMessage email);
     public Task SendEmail(SendMailDto dto) => SendEmail(CreateEmail(dto));
 

@@ -11,6 +11,7 @@ namespace Angular_Auth.Services;
 
 public class ProfileService(
     UserManager<User> userManager,
+    IAuthenticationService authenticationService,
     IMailService mailService,
     ProfileRepository repo,
     ILoggerFactory loggerFactory)
@@ -20,6 +21,21 @@ public class ProfileService(
     public async Task UpdateEmail(string userId, string newEmail) {
         var user = await GetUserOrException(userId);
         await repo.UpdateEmail(user, newEmail);
+        
+        var token = await userManager.GenerateEmailConfirmationTokenAsync(user);
+        var encodedToken = System.Net.WebUtility.UrlEncode(token);
+
+        // TODO: Remove debug print
+        var verificationLink = $"https://localhost:7134/api/v1/auth/verify-email?userId={user.Id}&token={encodedToken}";
+        
+        var mail = new MailBuilder(_mailBuilderLogger)
+            .To((user.UserName!, user.Email!))
+            .From((IMailService.FromName, IMailService.FromAdress))
+            .Subject("Updated Email")
+            .AddFiles("change-email", [("link", verificationLink), ("user", user.UserName!)])
+            .Build();
+
+        await mailService.SendEmail(mail);
     }
 
     public async Task UpdatePassword(string userId, string password, string newPassword) {
@@ -59,7 +75,7 @@ public class ProfileService(
         var imageBytes = await response.Content.ReadAsByteArrayAsync();
         var contentType = response.Content.Headers.ContentType?.MediaType;
 
-        string extension = ".jpeg"; // Default extension
+        var extension = ".jpeg"; // Default extension
         if (contentType != null) {
             extension = contentType switch {
                 "image/jpeg" => ".jpeg",
