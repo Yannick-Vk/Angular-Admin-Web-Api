@@ -73,10 +73,11 @@ public class MailBodyBuilder : IEnumerable {
         var divBuilder = new MailBodyBuilder();
         builderAction(divBuilder);
 
-        _add_text(GetText(divBuilder._text));
-
+        _add_text(divBuilder.GetText());
         var div = new Div();
-        foreach (var child in divBuilder._htmlBuilder.Tree.Children) div.Add(child);
+        foreach (var child in divBuilder._htmlBuilder.Tree.Children) {
+            div.Add(child);
+        }
 
         _htmlBuilder.Tree.Add(div);
 

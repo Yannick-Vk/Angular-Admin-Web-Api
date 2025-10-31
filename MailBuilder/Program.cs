@@ -1,9 +1,10 @@
 ﻿using Angular_Auth.Utils;
 
-internal class Program {
+namespace MailBuilder;
+internal static class Program {
     public static async Task Main(string[] args) {
-        var path = "../../../Mails";
-        var name = "demo";
+        const string path = "../../../Mails";
+        const string name = "demo";
 
         Console.WriteLine($"Creating Mail {name} in : '{path}'");
 
@@ -11,7 +12,7 @@ internal class Program {
             .AddTitle("Demo")
             .AddDiv(builder => builder
                 .AddParagraph("This is a demo build")
-                .AddLink("Link to github", "https://github.com")
+                .AddLink("Link to GitHub", "https://github.com")
             );
         await mail.ToFiles(path, name);
 

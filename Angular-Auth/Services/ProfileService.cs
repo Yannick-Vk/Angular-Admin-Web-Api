@@ -11,7 +11,6 @@ namespace Angular_Auth.Services;
 
 public class ProfileService(
     UserManager<User> userManager,
-    IAuthenticationService authenticationService,
     IMailService mailService,
     ProfileRepository repo,
     ILoggerFactory loggerFactory)
@@ -23,7 +22,7 @@ public class ProfileService(
         await repo.UpdateEmail(user, newEmail);
 
         var token = await userManager.GenerateEmailConfirmationTokenAsync(user);
-        var encodedToken = System.Net.WebUtility.UrlEncode(token);
+        var encodedToken = WebUtility.UrlEncode(token);
 
         var verificationLink = $"https://localhost:7134/api/v1/auth/verify-email?userId={user.Id}&token={encodedToken}";
 
