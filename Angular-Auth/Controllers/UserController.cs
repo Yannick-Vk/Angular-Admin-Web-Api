@@ -13,7 +13,7 @@ namespace Angular_Auth.Controllers;
 [Authorize]
 public class UserController(IUserService service, IRoleService roleService) : ControllerBase {
     [HttpGet]
-    [Authorize(Roles = "Admin")]
+    //[Authorize(Roles = "Admin")]
     [ProducesResponseType(Status200OK)]
     [ProducesResponseType(Status401Unauthorized)]
     [ProducesResponseType(Status403Forbidden)]
