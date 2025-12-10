@@ -61,7 +61,7 @@ public class ProfileService(
                 $"Invalid image format. Please upload a JPG, PNG, GIF, or WEBP file. Got {extension}");
         }
 
-        await repo.UpdateProfilePicture(user, pictureUpload.Image);
+        await ProfileRepository.UpdateProfilePicture(user, pictureUpload.Image);
     }
 
     public async Task UploadProfilePictureFromUrl(string userId, string pictureUrl) {
@@ -93,17 +93,17 @@ public class ProfileService(
         using var stream = new MemoryStream(imageBytes);
         IFormFile formFile = new FormFile(stream, 0, imageBytes.Length, fileName, fileName);
 
-        await repo.UpdateProfilePicture(user, formFile);
+        await ProfileRepository.UpdateProfilePicture(user, formFile);
     }
 
     public async Task<byte[]> GetProfilePicture(string userId) {
         var user = await GetUserOrException(userId);
-        return await repo.GetProfilePicture(user);
+        return await ProfileRepository.GetProfilePicture(user);
     }
 
     public async Task DeleteProfilePicture(string userId) {
         var user = await GetUserOrException(userId);
-        repo.DeleteProfilePicture(user);
+        ProfileRepository.DeleteProfilePicture(user);
     }
 
     private async Task<User> GetUserOrException(string userId, string? message = null) {

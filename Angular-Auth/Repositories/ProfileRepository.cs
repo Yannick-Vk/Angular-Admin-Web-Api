@@ -23,15 +23,15 @@ public class ProfileRepository(UserManager<User> userManager) {
         }
     }
 
-    public async Task UpdateProfilePicture(User user, IFormFile image) {
+    public static async Task UpdateProfilePicture(User user, IFormFile image) {
         await Files.SaveFile(user.Id, image);
     }
 
-    public async Task<byte[]> GetProfilePicture(User user) {
+    public static async Task<byte[]> GetProfilePicture(User user) {
         return await Files.GetFileBytes(user.Id);
     }
 
-    public void DeleteProfilePicture(User user) {
+    public static void DeleteProfilePicture(User user) {
         Files.DeleteFile(user.Id);
     }
 
