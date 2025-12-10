@@ -24,7 +24,6 @@ public class ProfileRepository(UserManager<User> userManager) {
     }
 
     public async Task UpdateProfilePicture(User user, IFormFile image) {
-        var extension = Path.GetExtension(image.FileName);
         await Files.SaveFile(user.Id, image);
     }
 
