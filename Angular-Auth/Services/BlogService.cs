@@ -62,10 +62,10 @@ public class BlogService(ILogger<BlogService> logger, BlogRepository repo, IUser
         var updatedBlog = await repo.UpdateBlog(blog);
 
         if (dto.Content is not null) await SaveBlogFile(updatedBlog.Id, dto.Content);
-        if (dto.BannerImage is not null) {
-            DeleteBanner(blog.Id);
-            await SaveBanner(blog.Id, dto.BannerImage);
-        }
+        if (dto.BannerImage is null) return await GetBlogWithContent(updatedBlog);
+        
+        DeleteBanner(blog.Id);
+        await SaveBanner(blog.Id, dto.BannerImage);
 
         return await GetBlogWithContent(updatedBlog);
     }
@@ -225,7 +225,7 @@ public class BlogService(ILogger<BlogService> logger, BlogRepository repo, IUser
     private static async Task SaveBlogFile(Guid id, string fileContent) =>
         await BlogFilesService.SaveFile(id.ToString(), fileContent);
 
-    private async Task<IEnumerable<BlogWithContent>> GetBlogsWithFile(IEnumerable<Blog> blogs) {
+    private static async Task<IEnumerable<BlogWithContent>> GetBlogsWithFile(IEnumerable<Blog> blogs) {
         var blogsWithFile = new List<BlogWithContent>();
 
         foreach (var blog in blogs) {

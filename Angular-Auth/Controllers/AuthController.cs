@@ -177,12 +177,11 @@ public class AuthController(
     [HttpGet("whoami")]
     public IActionResult WhoAmI() {
         var user = service.GetUserWithRolesFromClaimsPrincipal(User);
-        if (user is null) {
-            logger.LogWarning(
-                "WhoAmI: User is authorized, but claims (Id, Name, or Email) could not be retrieved from token.");
-            return Problem("Could not retrieve complete user information from token.");
-        }
+        if (user is not null) return Ok(user);
+        
+        logger.LogWarning(
+            "WhoAmI: User is authorized, but claims (Id, Name, or Email) could not be retrieved from token.");
+        return Problem("Could not retrieve complete user information from token.");
 
-        return Ok(user);
     }
 }

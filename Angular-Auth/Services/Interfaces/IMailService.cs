@@ -1,5 +1,4 @@
 ﻿using Angular_Auth.Dto.Mail;
-using Angular_Auth.Utils;
 using MimeKit;
 
 namespace Angular_Auth.Services.Interfaces;

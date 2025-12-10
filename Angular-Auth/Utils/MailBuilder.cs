@@ -196,7 +196,7 @@ public class MailBuilder(ILogger<MailBuilder> _logger) {
         return AddFilesOrThrow(files.htmlFile, files.textFile);
     }
 
-    private string FormatString(string html, _mappings mappings) {
+    private static string FormatString(string html, _mappings mappings) {
         const string pre = "{{";
         const string post = "}}";
         return mappings.Aggregate(html,

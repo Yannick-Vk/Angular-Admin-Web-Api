@@ -15,7 +15,7 @@ public class MailAddress {
     [SetsRequiredMembers]
     public MailAddress((string name, string address) email) : this(email.name, email.address) { }
     
-    public (string name, string address) ToTuple() => ((name, address));
+    public (string name, string address) ToTuple() => (name, address);
 
     public static (string name, string address) ToTuple(string name, string address) => (name, address);
 }

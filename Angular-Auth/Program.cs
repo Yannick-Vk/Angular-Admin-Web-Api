@@ -141,11 +141,11 @@ builder.Services.AddOpenIddict()
                     .SetClientSecret(builder.Configuration["Authentication:Google:ClientSecret"] ??
                                      throw new Exception("Missing [Google] ClientSecret"))
                     .SetRedirectUri("/api/v1/auth/callback/login/google")
-                    .AddScopes([
+                    .AddScopes(
                         OpenIddictConstants.Scopes.Email,
                         OpenIddictConstants.Scopes.Profile,
-                        OpenIddictConstants.Scopes.OpenId,
-                    ])
+                        OpenIddictConstants.Scopes.OpenId
+                    )
                     ;
             })
             ;

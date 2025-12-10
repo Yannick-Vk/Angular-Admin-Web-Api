@@ -30,10 +30,9 @@ public class BlogRepository(AppDbContext context) {
         return blog;
     }
 
-    public async Task<Blog?> DeleteBlog(Blog blog) {
+    public async Task DeleteBlog(Blog blog) {
         context.Blogs.Remove(blog);
         await context.SaveChangesAsync();
-        return blog;
     }
 
     public async Task<IEnumerable<BlogWithAuthor>> GetAllBlogsWithAuthor(User author) {
