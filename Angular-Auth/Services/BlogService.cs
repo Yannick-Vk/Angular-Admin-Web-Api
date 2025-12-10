@@ -12,7 +12,7 @@ public class BlogService(ILogger<BlogService> logger, BlogRepository repo, IUser
 
     public async Task<IEnumerable<BlogWithContent>> GetAllBlogs() {
         var blogs = await repo.GetAllBlogs();
-        var blogsWithContent = new List<BlogWithContent>();
+        var blogsWithContent = new List<BlogWithContent>(blogs.Count);
         foreach (var blog in blogs) {
             var content = await BlogFilesService.GetFileContent(blog.Id.ToString());
             blogsWithContent.Add(new BlogWithContent(blog, content));
