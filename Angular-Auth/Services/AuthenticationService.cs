@@ -21,7 +21,7 @@ public class AuthenticationService(
     : IAuthenticationService {
     private readonly ILogger<MailBuilder> _mailBuilderLogger = loggerFactory.CreateLogger<MailBuilder>();
 
-    private DateTime TokenExpiry() {
+    private static DateTime TokenExpiry() {
         return DateTime.UtcNow.AddMinutes(5);
     }
 
